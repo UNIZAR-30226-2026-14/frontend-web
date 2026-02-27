@@ -1,0 +1,39 @@
+.tile {
+    font-family: 'Arial', sans-serif;
+    width: 45px;
+    height: 65px;
+    background-color: #fdfcf0;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    font-size: 30px;
+    line-height: 1.4;
+    margin: 0;
+    font-weight: bold;
+    box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    border: 1px solid #d1d1d1;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.2s ease;
+}
+/* Efecto al pasar el ratón */
+.tile:hover {
+  transform: scale(1.05) translateY(-5px);
+}
+
+h1 {
+    font-size: 45px;
+    margin-top: 8px;
+
+}
+
+h3 {
+    justify-content: flex-end;
+    align-items: center;
+    display: flex;
+    font-size: 30px;
+    font-weight: bold;
+    margin-top: -15px;
+}
