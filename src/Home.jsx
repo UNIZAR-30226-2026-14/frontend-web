@@ -24,7 +24,7 @@ function Home({onStart}) {
                     <button className='close-button' onClick={toggleProfile}>X</button>
                 </div>
             )}
-            <svg width={800} height={2000} viewBox=''>
+            <svg width={800} height={2000}>
                 <rect className='regular-match' x={0} y={20} width={200} height={400}/>
             </svg>
             <button onClick={onStart}>Jugar</button>
