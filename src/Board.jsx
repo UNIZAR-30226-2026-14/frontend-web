@@ -124,8 +124,8 @@ function Board() {
 
           {/* Botones para ordenar las fichas */}
           <div className='order-container'>
-            <button onClick={sortByColor}>777</button>
-            <button onClick={sortByNumber}>789</button>
+            <button onClick={sortByColor} title='Ordenar por palo'>♤♤♤</button>
+            <button onClick={sortByNumber}title='Ordenar numéricamente'>789</button>
           </div>
           
           {/* SOPORTE DEL JUGADOR */}

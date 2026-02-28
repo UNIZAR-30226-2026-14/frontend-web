@@ -1,8 +1,5 @@
 import './Tile.css'
 
-let sig
-
-
 function sign(number, color) {
   if (number != 'J') {
     return(
