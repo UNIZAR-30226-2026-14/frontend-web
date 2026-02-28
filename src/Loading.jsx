@@ -11,9 +11,9 @@ function Loading({onFinished}) {
     }, [onFinished]);
 
     return (
-        <div className="loading-screen">
-            <h2>Buscando oponentes ...</h2>
-            <div className="spinner"></div>
+        <div className='loading-screen'>
+            <h2 className='loading-text'>Buscando oponentes</h2>
+            <div className='spinner'></div>
         </div>
     )
 }
