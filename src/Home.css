@@ -15,6 +15,7 @@
     background-color: rgba(0, 0, 0, 0.3);
     display: flex;
     align-items: center;
+    justify-content: center;
 }
 
 .profile {
@@ -27,9 +28,17 @@
 }
 
 .title {
-    color: black;
     font-family: 'Arial Black', sans-serif;
     user-select: none;
+}
+
+.friends {
+    cursor: pointer;
+}
+
+.friends-icon {
+    cursor: pointer;
+    fill: #2776F5;
 }
 
 .shop {
@@ -69,4 +78,5 @@
 
 .regular-match {
     fill: white;
+
 }
