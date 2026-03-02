@@ -23,11 +23,9 @@
   transform: scale(1.05) translateY(-5px);
 }
 
-h1 {
-    font-size: 45px;
-   /* margin-top: 8px;*/
-    margin-top: 2px;
-
+img {
+    margin-top: 10px;
+    width: 90%
 }
 
 h3 {

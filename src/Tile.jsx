@@ -1,4 +1,6 @@
 import './Tile.css'
+import rojo from './assets/J-ROJO.svg'
+import negro from './assets/J-NEGRO.svg'
 
 function sign(number, color) {
   if (number != 'J') {
@@ -19,12 +21,17 @@ function sign(number, color) {
     return (<h3></h3>);
 }
 
-function comodin(number) {
+function comodin(number, color) {
   if (number === 'J') {
-    return(<h1>{'🃏︎'}</h1>);
+    if (color ==='red') {
+      return(<h1><img src={rojo}/></h1>);
     }
-
-  else
+    else {
+      return(<h1><img src={negro}/></h1>);
+    }
+    
+    }
+  else 
     return (number);
 }
 
