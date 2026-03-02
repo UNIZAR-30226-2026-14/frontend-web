@@ -76,7 +76,47 @@
     user-select: none;
 }
 
-.regular-match {
-    fill: white;
+.gamemodes {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 50px;
+}
 
+.gamemode-card {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.gamemode-card:hover {
+    transform: scale(1.05);
+}
+
+.gamemode-title {
+    fill: #333;
+    font-size: 24px;
+    font-weight: bold;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.regular-background {
+    fill: white;
+}
+
+.tile-bottom {
+    transform: rotate(-10deg);
+    transform-origin: bottom right;
+    transform-box: fill-box;
+    fill: magenta;
+}
+
+.tile-top {
+    transform: rotate(-20deg);
+    transform-origin: bottom right;
+    transform-box: fill-box;
+    fill: maroon;
+}
+
+.enhanced-background {
+    fill: #2776F5;
 }
