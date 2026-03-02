@@ -23,11 +23,11 @@ function sign(number, color) {
 
 function comodin(number, color) {
   if (number === 'J') {
-    if (color ==='red') {
-      return(<h1><img src={rojo}/></h1>);
+    if (color === 'red') {
+      return(<img src={rojo}/>);
     }
     else {
-      return(<h1><img src={negro}/></h1>);
+      return(<img src={negro}/>);
     }
     
     }
@@ -37,7 +37,7 @@ function comodin(number, color) {
 
 const Tile = ({ number, color }) => (
   <div className='tile' style={{color: color}}>
-    {comodin(number)}
+    {comodin(number,color)}
     {sign(number,color)}
     
   </div>
