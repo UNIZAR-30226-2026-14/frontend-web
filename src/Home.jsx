@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import './Home.css'
-import './Tile'
-import './FriendsList'
-import FriendsList from './FriendsList';
+import './Tile.jsx'
+import FriendsList from './FriendsList'
+import Shop from './Shop.jsx'
 
 function Home({onStart}) {
-    const [isProfileOpen, setIsProfileOpen] = useState(false);
-    const [isFriendsOpen, setIsFriendsOpen] = useState(false);
+    const [activePopup, setActivePopup] = useState(null);
 
-    const toggleProfile = () => setIsProfileOpen(!isProfileOpen);
-    const toggleFriends = () => setIsFriendsOpen(!isFriendsOpen);
+    const togglePopup = (popupName) => {
+        setActivePopup(activePopup === popupName ? null : popupName)
+    }
 
     return (
         <div className='home-screen'>
@@ -19,40 +19,58 @@ function Home({onStart}) {
 
                 {/* Perfil */}
                 <svg width={100} height={100} viewBox='-50 -50 100 100'>
-                    <circle className='profile' cx={0} cy={-5} r={40} onClick={toggleProfile}/>
+                    <circle className='profile' cx={0} cy={-5} r={40} onClick={() => togglePopup('profile')}/>
                     <circle className='level' cx={35} cy={-30} r={15}/>
                 </svg>
 
                 {/* Título */}
                 <h1 className='title'>RUMMIPLUS</h1>
 
-                {/* Amigos */}
-                <svg width={100} height={100} viewBox='-50 -50 100 100'>
-                    <circle className='friends' cx={0} cy={-5} r={40} onClick={toggleFriends}/>
-                    <g className='friends-icon' onClick={toggleFriends}>
-                        <circle cy="-25" r="15"/>
-                        <path d="M -25 25 C -25 -17 25 -17 25 25 Z"/>
-                    </g>
-                </svg>
+                <div className='top-menu-right'>
+                    {/* Amigos */}
+                    <div className='friends' onClick={() => togglePopup('friends')}>
+                        <svg width={100} height={100} viewBox='-50 -50 100 100'>
+                            <circle className='friends-background' cx={0} cy={-5} r={40}/>
+                            <g className='friends-icon'>
+                                <circle cy="-25" r="15"/>
+                                <path d="M -25 25 C -25 -17 25 -17 25 25 Z"/>
+                            </g>
+                        </svg>
+                    </div>
 
-                {/* Tienda */}
-                <svg width={150} height={100} viewBox='0 0 200 50'>
-                    <rect className='shop' x={0} y={-15} width={200} height={50} rx={12}/>
-                    <path className='shop-add' d="M 157 11 L 183 11 M 170 -2 L 170 24"/>
-                </svg>
+                    {/* Tienda */}
+                    <div className='shop' onClick={() => togglePopup('shop')}>
+                        <svg width={150} height={100} viewBox='0 0 200 50'>
+                            <rect x={0} y={-15} width={200} height={50} rx={12}/>
+                            <path className='shop-add' d="M 157 11 L 183 11 M 170 -2 L 170 24"/>
+                        </svg>
+                    </div>
+
+                    {/* Ajustes */}
+                    <div className='settings' onClick={() => togglePopup('settings')}>
+                        <img/>
+                    </div>
+                </div>
             </div>
 
             {/* Pop-up del perfil */}
-            {isProfileOpen && (
+            {activePopup === 'profile' && (
                 <div className="profile-overlay">
-                    <button className='close-button' onClick={toggleProfile}>X</button>
+                    <button className='close-button' onClick={() => togglePopup('profile') }>X</button>
                 </div>
             )}
 
             {/* Pop-up de los amigos */}
-            {isFriendsOpen && (
+            {activePopup === 'friends' && (
                 <div>
-                    <FriendsList onClose={toggleFriends}/>
+                    <FriendsList onClose={() => togglePopup('friends')}/>
+                </div>
+            )}
+
+            {/* Pop-up de la tienda */}
+            {activePopup === 'shop' && (
+                <div>
+                    <Shop onClose={() => togglePopup('shop')}/>
                 </div>
             )}
 
