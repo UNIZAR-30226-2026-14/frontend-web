@@ -5,7 +5,7 @@ import FriendsList from '../UI/FriendsList/FriendsList.jsx'
 import Shop from '../UI/Shop/Shop.jsx'
 import Profile from '../UI/Profile/Profile.jsx'
 import Settings from '../UI/Settings/Settings.jsx'
-import settings from './assets/settings-icon.svg'
+import settings from '../../assets/settings-icon.svg'
 
 function Home({onStart}) {
     const [activePopup, setActivePopup] = useState(null);
