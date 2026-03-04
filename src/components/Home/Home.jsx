@@ -7,7 +7,7 @@ import Profile from '../UI/Profile/Profile.jsx'
 import Settings from '../UI/Settings/Settings.jsx'
 import settings from '../../assets/settings-icon.svg'
 
-function Home({onStart}) {
+function Home({onStart, username}) {
     const [activePopup, setActivePopup] = useState(null);
     
     const togglePopup = (popupName) => {
@@ -21,11 +21,13 @@ function Home({onStart}) {
             <div className='top-menu'>
 
                 {/* Perfil */}
-                <svg width={100} height={100} viewBox='-50 -50 100 100'>
-                    <circle className='profile' cx={0} cy={-5} r={40} onClick={() => togglePopup('profile')}/>
-                    <circle className='level' cx={35} cy={-30} r={15}/>
-                </svg>
-
+                <div className='profile-name'>
+                    <svg width={100} height={100} viewBox='-50 -50 100 100'>
+                        <circle className='profile' cx={0} cy={-5} r={40} onClick={() => togglePopup('profile')}/>
+                        <circle className='level' cx={35} cy={-30} r={15}/>
+                    </svg>
+                    <h1>{username || 'Invitado'}</h1>
+                </div>
                 {/*  */}
 
                 {/* Título */}

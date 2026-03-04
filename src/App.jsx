@@ -1,25 +1,23 @@
 import { useState } from 'react'
 import './App.css'
-import Board from './components/Game/Board.jsx'
-import Home from './components/Home/Home.jsx'
-import Loading from './components/Loading/Loading.jsx'
+import Board from './components/Game/Board'
+import Home from './components/Home/Home'
+import Loading from './components/Loading/Loading'
+import Login from './components/Login/Login'
 
 function App() {
-  const [isHome, setIsHome] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  
-  const startGame = () => {
-    setIsHome(false);
-    setIsLoading(true);
-  }
+  const [screen, setScreen] = useState('login');
+  const [user, setUser] = useState('');
 
   return (
     <>
-      {isHome && <Home onStart={startGame}/>}
+      {screen === 'login' && <Login onLogin={(user) => {setUser(user); setScreen('home');}} />}
 
-      {!isHome && isLoading && (<Loading onFinished={() => setIsLoading(false)}/>)}
+      {screen === 'home' && <Home onStart={() => setScreen('loading')} username={user}/>}
+
+      {screen === 'loading' && (<Loading onFinished={() => setScreen('game')}/>)}
       
-      {!isHome && !isLoading && <Board/>}
+      {screen === 'game' && <Board/>}
     </>
   )
 }
