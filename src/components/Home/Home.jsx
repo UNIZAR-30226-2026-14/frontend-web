@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import './Home.css'
-import './Tile.jsx'
-import FriendsList from './FriendsList'
-import Shop from './Shop.jsx'
+import '../Game/Tile.jsx'
+import FriendsList from '../UI/FriendsList/FriendsList.jsx'
+import Shop from '../UI/Shop/Shop.jsx'
+import Profile from '../UI/Profile/Profile.jsx'
+import Settings from '../UI/Settings/Settings.jsx'
+import settings from './assets/settings-icon.svg'
 
 function Home({onStart}) {
     const [activePopup, setActivePopup] = useState(null);
-
+    
     const togglePopup = (popupName) => {
         setActivePopup(activePopup === popupName ? null : popupName)
     }
@@ -22,6 +25,8 @@ function Home({onStart}) {
                     <circle className='profile' cx={0} cy={-5} r={40} onClick={() => togglePopup('profile')}/>
                     <circle className='level' cx={35} cy={-30} r={15}/>
                 </svg>
+
+                {/*  */}
 
                 {/* Título */}
                 <h1 className='title'>RUMMIPLUS</h1>
@@ -48,30 +53,29 @@ function Home({onStart}) {
 
                     {/* Ajustes */}
                     <div className='settings' onClick={() => togglePopup('settings')}>
-                        <img/>
+                        <img src={settings} alt='settings'/>
                     </div>
                 </div>
             </div>
 
             {/* Pop-up del perfil */}
             {activePopup === 'profile' && (
-                <div className="profile-overlay">
-                    <button className='close-button' onClick={() => togglePopup('profile') }>X</button>
-                </div>
+                <Profile onClose={() => togglePopup('profile')}/>
             )}
 
             {/* Pop-up de los amigos */}
             {activePopup === 'friends' && (
-                <div>
-                    <FriendsList onClose={() => togglePopup('friends')}/>
-                </div>
+                <FriendsList onClose={() => togglePopup('friends')}/>
             )}
 
             {/* Pop-up de la tienda */}
             {activePopup === 'shop' && (
-                <div>
-                    <Shop onClose={() => togglePopup('shop')}/>
-                </div>
+                <Shop onClose={() => togglePopup('shop')}/>
+            )}
+
+            {/* Pop-up de los ajustes */}
+            {activePopup === 'settings' && (
+                <Settings onClose={() => togglePopup('settings')}/>
             )}
 
             {/* Modos de juego */}

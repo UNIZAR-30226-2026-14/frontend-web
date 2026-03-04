@@ -10,7 +10,7 @@ const BACKGROUNDS = [
 
 function Shop({onClose}) {
   return (
-    <div className="shop-container">
+    <div className="shop-popup">
       <h2>Tienda</h2>
       <button className='close-button' onClick={onClose}>X</button>
       <div className="backgrounds-list">
