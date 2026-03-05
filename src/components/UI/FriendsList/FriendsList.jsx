@@ -1,4 +1,5 @@
 import './FriendsList.css'
+import { useState } from 'react';
 
 // Datos de test (simulan la respuesta del Backend)
 const MOCK_FRIENDS = [
@@ -9,6 +10,16 @@ const MOCK_FRIENDS = [
 ];
 
 function FriendsList({onClose}) {
+  const [challengeId, setChallengeId] = useState(null);
+
+  const handleChallenge = (id, name) => {
+    setChallengeId(id);
+
+    setTimeout(() => {
+      setChallengeId(null);
+    }, 2000)
+  }
+
   return (
     <div className="friends-sidebar">
       <h2>Amigos</h2>
@@ -21,6 +32,10 @@ function FriendsList({onClose}) {
               <span className="friend-name">{friend.name}</span>
               <span className={`status-indicator ${friend.status}`}></span>
             </div>
+            {friend.status === 'online' && 
+            <button className="challenge-button"onClick={() => handleChallenge(friend.id, friend.name)} disabled={challengeId === friend.id}>
+              {challengeId === friend.id ? "..." : "Retar"}
+            </button>}
           </div>
         ))}
       </div>
