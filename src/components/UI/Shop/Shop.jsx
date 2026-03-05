@@ -2,10 +2,10 @@ import './Shop.css'
 
 // Datos de test (simulan la respuesta del Backend)
 const BACKGROUNDS = [
-  { id: 'classic', name: 'Verde Casino', price: 0, value: '#2e7d32', owned: true },
-  { id: 'midnight', name: 'Azul Noche', price: 500, value: '#1a237e', owned: false },
-  { id: 'lava', name: 'Infierno', price: 1000, value: '#d32f2f', owned: false },
-  { id: 'gold', name: 'Edición Oro', price: 5000, value: 'gold', owned: false },
+  { id: 'classic', name: 'Verde Clásico', price: 0, value: '#2e7d32', owned: true },
+  { id: 'midnight', name: 'Azul Nocturno', price: 500, value: '#1a237e', owned: false },
+  { id: 'lava', name: 'Rojo Condente', price: 1000, value: '#d32f2f', owned: false },
+  { id: 'gold', name: 'Oro, "Pa que aiga lujo"', price: 5000, value: 'gold', owned: false },
 ];
 
 function Shop({onClose}) {

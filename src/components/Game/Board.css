@@ -60,6 +60,17 @@
   margin-bottom: 15px;
 }
 
+.player-Hand {
+  position: absolute; /* Para posicionarlo sobre el SVG */
+  top: 0px;
+  left: 240px;
+  display: grid;
+  grid-template-columns: repeat(10, 50px); /* 10 fichas por fila */
+  grid-template-rows: repeat(2, 70px);     /* 2 filas */
+  gap: 2px;
+  font-family: 'Arial', sans-serif;
+}
+
 .deck-container {
   position: fixed;
   bottom: 30px;

@@ -1,17 +1,11 @@
 import {useDroppable} from '@dnd-kit/core';
-import {CollisionPriority} from '@dnd-kit/abstract';
+//import {CollisionPriority} from '@dnd-kit/abstract';
 
 function Hand({children, id}) {
-  const {isDropTarget, ref} = useDroppable({
-    id,
-    type: 'hand-container',
-    accept: 'tile',
-    collisionPriority: CollisionPriority.Low,
-  });
-  const style = isDropTarget ? {background: '#ff0000'} : undefined;
+  const { setNodeRef, isOver } = useDroppable({ id });
 
   return (
-    <div className="hand-container" ref={ref} style={style}>
+    <div className="hand-container" ref={setNodeRef}>
       {children}
     </div>
   );
