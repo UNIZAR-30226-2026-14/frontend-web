@@ -5,10 +5,26 @@ import FriendsList from '../UI/FriendsList/FriendsList.jsx'
 import Shop from '../UI/Shop/Shop.jsx'
 import Profile from '../UI/Profile/Profile.jsx'
 import Settings from '../UI/Settings/Settings.jsx'
-import settings from '../../assets/settings-icon.svg'
+import settings_icon from '../../assets/settings-icon.svg'
+import alex from '../../assets/avatars/Alex.png'
+import dani from '../../assets/avatars/Dani.png'
+import dian from '../../assets/avatars/Dian.png'
+import fernando from '../../assets/avatars/Fernando.png'
+import gonzalo from '../../assets/avatars/Gonzalo.png'
+import miguel from '../../assets/avatars/Miguel.png'
+
+const AVATAR_LIST = [
+  { id: 1, url: alex, name: 'Alex' },
+  { id: 2, url: dani, name: 'Dani' },
+  { id: 3, url: dian, name: 'Dian' },
+  { id: 4, url: fernando, name: 'Fernando' },
+  { id: 5, url: gonzalo, name: 'Gonzalo' },
+  { id: 6, url: miguel, name: 'Miguel' },
+];
 
 function Home({onStart, username}) {
     const [activePopup, setActivePopup] = useState(null);
+    const [userAvatar, setUserAvatar] = useState(alex);
     
     const togglePopup = (popupName) => {
         setActivePopup(activePopup === popupName ? null : popupName)
@@ -23,7 +39,13 @@ function Home({onStart, username}) {
                 {/* Perfil */}
                 <div className='profile-name'>
                     <svg width={100} height={100} viewBox='-50 -50 100 100'>
-                        <circle className='profile' cx={0} cy={-5} r={40} onClick={() => togglePopup('profile')}/>
+                        <defs>
+                            {/* Definimos el patrón con la imagen del estado */}
+                            <pattern id={`userPhoto-${userAvatar}`} x="0" y="0" width="1" height="1" viewBox="0 0 100 100">
+                                <image x="0" y="0" width="100" height="100" href={userAvatar} preserveAspectRatio="xMidYMid slice" />
+                            </pattern>
+                        </defs>
+                        <circle key={userAvatar} className='profile' cx={0} cy={-5} r={40} fill='url(#userPhoto)' onClick={() => togglePopup('profile')}/>
                         <circle className='level' cx={35} cy={-30} r={15}/>
                     </svg>
                     <h1>{username || 'Invitado'}</h1>
@@ -55,14 +77,14 @@ function Home({onStart, username}) {
 
                     {/* Ajustes */}
                     <div className='settings' onClick={() => togglePopup('settings')}>
-                        <img src={settings} alt='settings'/>
+                        <img src={settings_icon} alt='settings_icon'/>
                     </div>
                 </div>
             </div>
 
             {/* Pop-up del perfil */}
             {activePopup === 'profile' && (
-                <Profile onClose={() => togglePopup('profile')}/>
+                <Profile onClose={() => togglePopup('profile')} currentAvatar={userAvatar} onSelectAvatar={setUserAvatar} opciones={AVATAR_LIST}/>
             )}
 
             {/* Pop-up de los amigos */}

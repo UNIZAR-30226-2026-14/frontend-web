@@ -6,7 +6,7 @@ import Loading from './components/Loading/Loading'
 import Login from './components/Login/Login'
 
 function App() {
-  const [screen, setScreen] = useState('login');
+  const [screen, setScreen] = useState('home');
   const [user, setUser] = useState('');
 
   return (
