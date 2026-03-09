@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import './Profile.css'
 
-function Profile({onClose, currentAvatar, onSelectAvatar, opciones}){
+function Profile({onClose, currentAvatar, onSelectAvatar, avatarList}){
   const [isEditing, setIsEditing] = useState(false);
 
   return (
@@ -11,27 +11,28 @@ function Profile({onClose, currentAvatar, onSelectAvatar, opciones}){
       {/* SI NO ESTOY EDITANDO: Muestro Perfil y Stats */}
       {!isEditing ? (
         <div className="stats-view">
-          <h2>Perfil</h2>
+          <h1>Perfil</h1>
           <div className="avatar-container">
             <img src={currentAvatar} alt='avatar' className="main-avatar"/>
             <button className="edit-pencil" onClick={() => setIsEditing(true)}>✎</button>
           </div>
-          {/* Aquí irían tus estadísticas: Nivel, Victorias, etc. */}
+
+          {/* Estadísticas: Nivel, Victorias, etc. */}
           <div className="user-info">
-            <h3>Nivel 15</h3>
-            <p>Partidas ganadas: 24</p>
+            <h3 className='level'>Nivel 15</h3>
+            <p className='wins'>Partidas ganadas: 24</p>
           </div>
         </div>
       ) : (
         /* SI ESTOY EDITANDO: Muestro la Galería */
         <div className="avatar-selector">
           <div className="selector-header">
-            <button className="back-button" onClick={() => setIsEditing(false)}>← Volver</button>
             <h3>Elige tu avatar</h3>
+            <button className="back-button" onClick={() => setIsEditing(false)}>← Volver</button>
           </div>
           
           <div className="avatar-grid">
-            {opciones.map((avatar) => (
+            {avatarList.map((avatar) => (
               <img 
                 key={avatar.id} 
                 src={avatar.url} 

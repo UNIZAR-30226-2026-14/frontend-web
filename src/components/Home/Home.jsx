@@ -6,6 +6,7 @@ import Shop from '../UI/Shop/Shop.jsx'
 import Profile from '../UI/Profile/Profile.jsx'
 import Settings from '../UI/Settings/Settings.jsx'
 import settings_icon from '../../assets/settings-icon.svg'
+
 import alex from '../../assets/avatars/Alex.png'
 import dani from '../../assets/avatars/Dani.png'
 import dian from '../../assets/avatars/Dian.png'
@@ -35,12 +36,10 @@ function Home({onStart, username}) {
 
             {/* Menú de arriba */}
             <div className='top-menu'>
-
                 {/* Perfil */}
                 <div className='profile-name'>
                     <svg width={100} height={100} viewBox='-50 -50 100 100'>
                         <defs>
-                            {/* Definimos el patrón con la imagen del estado */}
                             <pattern id={`userPhoto-${userAvatar}`} x="0" y="0" width="1" height="1" viewBox="0 0 100 100">
                                 <image x="0" y="0" width="100" height="100" href={userAvatar} preserveAspectRatio="xMidYMid slice" />
                             </pattern>
@@ -50,11 +49,16 @@ function Home({onStart, username}) {
                     </svg>
                     <h1>{username || 'Invitado'}</h1>
                 </div>
-                {/*  */}
+
+                {/* Barra de experiencia */}
+                <div className='experience'>
+
+                </div>
 
                 {/* Título */}
                 <h1 className='title'>RUMMIPLUS</h1>
 
+                {/* Menú arriba derecha */}
                 <div className='top-menu-right'>
                     {/* Amigos */}
                     <div className='friends' onClick={() => togglePopup('friends')}>
@@ -84,7 +88,7 @@ function Home({onStart, username}) {
 
             {/* Pop-up del perfil */}
             {activePopup === 'profile' && (
-                <Profile onClose={() => togglePopup('profile')} currentAvatar={userAvatar} onSelectAvatar={setUserAvatar} opciones={AVATAR_LIST}/>
+                <Profile onClose={() => togglePopup('profile')} currentAvatar={userAvatar} onSelectAvatar={setUserAvatar} avatarList={AVATAR_LIST}/>
             )}
 
             {/* Pop-up de los amigos */}
