@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import './Home.css'
 import '../Game/Tile.jsx'
 import FriendsList from '../UI/FriendsList/FriendsList.jsx'
@@ -25,12 +25,58 @@ const AVATAR_LIST = [
 
 function Home({onStart, username}) {
     const [activePopup, setActivePopup] = useState(null);
-    const [userAvatar, setUserAvatar] = useState(alex);
-    const [coins, setCoins] = useState(1000);
-    
+
     const togglePopup = (popupName) => {
         setActivePopup(activePopup === popupName ? null : popupName)
+    };
+
+    const [userAvatar, setUserAvatar] = useState(() => {
+        const saved = localStorage.getItem('rummi-avatar');
+        return saved ? saved : alex;
+    });
+
+    const [coins, setCoins] = useState(() => {
+        const saved = localStorage.getItem('rummi-coins');
+        return saved ? parseInt(saved) : 1000;
+    });
+
+    const [currentBackground, setCurrentBackground] = useState(() => {
+        const saved = localStorage.getItem('rummi-bg');
+        return saved ? saved : '#2e7d32';
+    });
+
+    const [level, setLevel] = useState(() => {
+        const saved = localStorage.getItem('rummi-lvl');
+        return saved ? parseInt(saved) : 1;
+    });
+
+    const [xp, setXp] = useState(() => {
+        const saved = localStorage.getItem('rummi-xp');
+        return saved ? parseInt(saved) : 0;
+    });
+
+    const xpToNextLevel = level * 100;
+
+    const addXp = (ammount) => {
+        let newXp = xp + ammount;
+        let newLevel = level;
+
+        if(newXp >= xpToNextLevel){
+            newXp -= xpToNextLevel;
+            newLevel++;
+        }
+
+        setXp(newXp);
+        setLevel(newLevel);
     }
+
+    useEffect(() => {
+        localStorage.setItem('rummi-coins', coins);
+        localStorage.setItem('rummi-bg', currentBackground);
+        localStorage.setItem('rummi-avatar', userAvatar);
+        localStorage.setItem('rummi-lvl', level);
+        localStorage.setItem('rummi-xp', xp);
+    }, [coins, currentBackground, userAvatar, level, xp])
 
     return (
         <div className='home-screen'>
@@ -54,7 +100,10 @@ function Home({onStart, username}) {
 
                 {/* Barra de experiencia */}
                 <div className='experience'>
-
+                    <div className='xp-bar-container'>
+                        <div className='xp-fill' style={{width: `${(xp/xpToNextLevel) * 100}%`}}/>
+                    </div>
+                    <span>{xp} / {xpToNextLevel} XP</span>
                 </div>
 
                 {/* Título */}
@@ -101,7 +150,7 @@ function Home({onStart, username}) {
 
             {/* Pop-up de la tienda */}
             {activePopup === 'shop' && (
-                <Shop onClose={() => togglePopup('shop')} coins={coins}/>
+                <Shop onClose={() => togglePopup('shop')} coins={coins} setCoins={setCoins} currentBackground={currentBackground} setCurrentBackground={setCurrentBackground}/>
             )}
 
             {/* Pop-up de los ajustes */}

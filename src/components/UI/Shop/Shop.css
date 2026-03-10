@@ -10,9 +10,36 @@
     align-items: center;
     z-index: 50;
     animation: fadeIn 0.3s ease-out;
+    overflow-y: auto;
 }
 
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
+}
+
+.shop-header {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.shop-sections {
+}
+
+.backgrounds-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    padding: 40px;
+}
+
+.color-preview {
+    height: 60px;
+    border-radius: 5px;
+}
+
+.pack-card {
+    
 }
