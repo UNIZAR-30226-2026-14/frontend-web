@@ -26,6 +26,7 @@ const AVATAR_LIST = [
 function Home({onStart, username}) {
     const [activePopup, setActivePopup] = useState(null);
     const [userAvatar, setUserAvatar] = useState(alex);
+    const [coins, setCoins] = useState(1000);
     
     const togglePopup = (popupName) => {
         setActivePopup(activePopup === popupName ? null : popupName)
@@ -40,11 +41,12 @@ function Home({onStart, username}) {
                 <div className='profile-name'>
                     <svg width={100} height={100} viewBox='-50 -50 100 100'>
                         <defs>
-                            <pattern id={`userPhoto-${userAvatar}`} x="0" y="0" width="1" height="1" viewBox="0 0 100 100">
-                                <image x="0" y="0" width="100" height="100" href={userAvatar} preserveAspectRatio="xMidYMid slice" />
+                            <pattern id="userProfilePattern" x="0" y="0" width="1" height="1" viewBox="0 0 100 100">
+                                <image x="0" y="0" width="100" height="100" href={userAvatar} preserveAspectRatio="xMidYMid slice"/>
                             </pattern>
                         </defs>
-                        <circle key={userAvatar} className='profile' cx={0} cy={-5} r={40} fill='url(#userPhoto)' onClick={() => togglePopup('profile')}/>
+
+                        <circle key={userAvatar} className='profile' cx={0} cy={-5} r={40} fill="url(#userProfilePattern)" onClick={() => togglePopup('profile')}/>
                         <circle className='level' cx={35} cy={-30} r={15}/>
                     </svg>
                     <h1>{username || 'Invitado'}</h1>
@@ -75,6 +77,7 @@ function Home({onStart, username}) {
                     <div className='shop' onClick={() => togglePopup('shop')}>
                         <svg width={150} height={100} viewBox='0 0 200 50'>
                             <rect x={0} y={-15} width={200} height={50} rx={12}/>
+                            <text x={60} y={20} className='coins'>{coins}💰</text>
                             <path className='shop-add' d="M 157 11 L 183 11 M 170 -2 L 170 24"/>
                         </svg>
                     </div>
@@ -98,7 +101,7 @@ function Home({onStart, username}) {
 
             {/* Pop-up de la tienda */}
             {activePopup === 'shop' && (
-                <Shop onClose={() => togglePopup('shop')}/>
+                <Shop onClose={() => togglePopup('shop')} coins={coins}/>
             )}
 
             {/* Pop-up de los ajustes */}
