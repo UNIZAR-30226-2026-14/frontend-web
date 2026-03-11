@@ -1,18 +1,18 @@
-import { use, useEffect, useState } from 'react';
-import './Home.css'
+import { useEffect, useState } from 'react';
+import './home.css'
 import '../Game/Tile.jsx'
 import FriendsList from '../UI/FriendsList/FriendsList.jsx'
 import Shop from '../UI/Shop/Shop.jsx'
 import Profile from '../UI/Profile/Profile.jsx'
 import Settings from '../UI/Settings/Settings.jsx'
-import settings_icon from '../../assets/settings-icon.svg'
+import settings_icon from '../../assets/settingsIcon.svg'
 
-import alex from '../../assets/avatars/Alex.png'
-import dani from '../../assets/avatars/Dani.png'
-import dian from '../../assets/avatars/Dian.png'
-import fernando from '../../assets/avatars/Fernando.png'
-import gonzalo from '../../assets/avatars/Gonzalo.png'
-import miguel from '../../assets/avatars/Miguel.png'
+import alex from '../../assets/avatars/alex.png'
+import dani from '../../assets/avatars/dani.png'
+import dian from '../../assets/avatars/dian.png'
+import fernando from '../../assets/avatars/fernando.png'
+import gonzalo from '../../assets/avatars/gonzalo.png'
+import miguel from '../../assets/avatars/miguel.png'
 
 import Realistic from 'react-canvas-confetti/dist/presets/realistic';
 

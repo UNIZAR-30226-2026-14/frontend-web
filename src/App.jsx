@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import './App.css'
+import './app.css'
 import Board from './components/Game/Board'
 import Home from './components/Home/Home'
 import Loading from './components/Loading/Loading'

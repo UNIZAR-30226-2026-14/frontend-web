@@ -1,9 +1,9 @@
 import { useState } from "react";
-import './Login.css';
+import './login.css';
 
 const Login = ({onLogin}) => {
-    const [username, setUsername] = useState(localStorage.getItem('username') || "");
-    const [password, setPassword] = useState("");
+    const usernameRef = useRef();
+    const passwordRef = useRef();
     const [error, setError] = useState(false);
 
     const handleSubmit = (e) => {

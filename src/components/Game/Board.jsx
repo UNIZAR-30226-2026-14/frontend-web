@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import Tile from './Tile.jsx';
 import Hand from './Hand.jsx';
 import { useGame } from '../../hooks/useGame.js';
-import './Board.css';
+import './board.css';
 import { useDraggable, DndContext, DragOverlay } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import {arrayMove, useSortable, SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';

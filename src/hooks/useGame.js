@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { createDeck } from './deck_factory.js';
+import { createDeck } from './deckFactory.js';
 
 export const useGame = () => {
     const [bag, setBag] = useState(createDeck());

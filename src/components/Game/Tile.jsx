@@ -1,6 +1,6 @@
-import './Tile.css'
-import rojo from '../../assets/J-ROJO.svg'
-import negro from '../../assets/J-NEGRO.svg'
+import './tile.css'
+import rojo from '../../assets/jRojo.svg'
+import negro from '../../assets/jNegro.svg'
 
 function sign(number, color) {
   if (number != 'J') {

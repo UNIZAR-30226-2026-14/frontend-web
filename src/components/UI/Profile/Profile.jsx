@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import './Profile.css'
+import './profile.css'
 
 function Profile({onClose, currentAvatar, onSelectAvatar, avatarList}){
   const [isEditing, setIsEditing] = useState(false);

@@ -1,4 +1,4 @@
-import './FriendsList.css'
+import './friendsList.css'
 import { useState } from 'react';
 
 // Datos de test (simulan la respuesta del Backend)

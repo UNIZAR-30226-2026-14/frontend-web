@@ -1,5 +1,5 @@
 import { sileo, Toaster } from 'sileo';
-import './Shop.css'
+import './shop.css'
 
 // Datos de test (simulan la respuesta del Backend)
 const BACKGROUNDS = [
