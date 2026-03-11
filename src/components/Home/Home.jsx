@@ -5,7 +5,7 @@ import FriendsList from '../UI/FriendsList/FriendsList.jsx'
 import Shop from '../UI/Shop/Shop.jsx'
 import Profile from '../UI/Profile/Profile.jsx'
 import Settings from '../UI/Settings/Settings.jsx'
-import settings_icon from '../../assets/settingsIcon.svg'
+import settings_icon from '../../assets/settings-icon.svg'
 
 import alex from '../../assets/avatars/alex.png'
 import dani from '../../assets/avatars/dani.png'
