@@ -14,6 +14,8 @@ import fernando from '../../assets/avatars/Fernando.png'
 import gonzalo from '../../assets/avatars/Gonzalo.png'
 import miguel from '../../assets/avatars/Miguel.png'
 
+import Realistic from 'react-canvas-confetti/dist/presets/realistic';
+
 const AVATAR_LIST = [
   { id: 1, url: alex, name: 'Alex' },
   { id: 2, url: dani, name: 'Dani' },
@@ -55,6 +57,8 @@ function Home({onStart, username}) {
         return saved ? parseInt(saved) : 0;
     });
 
+    const [showConfetti, setShowConfetti] = useState(false);
+
     const xpToNextLevel = level * 100;
 
     const addXp = (ammount) => {
@@ -64,6 +68,8 @@ function Home({onStart, username}) {
         if(newXp >= xpToNextLevel){
             newXp -= xpToNextLevel;
             newLevel++;
+            setShowConfetti(true);
+            setTimeout(() => setShowConfetti(false), 3000);
         }
 
         setXp(newXp);
@@ -93,7 +99,11 @@ function Home({onStart, username}) {
                         </defs>
 
                         <circle key={userAvatar} className='profile' cx={0} cy={-5} r={40} fill="url(#userProfilePattern)" onClick={() => togglePopup('profile')}/>
-                        <circle className='level' cx={35} cy={-30} r={15}/>
+                        
+                        <g>
+                            <circle className='level-bg' cx={35} cy={-30} r={15}/>
+                            <text className='level' x={35} y={-30} textAnchor='middle' alignmentBaseline='central'>{level}</text>
+                        </g>
                     </svg>
                     <h1>{username || 'Invitado'}</h1>
                 </div>
@@ -150,7 +160,7 @@ function Home({onStart, username}) {
 
             {/* Pop-up de la tienda */}
             {activePopup === 'shop' && (
-                <Shop onClose={() => togglePopup('shop')} coins={coins} setCoins={setCoins} currentBackground={currentBackground} setCurrentBackground={setCurrentBackground}/>
+                <Shop onClose={() => togglePopup('shop')} coins={coins} setCoins={setCoins} currentBackground={currentBackground} setCurrentBackground={setCurrentBackground} addXp={addXp}/>
             )}
 
             {/* Pop-up de los ajustes */}
@@ -183,6 +193,21 @@ function Home({onStart, username}) {
                     </svg>
                 </div>
             </div>
+
+            {showConfetti && (
+                <Realistic 
+                    autorun={{ speed: 0.3, duration: 3000 }} 
+                    style={{
+                        position: 'fixed',
+                        pointerEvents: 'none',
+                        width: '100%',
+                        height: '100%',
+                        top: 0,
+                        left: 0,
+                        zIndex: 9999
+                    }}
+                />
+            )}
         </div>
     )
 }

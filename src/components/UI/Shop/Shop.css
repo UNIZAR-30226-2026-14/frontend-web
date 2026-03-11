@@ -25,9 +25,6 @@
     align-items: center;
 }
 
-.shop-sections {
-}
-
 .backgrounds-list {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -40,6 +37,6 @@
     border-radius: 5px;
 }
 
-.pack-card {
-    
+.insufficent-founds {
+    color: black;
 }

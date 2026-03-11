@@ -33,8 +33,14 @@
     display: flex;
 }
 
-.level {
+.level-bg {
     fill: gray;
+}
+
+.level {
+    font-size: 14px;
+    font-weight: bold;
+    fill: black;
 }
 
 .title {

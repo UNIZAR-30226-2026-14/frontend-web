@@ -1,3 +1,4 @@
+import { sileo, Toaster } from 'sileo';
 import './Shop.css'
 
 // Datos de test (simulan la respuesta del Backend)
@@ -8,7 +9,7 @@ const BACKGROUNDS = [
   { id: 'gold', name: 'Oro, "Pa que aiga lujo"', price: 5000, value: 'gold', owned: false },
 ];
 
-function Shop({onClose, coins, setCoins, currentBackground, setCurrentBackground}){
+function Shop({onClose, coins, setCoins, currentBackground, setCurrentBackground, addXp}){
 
   const handleAction = (item) => {
     if(item.owned){
@@ -18,14 +19,21 @@ function Shop({onClose, coins, setCoins, currentBackground, setCurrentBackground
         setCoins(coins - item.price);
         item.owned = true;
         setCurrentBackground(item.value);
+        addXp(50);
       } else {
-        alert("¡No tienes suficientes monedas!")
+        sileo.error({
+          title: "Fondos insuficientes",
+          description: (
+            <span className='insufficent-founds'>No tienes suficientes monedas para comprar este fondo. ¡Sigue jugando para ganar más!</span>
+          ),
+        });
       }
     }
   };
 
   return (
     <div className="shop-popup">
+      <Toaster position='top-center'/>
       <div className='shop-header'>
         <h2>Tienda</h2>
         <button className='close-button' onClick={onClose}>X</button>
