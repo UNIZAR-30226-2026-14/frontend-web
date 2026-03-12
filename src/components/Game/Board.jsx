@@ -2,36 +2,9 @@ import { useEffect, useState } from 'react';
 import Tile from './Tile.jsx';
 import Hand from './Hand.jsx';
 import { useGame } from '../../hooks/useGame.js';
-import './board.css';
+import './Board.css';
 import { useDraggable, DndContext, DragOverlay } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
-import {arrayMove, useSortable, SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
-
-
-//-------------------ESTO LUEGO IRÁ APARTE
-  function ShortableTile({ tile }) { // Versión de ficha ya draggeable
-    const { attributes, listeners, setNodeRef, transform, transition,isDragging } = useSortable({
-      id: tile.id, // El ID único que ya tienes
-    });
-
-    // Estilo para que el componente se desplace visualmente
-    const style = {
-      transform: CSS.Translate.toString(transform), transition, touchAction: 'none',
-      opacity: isDragging ? 0 : 1, // La ficha original se vuelve traslúcida
-    };
-
-    return (
-      <div 
-        ref={setNodeRef} 
-        style={style} 
-        {...listeners} 
-        {...attributes}
-      >
-        <Tile key={tile.id} number={tile.number} color={tile.color} />
-      </div>
-    );
-  }
-//-----------------------------------------------------
 
 //-------------------ESTO LUEGO IRÁ APARTE
   function DraggableTile({ tile }) { // Versión de ficha ya draggeable
@@ -135,6 +108,11 @@ function Board() {
     const sorted = [...playerHand].sort((a,b) => {
       const aIsJoker = a.number === 'J';
       const bIsJoker = b.number === 'J';
+      const aIsNull = a === '';
+      const bIsNull = b === '';
+
+      if (aIsJoker && bIsNull) return -1;
+      if (bIsJoker && aIsNull) return 1;
 
       // Si ambos son Jokers, se quedan igual entre ellos
       if (aIsJoker && bIsJoker) return 0;
@@ -144,6 +122,11 @@ function Board() {
 
       // Si 'b' es Joker, lo mandamos al final (negativo para que 'a' vaya antes)
       if (bIsJoker) return -1;
+      if (aIsNull && bIsNull) return 0;
+      if (aIsNull) return 1;
+      if (bIsNull) return -1;
+
+      
 
       // Si ninguno es Joker, resta normal
       return a.number - b.number;
@@ -159,6 +142,9 @@ function Board() {
       const aIsNull = a === '';
       const bIsNull = b === '';
 
+      if (aIsJoker && bIsNull) return -1;
+      if (bIsJoker && aIsNull) return 1;
+
       // Si hay comodines, mandarlos al final
       if (aIsJoker && bIsJoker) return 0;
       if (aIsJoker) return 1;
@@ -167,6 +153,8 @@ function Board() {
       if (aIsNull && bIsNull) return 0;
       if (aIsNull) return 1;
       if (bIsNull) return -1;
+
+      
 
       // Si son del mismo color, ordenamos por número dentro del grupo de color
       if (a.color === b.color) {
