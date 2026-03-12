@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import './home.css'
-import '../Game/Tile.jsx'
 import FriendsList from '../UI/FriendsList/FriendsList.jsx'
 import Shop from '../UI/Shop/Shop.jsx'
 import Profile from '../UI/Profile/Profile.jsx'
@@ -16,6 +15,7 @@ import miguel from '../../assets/avatars/miguel.png'
 
 import Realistic from 'react-canvas-confetti/dist/presets/realistic';
 
+// Lista de avatares disponibles para el perfil
 const AVATAR_LIST = [
   { id: 1, url: alex, name: 'Alex' },
   { id: 2, url: dani, name: 'Dani' },
@@ -28,30 +28,31 @@ const AVATAR_LIST = [
 function Home({onStart, username}) {
     const [activePopup, setActivePopup] = useState(null);
 
-    const togglePopup = (popupName) => {
-        setActivePopup(activePopup === popupName ? null : popupName)
-    };
-
+    // Avatar
     const [userAvatar, setUserAvatar] = useState(() => {
         const saved = localStorage.getItem('rummi-avatar');
         return saved ? saved : alex;
     });
 
+    // Monedas
     const [coins, setCoins] = useState(() => {
         const saved = localStorage.getItem('rummi-coins');
         return saved ? parseInt(saved) : 1000;
     });
 
+    // Fondo de la mesa de juego
     const [currentBackground, setCurrentBackground] = useState(() => {
         const saved = localStorage.getItem('rummi-bg');
         return saved ? saved : '#2e7d32';
     });
 
+    // Nivel
     const [level, setLevel] = useState(() => {
         const saved = localStorage.getItem('rummi-lvl');
         return saved ? parseInt(saved) : 1;
     });
 
+    // Experiencia del nivel actual
     const [xp, setXp] = useState(() => {
         const saved = localStorage.getItem('rummi-xp');
         return saved ? parseInt(saved) : 0;
@@ -59,8 +60,22 @@ function Home({onStart, username}) {
 
     const [showConfetti, setShowConfetti] = useState(false);
 
+    // Experiencia para subir de nivel
     const xpToNextLevel = level * 100;
 
+    /**
+     * Alterna la visibilidad de los popups. Si el popup ya está abierto,
+     * lo cierra.
+     * @param {*} popupName 
+     */
+    const togglePopup = (popupName) => {
+        setActivePopup(activePopup === popupName ? null : popupName)
+    };
+
+    /**
+     * Añade XP al jugador y gestiona la subida de nivel con efectos visuales.
+     * @param {number} ammount - Cantidad de XP ganada. 
+     */
     const addXp = (ammount) => {
         let newXp = xp + ammount;
         let newLevel = level;
@@ -76,6 +91,9 @@ function Home({onStart, username}) {
         setLevel(newLevel);
     }
 
+    /**
+     * Sincroniza automáticamente cualquier cambio en el estado con el LocalStorage
+     */
     useEffect(() => {
         localStorage.setItem('rummi-coins', coins);
         localStorage.setItem('rummi-bg', currentBackground);
@@ -87,24 +105,27 @@ function Home({onStart, username}) {
     return (
         <div className='home-screen'>
 
-            {/* Menú de arriba */}
+            {/* Barra superior */}
             <div className='top-menu'>
                 {/* Perfil */}
                 <div className='profile-name'>
                     <svg width={100} height={100} viewBox='-50 -50 100 100'>
                         <defs>
+                            {/* Patrón para mostrar el avatar en el círculo designado para ello. */}
                             <pattern id="userProfilePattern" x="0" y="0" width="1" height="1" viewBox="0 0 100 100">
                                 <image x="0" y="0" width="100" height="100" href={userAvatar} preserveAspectRatio="xMidYMid slice"/>
                             </pattern>
                         </defs>
-
                         <circle key={userAvatar} className='profile' cx={0} cy={-5} r={40} fill="url(#userProfilePattern)" onClick={() => togglePopup('profile')}/>
                         
+                        {/* Nivel */}
                         <g>
                             <circle className='level-bg' cx={35} cy={-30} r={15}/>
                             <text className='level' x={35} y={-30} textAnchor='middle' alignmentBaseline='central'>{level}</text>
                         </g>
                     </svg>
+
+                    {/* Nombre de usuario */}
                     <h1>{username || 'Invitado'}</h1>
                 </div>
 
@@ -168,7 +189,7 @@ function Home({onStart, username}) {
                 <Settings onClose={() => togglePopup('settings')}/>
             )}
 
-            {/* Modos de juego */}
+            {/* Selector de modos de juego */}
             <div className='gamemodes'>
 
                 {/* Modo normal */}
@@ -194,6 +215,7 @@ function Home({onStart, username}) {
                 </div>
             </div>
 
+            {/* Efecto de confetti */}
             {showConfetti && (
                 <Realistic 
                     autorun={{ speed: 0.3, duration: 3000 }} 

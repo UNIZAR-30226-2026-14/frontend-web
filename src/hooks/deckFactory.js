@@ -39,6 +39,13 @@ const shuffle = ([...arr]) => {
     return arr;
 };
 
+// Funciones para validar jugadas
+
+/**
+ * Valida si un grupo de fichas es un grupo del mismo número de distintos colores.
+ * @param {Array} tiles - Array de fichas a validar.
+ * @returns {boolean} - True si es un grupo váildo, false en caso contrario.
+ */
 const isValidSameNumberGroup = (tiles) => {
     if(tiles.length >= 3){
         const firstTile = tiles.find(t => t.number !== 'J')
@@ -51,6 +58,11 @@ const isValidSameNumberGroup = (tiles) => {
     }
 };
 
+/**
+ * Valida si un grupo de fichas es una escalera del mismo color.
+ * @param {Array} tiles - Array de fichas a validar.
+ * @returns {boolean} - True si es un grupo váildo, false en caso contrario.
+ */
 const isValidLadderGroup = (tiles) => {
     if(tiles.length >= 3){
         // Buscamos la primera ficha que no sea un Joker
@@ -77,10 +89,23 @@ const isValidLadderGroup = (tiles) => {
     }
 };
 
+/**
+ * Valida si un movimiento es válido.
+ * @param {Array} tiles - Array de fichas a validar.
+ * @returns {boolean} - True si el movimiento es válido, false en caso contrario.
+ */
 const isMoveValid = (tiles) => {
     return isValidSameNumberGroup(tiles) || isValidLadderGroup(tiles);
 };
 
+
+/**
+ * Calcula el valor de un grupo de fichas para la apertura. El valor se basa en la suma de los números de las fichas,
+ * donde los Jokers toman el valor del número que le correspondería si no fueran Jokers. Para grupos del mismo número,
+ * el valor es el número multiplicado por la cantidad de fichas. Para escaleras, el valor es la suma de los números en la escalera.
+ * @param {Array} tiles - Array de fichas a evaluar.
+ * @returns {number} - El valor total del grupo de fichas.
+ */
 const groupValue = (tiles) => {
     const firstRealIndex = tiles.findIndex(t => t.number !== 'J');
     const firstRealTile = tiles[firstRealIndex];
@@ -98,6 +123,12 @@ const groupValue = (tiles) => {
     return total;
 }
 
+/**
+ * Valida si el jugador puede abrir con los grupos seleccionados. Para abrir, el jugador debe colocar grupos válidos
+ * que sumen un valor total de al menos 30 puntos.
+ * @param {Array} groups - Array de grupos de fichas que el jugador quiere colocar en la apertura. 
+ * @returns {boolean} - True si el jugador puede abrir, false en caso contrario.
+ */
 const canPlayerOpen = (groups) => {
     //Todos los grupos son validos
     const areAllValid = groups.every(g => isMoveValid(g));

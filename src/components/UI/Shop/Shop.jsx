@@ -10,9 +10,9 @@ const BACKGROUNDS = [
 ];
 
 function Shop({onClose, coins, setCoins, currentBackground, setCurrentBackground, addXp}){
-
+  // Maneja la accion de comprar o equipar un fondo
   const handleAction = (item) => {
-    if(item.owned){
+    if(item.owned){ 
       setCurrentBackground(item.value);
     } else {
       if(coins >= item.price){
@@ -33,12 +33,13 @@ function Shop({onClose, coins, setCoins, currentBackground, setCurrentBackground
 
   return (
     <div className="shop-popup">
+      {/* Toaster para las notificaciones */}
       <Toaster position='top-center'/>
       <div className='shop-header'>
         <h2>Tienda</h2>
         <button className='close-button' onClick={onClose}>X</button>
       </div>
-      
+      {/* Sección de tableros */}
       <div className='shop-sections'>
         <h3>Tableros</h3>
         <div className='backgrounds-list'>
@@ -51,7 +52,7 @@ function Shop({onClose, coins, setCoins, currentBackground, setCurrentBackground
           ))}
         </div>
 
-        {/* Añade esto debajo de la lista de tableros */}
+        {/* Skins para las fichas */}
         <div className='shop-sections'>
           <h3>Skins de Fichas</h3>
           <div className='skins-list'>
@@ -59,6 +60,7 @@ function Shop({onClose, coins, setCoins, currentBackground, setCurrentBackground
           </div>
         </div>
 
+        {/* Sección de monedas */}
         <div className='shop-sections real-money'>
           <h3>Obtener Monedas</h3>
           <div className='money-packs'>

@@ -2,8 +2,8 @@ import { useState } from "react";
 import './login.css';
 
 const Login = ({onLogin}) => {
-    const usernameRef = useRef();
-    const passwordRef = useRef();
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
     const [error, setError] = useState(false);
 
     const handleSubmit = (e) => {
@@ -11,7 +11,7 @@ const Login = ({onLogin}) => {
         if(username.trim() === "" || password.trim() === ""){
             setError(true);
         } else {
-            localStorage.setItem('username', username);
+            localStorage.setItem('rummi-username', username);
             onLogin(username);
         }
     };

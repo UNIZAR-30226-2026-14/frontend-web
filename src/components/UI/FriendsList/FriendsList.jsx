@@ -10,8 +10,10 @@ const MOCK_FRIENDS = [
 ];
 
 function FriendsList({onClose}) {
+  // Estado para controlar el boton de retar
   const [challengeId, setChallengeId] = useState(null);
 
+  // Simula el proceso de retar a un amigo (aquí irá la lógica de enviar la solicitud al Backend)
   const handleChallenge = (id, name) => {
     setChallengeId(id);
 

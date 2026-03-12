@@ -8,7 +8,7 @@ function Profile({onClose, currentAvatar, onSelectAvatar, avatarList}){
     <div className="profile-stats">
       <button className='close-button' onClick={onClose}>x</button>
 
-      {/* SI NO ESTOY EDITANDO: Muestro Perfil y Stats */}
+      {/* Si no estoy editando, muestro el perfil y las estadísticas */}
       {!isEditing ? (
         <div className="stats-view">
           <h1>Perfil</h1>
@@ -24,7 +24,7 @@ function Profile({onClose, currentAvatar, onSelectAvatar, avatarList}){
           </div>
         </div>
       ) : (
-        /* SI ESTOY EDITANDO: Muestro la Galería */
+        /* Si estoy editando, muestro la galería de avatares */
         <div className="avatar-selector">
           <div className="selector-header">
             <h3>Elige tu avatar</h3>
