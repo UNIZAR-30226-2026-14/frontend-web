@@ -46,7 +46,7 @@ const shuffle = ([...arr]) => {
  * @param {Array} tiles - Array de fichas a validar.
  * @returns {boolean} - True si es un grupo váildo, false en caso contrario.
  */
-const isValidSameNumberGroup = (tiles) => {
+export const isValidSameNumberGroup = (tiles) => {
     if(tiles.length >= 3){
         const firstTile = tiles.find(t => t.number !== 'J')
         const sameNumber = tiles.every(ficha => ficha.number === 'J' || ficha.number === firstTile.number);
@@ -63,7 +63,7 @@ const isValidSameNumberGroup = (tiles) => {
  * @param {Array} tiles - Array de fichas a validar.
  * @returns {boolean} - True si es un grupo váildo, false en caso contrario.
  */
-const isValidLadderGroup = (tiles) => {
+export const isValidLadderGroup = (tiles) => {
     if(tiles.length >= 3){
         // Buscamos la primera ficha que no sea un Joker
         const firstRealIndex = tiles.findIndex(t => t.number !== 'J');
@@ -94,7 +94,7 @@ const isValidLadderGroup = (tiles) => {
  * @param {Array} tiles - Array de fichas a validar.
  * @returns {boolean} - True si el movimiento es válido, false en caso contrario.
  */
-const isMoveValid = (tiles) => {
+export const isMoveValid = (tiles) => {
     return isValidSameNumberGroup(tiles) || isValidLadderGroup(tiles);
 };
 
@@ -106,7 +106,7 @@ const isMoveValid = (tiles) => {
  * @param {Array} tiles - Array de fichas a evaluar.
  * @returns {number} - El valor total del grupo de fichas.
  */
-const groupValue = (tiles) => {
+export const groupValue = (tiles) => {
     const firstRealIndex = tiles.findIndex(t => t.number !== 'J');
     const firstRealTile = tiles[firstRealIndex];
 
@@ -129,7 +129,7 @@ const groupValue = (tiles) => {
  * @param {Array} groups - Array de grupos de fichas que el jugador quiere colocar en la apertura. 
  * @returns {boolean} - True si el jugador puede abrir, false en caso contrario.
  */
-const canPlayerOpen = (groups) => {
+export const canPlayerOpen = (groups) => {
     //Todos los grupos son validos
     const areAllValid = groups.every(g => isMoveValid(g));
 
