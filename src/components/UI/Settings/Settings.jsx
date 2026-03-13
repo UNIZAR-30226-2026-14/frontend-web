@@ -1,10 +1,12 @@
-import './settings.css'
+import "./settings.css";
 
-function Settings({onClose}) {
+function Settings({ onClose }) {
   return (
     <div className="settings-popup">
       <h2>Settings</h2>
-      <button className='close-button' onClick={onClose}>X</button>
+      <button className="close-button" onClick={onClose}>
+        X
+      </button>
     </div>
   );
 }
