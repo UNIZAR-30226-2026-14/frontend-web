@@ -32,9 +32,10 @@ const MOCK_FRIENDS = [
 function FriendsList({ onClose }) {
   // Estado para controlar el boton de retar
   const [challengeId, setChallengeId] = useState(null);
+  const [search, setSearch] = useState("");
 
   // Simula el proceso de retar a un amigo (aquí irá la lógica de enviar la solicitud al Backend)
-  const handleChallenge = (id, name) => {
+  const handleChallenge = (id) => {
     setChallengeId(id);
 
     setTimeout(() => {
@@ -42,14 +43,27 @@ function FriendsList({ onClose }) {
     }, 2000);
   };
 
+  const filteredFriends = MOCK_FRIENDS.filter((friend) =>
+    friend.name.toLowerCase().includes(search.toLowerCase()),
+  );
+
   return (
     <div className="friends-sidebar">
       <h2>Amigos</h2>
       <button className="close-button" onClick={onClose}>
         X
       </button>
+      <div className="searchbar">
+        <input
+          type="text"
+          placeholder="Buscar amigo..."
+          className="search-input"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
       <div className="friends-list">
-        {MOCK_FRIENDS.map((friend) => (
+        {filteredFriends.length > 0 ? (filteredFriends.map((friend) => (
           <div key={friend.id} className="friend-card">
             <img
               src={friend.avatar}
@@ -69,8 +83,9 @@ function FriendsList({ onClose }) {
                 {challengeId === friend.id ? "..." : "Retar"}
               </button>
             )}
-          </div>
-        ))}
+          </div>))) : (
+            <p className="no-results">No se han encontrado amigos</p>
+          )}
       </div>
     </div>
   );
