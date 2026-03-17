@@ -63,17 +63,6 @@ function Board() {
     }
   }, [playerHand]);
 
-
-   useEffect(() => {
-    if (playerHand.length > 0) {
-      const newPositions = { ...boardPositions };
-      playerHand.forEach((tile, index) => {
-        newPositions[`hand-slot-${index}`] = tile;
-      });
-      setBoardPositions(newPositions);
-    }
-  }, [gameBoard]);
-
   // Repartimos las 14 fichas iniciales
   useEffect(() => {
     dealInitialHand();
@@ -124,7 +113,7 @@ function Board() {
             // aqui es el huevo
             const oldSlot = Object.keys(prev).find(key => prev[key]?.id === overId);
             // 3. Intercambio de fichas (Swap logic)
-            newPositions[fromHandKey] = tileMoving;
+            newPositions[overId] = tileMoving;
             // 4. Actualizamos el playerHand del hook useGame (opcional)
             // Extraemos solo las fichas que no son null para mantener la lista plana sincronizada
             const updatedTilesArray = Object.values(newPositions).filter(tile => tile !== null);
@@ -189,7 +178,7 @@ function Board() {
   }
 }
 
-  const activeTile = playerHand.find(t => t.id === activeId);
+  const activeTile = Object.values(handPositions).find(t => t?.id === activeId) || Object.values(boardPositions).find(t => t?.id === activeId);
 
   const sortByNumber = () => {
     const sorted = [...playerHand].sort((a,b) => {
