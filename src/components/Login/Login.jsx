@@ -11,7 +11,6 @@ const Login = ({ onLogin }) => {
     if (username.trim() === "" || password.trim() === "") {
       setError(true);
     } else {
-      localStorage.setItem("rummi-username", username);
       onLogin(username);
     }
   };
@@ -19,30 +18,34 @@ const Login = ({ onLogin }) => {
   return (
     <div className="login">
       <form className="login-form" onSubmit={handleSubmit}>
-        <label htmlFor="username">Username:</label>
-        <br />
-        <input
-          type="text"
-          id="username"
-          value={username}
-          onChange={(u) => {
-            setUsername(u.target.value);
-            setError(false);
-          }}
-        />
-        <br />
-        <label htmlFor="pwd">Password:</label>
-        <br />
-        <input
-          type="password"
-          id="pwd"
-          value={password}
-          onChange={(p) => {
-            setPassword(p.target.value);
-            setError(false);
-          }}
-        />
-        <br />
+        <div className="form-group">
+          <label htmlFor="username">Username:</label>
+          <input
+            type="text"
+            id="username"
+            value={username}
+            onChange={(u) => {
+              setUsername(u.target.value);
+              setError(false);
+            }}
+            required
+            autoComplete="username"
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="pwd">Password:</label>
+          <input
+            type="password"
+            id="pwd"
+            value={password}
+            onChange={(p) => {
+              setPassword(p.target.value);
+              setError(false);
+            }}
+            required
+            autoComplete="current-password"
+          />
+        </div>
         <button type="submit" className="submit-button">
           Enviar
         </button>

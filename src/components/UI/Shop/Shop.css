@@ -1,42 +1,46 @@
 .shop-popup {
-    position: absolute;
-    top: 120px; 
-    width: 100vw;
-    height: calc(100vh - 120px); 
-    background-color: rgba(0, 0, 0, 0.6);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 50;
-    animation: fadeIn 0.3s ease-out;
-    overflow-y: auto;
+  position: absolute;
+  top: 120px;
+  width: 100vw;
+  height: calc(100vh - 120px);
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+  animation: fadeIn 0.3s ease-out;
+  overflow-y: auto;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .shop-header {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .backgrounds-list {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-    padding: 40px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  padding: 40px;
 }
 
 .color-preview {
-    height: 60px;
-    border-radius: 5px;
+  height: 60px;
+  border-radius: 5px;
 }
 
 .insufficent-founds {
-    color: black;
+  color: black;
 }

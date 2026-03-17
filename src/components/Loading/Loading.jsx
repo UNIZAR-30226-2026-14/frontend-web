@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import "./loading.css";
 
-function Loading({ onFinished }) {
+function Loading({ onFinished, onCancel }) {
   useEffect(() => {
     const timeout = setTimeout(() => {
       onFinished();
@@ -14,6 +14,9 @@ function Loading({ onFinished }) {
     <div className="loading-screen">
       <h2 className="loading-text">Buscando oponentes</h2>
       <div className="spinner"></div>
+      <button className="cancel-button" onClick={onCancel}>
+        Cancelar
+      </button>
     </div>
   );
 }

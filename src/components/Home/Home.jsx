@@ -66,7 +66,7 @@ function Home({ onStart, username }) {
   /**
    * Alterna la visibilidad de los popups. Si el popup ya está abierto,
    * lo cierra.
-   * @param {*} popupName
+   * @param {string} popupName - Nombre del popup a mostrar ("profile", "friends", "shop", "settings").
    */
   const togglePopup = (popupName) => {
     setActivePopup(activePopup === popupName ? null : popupName);

@@ -6,27 +6,43 @@ import Loading from "./components/Loading/Loading";
 import Login from "./components/Login/Login";
 
 function App() {
-  const [screen, setScreen] = useState("home");
-  const [user, setUser] = useState("");
+  const [username, setUsername] = useState(
+    () => localStorage.getItem("rummi-username") || "",
+  );
+  const [screen, setScreen] = useState(username ? "home" : "login");
+
+  const handleLogin = (username) => {
+    setUsername(username);
+    localStorage.setItem("rummi-username", username);
+    setScreen("home");
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("rummi-username");
+    setUsername("");
+    setScreen("login");
+  };
 
   return (
     <>
-      {screen === "login" && (
-        <Login
-          onLogin={(user) => {
-            setUser(user);
-            setScreen("home");
-          }}
+      {screen === "login" && <Login onLogin={handleLogin} />}
+
+      {screen === "home" && (
+        <Home
+          onStart={() => setScreen("loading")}
+          username={username}
+          logout={handleLogout}
         />
       )}
 
-      {screen === "home" && (
-        <Home onStart={() => setScreen("loading")} username={user} />
+      {screen === "loading" && (
+        <Loading
+          onFinished={() => setScreen("game")}
+          onCancel={() => setScreen("home")}
+        />
       )}
 
-      {screen === "loading" && <Loading onFinished={() => setScreen("game")} />}
-
-      {screen === "game" && <Board />}
+      {screen === "game" && <Board username={username} />}
     </>
   );
 }

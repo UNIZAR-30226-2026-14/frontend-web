@@ -1,56 +1,55 @@
 .friends-sidebar {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 300px;
-    height: 100vh;
-    background-color: #2c3e50;
-    z-index: 1000;
-    padding: 20px;
-    box-shadow: -2px 0 10px rgba(0,0,0,0.5);
-    display: flex;
-    flex-direction: column;
-
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: 100vh;
+  background-color: #2c3e50;
+  z-index: 1000;
+  padding: 20px;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
 }
 
 .friends-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .friend-card {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    border-radius: 10px;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-radius: 10px;
 }
 
 .friend-avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
 }
 
 .friend-info {
-    margin-left: 10px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-grow: 1;
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-grow: 1;
 }
 
 .status-indicator {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
 }
 
 .status-indicator.online {
-    background-color: green;
+  background-color: green;
 }
 
 .status-indicator.offline {
-    background-color: gray;
+  background-color: gray;
 }

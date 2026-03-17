@@ -1,201 +1,213 @@
 .home-screen {
-    height: 100vh;
-    width: 100vw;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
 }
 
 .profile-name {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    user-select: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  user-select: none;
 }
 
 .profile {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .top-menu {
-    width: 100%;
-    height: 80px;
-    padding: 20px;
-    background-color: rgba(0, 0, 0, 0.3);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  width: 100%;
+  height: 80px;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .top-menu-right {
-    display: flex;
+  display: flex;
 }
 
 .level-bg {
-    fill: gray;
+  fill: gray;
 }
 
 .level {
-    font-size: 14px;
-    font-weight: bold;
-    fill: black;
+  font-size: 14px;
+  font-weight: bold;
+  fill: black;
 }
 
 .title {
-    font-family: 'Arial Black', sans-serif;
-    user-select: none;
+  font-family: "Arial Black", sans-serif;
+  user-select: none;
 }
 
 .friends {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .friends-icon {
-    cursor: pointer;
-    fill: #2776F5;
+  cursor: pointer;
+  fill: #2776f5;
 }
 
 .shop {
-    fill: white;
-    cursor: pointer;
+  fill: white;
+  cursor: pointer;
 }
 
 .coins {
-    fill: #333;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 24px;
-    font-weight: bold;
+  fill: #333;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 24px;
+  font-weight: bold;
 }
 
 .shop-add {
-    stroke: red;
-    stroke-width: 10px;
-    stroke-linecap: round;
+  stroke: red;
+  stroke-width: 10px;
+  stroke-linecap: round;
 }
 
 .settings img {
-    width: 85px;
-    height: auto;
+  width: 85px;
+  height: auto;
 }
 
 .gamemodes {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-bottom: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 50px;
 }
 
 .gamemode-card {
-    cursor: pointer;
-    transition: transform 0.2s ease;
+  cursor: pointer;
+  transition: transform 0.2s ease;
 }
 
 .gamemode-card:hover {
-    transform: scale(1.05);
+  transform: scale(1.05);
 }
 
 .gamemode-title {
-    fill: #333;
-    font-size: 24px;
-    font-weight: bold;
-    font-family: Arial, Helvetica, sans-serif;
-    user-select: none;
+  fill: #333;
+  font-size: 24px;
+  font-weight: bold;
+  font-family: Arial, Helvetica, sans-serif;
+  user-select: none;
 }
 
 .regular-background {
-    fill: white;
+  fill: white;
 }
 
 .tile-bottom {
-    transform: rotate(-10deg);
-    transform-origin: bottom right;
-    transform-box: fill-box;
-    fill: magenta;
+  transform: rotate(-10deg);
+  transform-origin: bottom right;
+  transform-box: fill-box;
+  fill: magenta;
 }
 
 .tile-top {
-    transform: rotate(-20deg);
-    transform-origin: bottom right;
-    transform-box: fill-box;
-    fill: maroon;
+  transform: rotate(-20deg);
+  transform-origin: bottom right;
+  transform-box: fill-box;
+  fill: maroon;
 }
 
 .enhanced-background {
-    fill: #2776F5;
+  fill: #2776f5;
 }
 
 .close-button {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    border: none;
-    background: none;
-    font-size: 30px;
-    color: gray;
-    cursor: pointer;
-    user-select: none;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  border: none;
+  background: none;
+  font-size: 30px;
+  color: gray;
+  cursor: pointer;
+  user-select: none;
 }
 
 /* Contenedor principal de la experiencia */
 .experience {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-    width: 250px; /* Ajusta según tu diseño */
-    margin: 10px 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 250px; /* Ajusta según tu diseño */
+  margin: 10px 0;
 }
 
 /* El "hueco" de la barra */
 .xp-bar-container {
-    width: 100%;
-    height: 18px;
-    background: #1a1a1a; /* Fondo muy oscuro */
-    border: 2px solid #444;
-    border-radius: 10px;
-    overflow: hidden; /* Corta la barra si se sale */
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); /* Sombra interna para dar profundidad */
-    position: relative;
+  width: 100%;
+  height: 18px;
+  background: #1a1a1a; /* Fondo muy oscuro */
+  border: 2px solid #444;
+  border-radius: 10px;
+  overflow: hidden; /* Corta la barra si se sale */
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5); /* Sombra interna para dar profundidad */
+  position: relative;
 }
 
 /* La parte de color que se llena */
 .xp-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #3498db, #2ecc71); /* Degradado de azul a verde */
-    border-radius: 8px;
-    transition: width 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Animación elástica */
-    box-shadow: 0 0 10px rgba(46, 204, 113, 0.5); /* Resplandor */
-    
-    /* Animación de brillo pasando por encima */
-    position: relative;
-    overflow: hidden;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    #3498db,
+    #2ecc71
+  ); /* Degradado de azul a verde */
+  border-radius: 8px;
+  transition: width 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Animación elástica */
+  box-shadow: 0 0 10px rgba(46, 204, 113, 0.5); /* Resplandor */
+
+  /* Animación de brillo pasando por encima */
+  position: relative;
+  overflow: hidden;
 }
 
 .xp-fill::after {
-    content: '';
-    position: absolute;
-    top: 0; left: -100%;
-    width: 100%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-    animation: shine 3s infinite;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  animation: shine 3s infinite;
+}
+
+@keyframes shine {
+  to {
+    left: 100%;
+  }
 }
 
 /* Texto de la experiencia (0/100 XP) */
 .experience span {
-    font-size: 0.8rem;
-    color: #ecf0f1;
-    font-weight: bold;
-    text-shadow: 1px 1px 2px black;
-    font-family: 'Arial Black', sans-serif;
+  font-size: 0.8rem;
+  color: #ecf0f1;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px black;
+  font-family: "Arial Black", sans-serif;
 }
 
 /* Estilo para el número de nivel sobre el avatar */
 .level-circle {
-    filter: drop-shadow(0 0 3px rgba(0,0,0,0.5));
-}
-
-@keyframes shine {
-    to { left: 100%; }
+  filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.5));
 }
