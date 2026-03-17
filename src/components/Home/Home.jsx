@@ -25,7 +25,7 @@ const AVATAR_LIST = [
   { id: 6, url: miguel, name: "Miguel" },
 ];
 
-function Home({ onStart, username }) {
+function Home({ onStart, username, onLogout }) {
   const [activePopup, setActivePopup] = useState(null);
 
   // Avatar
@@ -60,8 +60,8 @@ function Home({ onStart, username }) {
 
   const [showConfetti, setShowConfetti] = useState(false);
 
-  // Experiencia para subir de nivel
-  const xpToNextLevel = level * 100;
+  // Experiencia para subir al siguiente nivel
+  const xpToNextLevel = (level - 1) ** 2 * 50 + 100;
 
   /**
    * Alterna la visibilidad de los popups. Si el popup ya está abierto,
@@ -237,7 +237,7 @@ function Home({ onStart, username }) {
 
       {/* Pop-up de los ajustes */}
       {activePopup === "settings" && (
-        <Settings onClose={() => togglePopup("settings")} />
+        <Settings onClose={() => togglePopup("settings")} onLogout={onLogout} />
       )}
 
       {/* Selector de modos de juego */}

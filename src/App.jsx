@@ -18,7 +18,7 @@ function App() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("rummi-username");
+    localStorage.clear();
     setUsername("");
     setScreen("login");
   };
@@ -31,7 +31,7 @@ function App() {
         <Home
           onStart={() => setScreen("loading")}
           username={username}
-          logout={handleLogout}
+          onLogout={handleLogout}
         />
       )}
 
