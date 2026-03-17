@@ -45,6 +45,13 @@ function Board() {
     return initial;
   });
 
+  const [boardPositions, setBoardPositions] = useState(() => {
+        // Inicializamos 40 huecos vacíos
+    const initial = {};
+    for (let i = 0; i < 40; i++) initial[`board-slot-${i}`] = null;
+    return initial;
+  });
+
   // Cuando recibas las 14 fichas iniciales, llénalas en los primeros huecos:
   useEffect(() => {
     if (playerHand.length > 0) {
@@ -76,31 +83,75 @@ function Board() {
     const activeId = active.id;
     const overId = over.id; // El ID del hueco: "hand-slot-X"
 
-    setHandPositions((prev) => {
-      // IMPORTANTE: Clonamos el objeto anterior para no mutar el estado directamente
-      const newPositions = { ...prev };
+      const fromHandKey = Object.keys(handPositions).find(k => handPositions[k]?.id === activeId);
+  const fromBoardKey = Object.keys(boardPositions).find(k => boardPositions[k]?.id === activeId);
+  
+  const tile = fromHandKey ? handPositions[fromHandKey] : boardPositions[fromBoardKey];
+  if (!tile) return;
 
-      // 2. Buscamos en qué hueco estaba la ficha que estamos moviendo
-      const oldSlot = Object.keys(prev).find(key => prev[key]?.id === activeId);
+ // si se suleta en tablero
+  if (overId.startsWith('board-slot')) {
+        //setBoardPositions(prev => ({ ...prev, [overId]: tile }));
+        //if (handKey) setHandPositions(prev => ({ ...prev, [handKey]: null })); // La quitamos de la mano
+        if (handKey) {
+          const oldSlot = Object.keys(prev).find(key => prev[key]?.id === activeId);
+          const tileMoving = prev[oldSlot];   // La ficha que arrastras
 
-      // Si no se encuentra el origen (por ejemplo, viene de fuera), o es el mismo sitio, no hacemos nada
-      if (!oldSlot || oldSlot === overId) return prev;
+          setHandPositions((prev) => {
+            // IMPORTANTE: Clonamos el objeto anterior para no mutar el estado directamente
+            const newPositions = { ...prev };
+            const shift = { ...boardPositions};
+            // 2. Buscamos en qué hueco estaba la ficha que estamos moviendo
+            
+            // Si no se encuentra el origen (por ejemplo, viene de fuera), o es el mismo sitio, no hacemos nada
+            if (!oldSlot || oldSlot === overId) return prev;
+            // 3. Intercambio de fichas (Swap logic)
+            
+            const tileAtTarget = shift[overId];  // Lo que haya en el destino (ficha o null)
+            newPositions[oldSlot] = tileAtTarget; 
+            newPositions[overId] = tileMoving;
+            // 4. Actualizamos el playerHand del hook useGame (opcional)
+            // Extraemos solo las fichas que no son null para mantener la lista plana sincronizada
+            const updatedTilesArray = Object.values(newPositions).filter(tile => tile !== null);
+            setPlayerHand(updatedTilesArray);
+              
+            return newPositions;
+          })
+        };
+        if (boardKey && boardKey !== overId) setBoardPositions(prev => ({ ...prev, [boardKey]: null, [overId]: tile })); // La movemos dentro del tablero
+    }
 
-      // 3. Intercambio de fichas (Swap logic)
-      const tileMoving = prev[oldSlot];   // La ficha que arrastras
-      const tileAtTarget = prev[overId];  // Lo que haya en el destino (ficha o null)
 
-      newPositions[oldSlot] = tileAtTarget; 
-      newPositions[overId] = tileMoving;
+  // si se suelta en mano
+  else if (overId.startsWith('hand-slot')) {
 
-      // 4. Actualizamos el playerHand del hook useGame (opcional)
-      // Extraemos solo las fichas que no son null para mantener la lista plana sincronizada
-      const updatedTilesArray = Object.values(newPositions).filter(tile => tile !== null);
-      setPlayerHand(updatedTilesArray);
+    //si pillas ficha del tablero a la mano, no pasa anada
+    if (fromBoardKey) return;
 
-      return newPositions;
-    });
+    //si es una que mueves dentro de la mano, todo bien
+    if (fromHandKey && fromHandKey !== overId) {
+      setHandPositions((prev) => {
+        // IMPORTANTE: Clonamos el objeto anterior para no mutar el estado directamente
+        const newPositions = { ...prev };
+        // 2. Buscamos en qué hueco estaba la ficha que estamos moviendo
+        const oldSlot = Object.keys(prev).find(key => prev[key]?.id === activeId);
+        // Si no se encuentra el origen (por ejemplo, viene de fuera), o es el mismo sitio, no hacemos nada
+        if (!oldSlot || oldSlot === overId) return prev;
+        // 3. Intercambio de fichas (Swap logic)
+        const tileMoving = prev[oldSlot];   // La ficha que arrastras
+        const tileAtTarget = prev[overId];  // Lo que haya en el destino (ficha o null)
+        newPositions[oldSlot] = tileAtTarget; 
+        newPositions[overId] = tileMoving;
+        // 4. Actualizamos el playerHand del hook useGame (opcional)
+        // Extraemos solo las fichas que no son null para mantener la lista plana sincronizada
+        const updatedTilesArray = Object.values(newPositions).filter(tile => tile !== null);
+        setPlayerHand(updatedTilesArray);
+
+        return newPositions;
+      })
+    };
   }
+}
 
   const activeTile = playerHand.find(t => t.id === activeId);
 
@@ -176,7 +227,22 @@ function Board() {
         <div className='header'>RUMMIPLUS TABLE</div>
     
           {/* ÁREA DEL TABLERO */}
-          <main className='board-area'></main>
+                    <main className='board-area'>
+                        {/* El SVG de fondo */}
+                        <svg  width="650" height="350" className='board-svg'>
+                          <rect  width="800" height="800" fill="#073600" />
+                        </svg>
+          
+                        {/* FICHAS DINÁMICAS (Las que el jugador tiene en la mano) */}
+                        <div className='board-grid'>
+                        {Object.keys(boardPositions).map((slotId) => (
+                          <Hand key={slotId} id={slotId}>
+                            {boardPositions[slotId] && (
+                              <DraggableTile tile={boardPositions[slotId]} />
+                            )}
+                          </Hand>
+                        ))}</div>
+                    </main>
 
           {/* Baraja con las fichas restantes */}
           <div className='deck-container' onClick={drawTile} title='Robar ficha'>

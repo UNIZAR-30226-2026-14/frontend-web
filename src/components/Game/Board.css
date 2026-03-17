@@ -24,11 +24,26 @@
 
 /* Área central de juego */
 .board-area {
-  padding: 20px;
+  position: fixed;
   display: flex;
-  flex-wrap: wrap;
-  gap: 40px;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
+  transform: translateX(-50%);
+  width: 1000px;
+  left: 50%;
+  padding: 100px;
+  gap: 40px;
+}
+
+.board-grid {
+  position: absolute; 
+  top: 90px;
+  display: grid;
+  grid-template-columns: repeat(10, 55px); 
+  grid-template-rows: repeat(4, 75px);
+  gap: 10px;
+  padding: 20px;
 }
 
 /* Soporte inferior */
