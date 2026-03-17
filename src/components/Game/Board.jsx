@@ -35,7 +35,7 @@ import { CSS } from '@dnd-kit/utilities';
 
 function Board() {
   // Obtenemos el estado del juego y las funciones para manipularlo
-  const { bag, playerHand, setPlayerHand, drawTile, dealInitialHand } = useGame();
+  const { bag, playerHand, setPlayerHand,gameBoard, setGameBoard, drawTile, dealInitialHand } = useGame();
   const [activeId, setActiveId] = useState(null); // Para rastrear qué ficha se arrastra
 
   const [handPositions, setHandPositions] = useState(() => {
@@ -62,6 +62,17 @@ function Board() {
       setHandPositions(newPositions);
     }
   }, [playerHand]);
+
+
+   useEffect(() => {
+    if (playerHand.length > 0) {
+      const newPositions = { ...boardPositions };
+      playerHand.forEach((tile, index) => {
+        newPositions[`hand-slot-${index}`] = tile;
+      });
+      setBoardPositions(newPositions);
+    }
+  }, [gameBoard]);
 
   // Repartimos las 14 fichas iniciales
   useEffect(() => {
@@ -93,32 +104,58 @@ function Board() {
   if (overId.startsWith('board-slot')) {
         //setBoardPositions(prev => ({ ...prev, [overId]: tile }));
         //if (handKey) setHandPositions(prev => ({ ...prev, [handKey]: null })); // La quitamos de la mano
-        if (handKey) {
-          const oldSlot = Object.keys(prev).find(key => prev[key]?.id === activeId);
-          const tileMoving = prev[oldSlot];   // La ficha que arrastras
-
+        if (fromHandKey) {
+          const tileMoving=handPositions[fromHandKey];
           setHandPositions((prev) => {
             // IMPORTANTE: Clonamos el objeto anterior para no mutar el estado directamente
             const newPositions = { ...prev };
-            const shift = { ...boardPositions};
             // 2. Buscamos en qué hueco estaba la ficha que estamos moviendo
-            
+            newPositions[fromHandKey] = '';
+            // 4. Actualizamos el playerHand del hook useGame (opcional)
+            // Extraemos solo las fichas que no son null para mantener la lista plana sincronizada
+            const updatedTilesArray = Object.values(newPositions).filter(tile => tile !== null);
+            setPlayerHand(updatedTilesArray);
+            return newPositions;
+          })
+
+          setBoardPositions((prev) => {
+            // IMPORTANTE: Clonamos el objeto anterior para no mutar el estado directamente
+            const newPositions = { ...prev };
+            // aqui es el huevo
+            const oldSlot = Object.keys(prev).find(key => prev[key]?.id === overId);
+            // 3. Intercambio de fichas (Swap logic)
+            newPositions[fromHandKey] = tileMoving;
+            // 4. Actualizamos el playerHand del hook useGame (opcional)
+            // Extraemos solo las fichas que no son null para mantener la lista plana sincronizada
+            const updatedTilesArray = Object.values(newPositions).filter(tile => tile !== null);
+            setGameBoard(updatedTilesArray);
+            return newPositions;
+          })
+          
+        };
+
+        // La movemos dentro del tablero
+        if (fromBoardKey && fromBoardKey !== overId) {
+          setBoardPositions((prev) => {
+            // IMPORTANTE: Clonamos el objeto anterior para no mutar el estado directamente
+            const newPositions = { ...prev };
+            // 2. Buscamos en qué hueco estaba la ficha que estamos moviendo
+            const oldSlot = Object.keys(prev).find(key => prev[key]?.id === activeId);
             // Si no se encuentra el origen (por ejemplo, viene de fuera), o es el mismo sitio, no hacemos nada
             if (!oldSlot || oldSlot === overId) return prev;
             // 3. Intercambio de fichas (Swap logic)
-            
-            const tileAtTarget = shift[overId];  // Lo que haya en el destino (ficha o null)
+            const tileMoving = prev[oldSlot];   // La ficha que arrastras
+            const tileAtTarget = prev[overId];  // Lo que haya en el destino (ficha o null)
             newPositions[oldSlot] = tileAtTarget; 
             newPositions[overId] = tileMoving;
             // 4. Actualizamos el playerHand del hook useGame (opcional)
             // Extraemos solo las fichas que no son null para mantener la lista plana sincronizada
             const updatedTilesArray = Object.values(newPositions).filter(tile => tile !== null);
-            setPlayerHand(updatedTilesArray);
-              
+            setGameBoard(updatedTilesArray);
             return newPositions;
           })
-        };
-        if (boardKey && boardKey !== overId) setBoardPositions(prev => ({ ...prev, [boardKey]: null, [overId]: tile })); // La movemos dentro del tablero
+
+        }; 
     }
 
 
@@ -146,7 +183,6 @@ function Board() {
         // Extraemos solo las fichas que no son null para mantener la lista plana sincronizada
         const updatedTilesArray = Object.values(newPositions).filter(tile => tile !== null);
         setPlayerHand(updatedTilesArray);
-
         return newPositions;
       })
     };

@@ -4,7 +4,7 @@ import { createDeck } from "./deckFactory.js";
 export const useGame = () => {
   const [bag, setBag] = useState(createDeck()); // El mazo de fichas se inicializa con un nuevo mazo barajado creado por createDeck()
   const [playerHand, setPlayerHand] = useState(Array(20).fill("")); // La mano del jugador se inicializa como un array de 20 posiciones vacías, que se llenarán con las fichas repartidas al inicio del juego.
-
+  const [gameBoard, setGameBoard] = useState(Array(40).fill(""));
   /**
    * Reparte la mano inicial al jugador. Toma las primeras 14 fichas del mazo y las asigna a la mano del jugador.
    * Luego actualiza el mazo eliminando las fichas repartidas. Esta función se llama al iniciar una nueva partida.
@@ -39,5 +39,5 @@ export const useGame = () => {
     });
   };
 
-  return { bag, playerHand, setPlayerHand, drawTile, dealInitialHand };
+  return { bag, playerHand, gameBoard, setGameBoard, setPlayerHand, drawTile, dealInitialHand };
 };
