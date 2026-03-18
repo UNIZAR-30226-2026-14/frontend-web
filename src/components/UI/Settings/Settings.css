@@ -19,3 +19,15 @@
     opacity: 1;
   }
 }
+
+.settings-title {
+  position: absolute;
+  top: 5px;
+}
+
+.logout-button {
+  position: absolute;
+  color: red;
+  bottom: 10px;
+  right: 10px;
+}

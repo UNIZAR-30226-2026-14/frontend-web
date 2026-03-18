@@ -48,46 +48,52 @@ function FriendsList({ onClose }) {
   );
 
   return (
-    <div className="friends-sidebar">
-      <h2>Amigos</h2>
-      <button className="close-button" onClick={onClose}>
-        X
-      </button>
-      <div className="searchbar">
-        <input
-          type="text"
-          placeholder="Buscar amigo..."
-          className="search-input"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-      </div>
-      <div className="friends-list">
-        {filteredFriends.length > 0 ? (filteredFriends.map((friend) => (
-          <div key={friend.id} className="friend-card">
-            <img
-              src={friend.avatar}
-              alt={friend.name}
-              className="friend-avatar"
-            />
-            <div className="friend-info">
-              <span className="friend-name">{friend.name}</span>
-              <span className={`status-indicator ${friend.status}`}></span>
-            </div>
-            {friend.status === "online" && (
-              <button
-                className="challenge-button"
-                onClick={() => handleChallenge(friend.id, friend.name)}
-                disabled={challengeId === friend.id}
-              >
-                {challengeId === friend.id ? "..." : "Retar"}
-              </button>
-            )}
-          </div>))) : (
+    <>
+      <div className="friends-overlay" onClick={onClose}></div>
+      <div className="friends-sidebar">
+        <h2>Amigos</h2>
+        <button className="close-button" onClick={onClose}>
+          X
+        </button>
+        <div className="searchbar">
+          <input
+            type="text"
+            placeholder="Buscar amigo..."
+            className="search-input"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <div className="friends-list">
+          {filteredFriends.length > 0 ? (
+            filteredFriends.map((friend) => (
+              <div key={friend.id} className="friend-card">
+                <img
+                  src={friend.avatar}
+                  alt={friend.name}
+                  className="friend-avatar"
+                />
+                <div className="friend-info">
+                  <span className="friend-name">{friend.name}</span>
+                  <span className={`status-indicator ${friend.status}`}></span>
+                </div>
+                {friend.status === "online" && (
+                  <button
+                    className="challenge-button"
+                    onClick={() => handleChallenge(friend.id, friend.name)}
+                    disabled={challengeId === friend.id}
+                  >
+                    {challengeId === friend.id ? "..." : "Retar"}
+                  </button>
+                )}
+              </div>
+            ))
+          ) : (
             <p className="no-results">No se han encontrado amigos</p>
           )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

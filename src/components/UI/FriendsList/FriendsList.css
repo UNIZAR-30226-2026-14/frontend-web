@@ -1,3 +1,23 @@
+.friends-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  background-color: rgba(0, 0, 0, 0.5);
+  animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100%{
+    opacity: 1;
+  }
+}
+
 .friends-sidebar {
   position: fixed;
   top: 0;
@@ -10,12 +30,23 @@
   box-shadow: -2px 0 10px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
+  animation: slide 0.5s ease-out;
+}
+
+@keyframes slide {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }
 
 .friends-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  overflow-y: auto;
 }
 
 .friend-card {
@@ -23,6 +54,12 @@
   align-items: center;
   padding: 10px;
   border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.friend-card:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  transform: translateX(-5px);
 }
 
 .friend-avatar {
@@ -47,9 +84,29 @@
 }
 
 .status-indicator.online {
-  background-color: green;
+  background-color: #2ecc71;
 }
 
 .status-indicator.offline {
-  background-color: gray;
+  background-color: #95a5a6;
+}
+
+.searchbar {
+  margin-bottom: 20px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 15px;
+  border-radius: 20px;
+  border: none;
+  background-color: rgba(0, 0, 0, 0.2);
+  color: white;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  background-color: rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 0 2px #3498db;
 }

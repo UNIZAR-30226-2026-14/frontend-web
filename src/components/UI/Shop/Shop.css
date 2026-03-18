@@ -22,11 +22,17 @@
   }
 }
 
-.shop-header {
-  width: 100%;
-  display: flex;
-  justify-content: center;
+.shop-title {
+  position: absolute;
+  top: 0px;
+  font-size: 30px;
+}
+
+.bg-title {
+  position: absolute;
+  top: 50px;
   align-items: center;
+  justify-content: center;
 }
 
 .backgrounds-list {

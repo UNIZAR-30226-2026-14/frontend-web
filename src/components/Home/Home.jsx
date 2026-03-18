@@ -60,6 +60,11 @@ function Home({ onStart, username, onLogout }) {
 
   const [showConfetti, setShowConfetti] = useState(false);
 
+  const [ownedBgs, setOwnedBgs] = useState(() => {
+    const saved = localStorage.getItem("rummi-bgs");
+    return saved ? JSON.parse(saved) : ["classic"];
+  });
+
   // Experiencia para subir al siguiente nivel
   const xpToNextLevel = (level - 1) ** 2 * 50 + 100;
 
@@ -83,6 +88,7 @@ function Home({ onStart, username, onLogout }) {
     if (newXp >= xpToNextLevel) {
       newXp -= xpToNextLevel;
       newLevel++;
+      setCoins(coins + 100)
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 3000);
     }
@@ -232,6 +238,8 @@ function Home({ onStart, username, onLogout }) {
           currentBackground={currentBackground}
           setCurrentBackground={setCurrentBackground}
           addXp={addXp}
+          ownedBgs={ownedBgs}
+          setOwnedBgs={setOwnedBgs}
         />
       )}
 
