@@ -255,7 +255,7 @@ function Home({ onStart, username, onLogout }) {
       <div className="gamemodes">
         {/* Modo normal */}
         <div className="gamemode-card" onClick={onStart}>
-          <svg width={300} height={450}>
+          <svg viewBox="0 0 300 450">
             <g>
               <rect
                 className="regular-background"
@@ -290,7 +290,7 @@ function Home({ onStart, username, onLogout }) {
 
         {/* Modo con power-ups */}
         <div className="gamemode-card">
-          <svg width={300} height={450}>
+          <svg viewBox="0 0 300 450">
             <g>
               <rect
                 className="enhanced-background"

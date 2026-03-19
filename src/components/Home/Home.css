@@ -4,8 +4,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   overflow: hidden;
+}
+
+.home-screen .gamemodes {
+  justify-content: center;
+  align-items: center;
 }
 
 .profile-name {
@@ -21,7 +26,7 @@
 
 .top-menu {
   width: 100%;
-  height: auto;
+  height: 100px;
   min-width: 80px;
   padding: 10px 20px;
   background-color: rgba(0, 0, 0, 0.3);
@@ -31,7 +36,8 @@
   box-sizing: border-box;
 }
 
-.top-menu svg, .top-menu img {
+.top-menu svg,
+.top-menu img {
   display: block;
   margin-top: auto;
   margin-bottom: auto;
@@ -110,13 +116,15 @@
 
 .gamemodes {
   display: flex;
+  flex: 1;
   align-items: center;
   justify-content: center;
-  padding-bottom: 50px;
 }
 
-.gamemode-card {
+.gamemode-card svg {
   cursor: pointer;
+  width: 300px;
+  height: auto;
   transition: transform 0.2s ease;
 }
 
@@ -169,6 +177,7 @@
 .experience {
   display: flex;
   align-items: center;
+  flex-direction: row;
   gap: 5px;
   width: 180px;
   margin: 10px 0;
@@ -230,9 +239,13 @@
 }
 
 @media (max-width: 768px) {
-  .profile-name h1,
-  .experience {
+  .profile-name h1 {
     display: none;
+  }
+
+  .experience {
+    width: 150px;
+    height: 50px;
   }
 
   .friends svg,
@@ -253,5 +266,13 @@
 
   .title {
     font-size: 1.2rem;
+  }
+
+  .gamemode-card svg {
+    width: 35vw;
+  }
+
+  .gamemode-title {
+    font-size: 18px;
   }
 }
