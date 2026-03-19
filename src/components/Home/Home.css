@@ -21,16 +21,44 @@
 
 .top-menu {
   width: 100%;
-  height: 80px;
-  padding: 20px;
+  height: auto;
+  min-width: 80px;
+  padding: 10px 20px;
   background-color: rgba(0, 0, 0, 0.3);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-sizing: border-box;
 }
 
-.top-menu-right {
+.top-menu svg, .top-menu img {
+  display: block;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.top-left,
+.top-middle,
+.top-right {
+  flex: 1;
   display: flex;
+  align-items: center;
+}
+
+.top-left {
+  justify-content: flex-start;
+  gap: 20px;
+}
+
+.top-middle {
+  justify-content: center;
+}
+
+.top-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
 }
 
 .level-bg {
@@ -138,40 +166,31 @@
   user-select: none;
 }
 
-/* Contenedor principal de la experiencia */
 .experience {
   display: flex;
   align-items: center;
   gap: 5px;
-  width: 250px; /* Ajusta según tu diseño */
+  width: 180px;
   margin: 10px 0;
 }
 
-/* El "hueco" de la barra */
 .xp-bar-container {
   width: 100%;
   height: 18px;
-  background: #1a1a1a; /* Fondo muy oscuro */
+  background: #1a1a1a;
   border: 2px solid #444;
   border-radius: 10px;
-  overflow: hidden; /* Corta la barra si se sale */
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5); /* Sombra interna para dar profundidad */
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
   position: relative;
 }
 
-/* La parte de color que se llena */
 .xp-fill {
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    #3498db,
-    #2ecc71
-  ); /* Degradado de azul a verde */
+  background: linear-gradient(90deg, #3498db, #2ecc71);
   border-radius: 8px;
-  transition: width 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Animación elástica */
-  box-shadow: 0 0 10px rgba(46, 204, 113, 0.5); /* Resplandor */
-
-  /* Animación de brillo pasando por encima */
+  transition: width 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
   position: relative;
   overflow: hidden;
 }
@@ -198,7 +217,6 @@
   }
 }
 
-/* Texto de la experiencia (0/100 XP) */
 .experience span {
   font-size: 0.8rem;
   color: #ecf0f1;
@@ -207,7 +225,33 @@
   font-family: "Arial Black", sans-serif;
 }
 
-/* Estilo para el número de nivel sobre el avatar */
 .level-circle {
   filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.5));
+}
+
+@media (max-width: 768px) {
+  .profile-name h1,
+  .experience {
+    display: none;
+  }
+
+  .friends svg,
+  .profile-name svg {
+    width: 70px;
+    height: 70px;
+  }
+
+  .settings img {
+    width: 65px;
+    height: 65px;
+  }
+
+  .shop svg {
+    width: 80px;
+    height: 50px;
+  }
+
+  .title {
+    font-size: 1.2rem;
+  }
 }
