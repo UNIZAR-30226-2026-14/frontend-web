@@ -115,7 +115,7 @@ function Home({ onStart, username, onLogout }) {
         <div className="top-left">
           {/* Perfil */}
           <div className="profile-name">
-            <svg width={100} height={100} viewBox="-50 -50 100 100">
+            <svg viewBox="-50 -50 100 100">
               <defs>
                 {/* Patrón para mostrar el avatar en el círculo designado para ello. */}
                 <pattern
@@ -180,14 +180,15 @@ function Home({ onStart, username, onLogout }) {
         </div>
 
         <div className="top-middle">
-        {/* Título */}
-        <h1 className="title">RUMMIPLUS</h1>
+          {/* Título */}
+          <h1 className="title">RUMMIPLUS</h1>
         </div>
+        
         {/* Menú arriba derecha */}
         <div className="top-right">
           {/* Amigos */}
           <div className="friends" onClick={() => togglePopup("friends")}>
-            <svg width={100} height={100} viewBox="-50 -50 100 100">
+            <svg viewBox="-50 -50 100 100">
               <circle className="friends-background" cx={0} cy={-5} r={40} />
               <g className="friends-icon">
                 <circle cy="-25" r="15" />
@@ -198,14 +199,14 @@ function Home({ onStart, username, onLogout }) {
 
           {/* Tienda */}
           <div className="shop" onClick={() => togglePopup("shop")}>
-            <svg width={150} height={100} viewBox="0 0 200 50">
-              <rect x={0} y={-15} width={200} height={50} rx={12} />
-              <text x={60} y={20} className="coins">
+            <svg viewBox="0 0 200 50">
+              <rect x={0} y={5} width={200} height={50} rx={12} />
+              <text x={40} y={37} className="coins">
                 {coins}💰
               </text>
               <path
                 className="shop-add"
-                d="M 157 11 L 183 11 M 170 -2 L 170 24"
+                d="M 157 30 L 183 30 M 170 17 L 170 43"
               />
             </svg>
           </div>
