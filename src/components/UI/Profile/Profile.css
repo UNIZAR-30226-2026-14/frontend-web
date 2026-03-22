@@ -67,8 +67,15 @@
 
 .avatar-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, auto);
+  justify-content: center;
   gap: 15px;
+}
+
+.avatar-grid img {
+  cursor: pointer;
+  width: 100px;
+  height: auto;
 }
 
 .avatar-item {
@@ -118,12 +125,9 @@
     padding: 20px;
   }
 
-  .avatar-grid {
-    gap: 0;
-  }
-
   .avatar-grid img {
-    width: 80px;
+    width: 75px;
+    height: auto;
   }
 
   .main-avatar {

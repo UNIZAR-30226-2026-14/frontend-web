@@ -84,7 +84,8 @@
 
 .friends,
 .settings img,
-.profile img {
+.profile-name svg,
+.profile svg {
   cursor: pointer;
   width: 75px;
   height: auto;
@@ -269,12 +270,16 @@
     padding: 10px 5px;
   }
 
+  .top-left {
+    gap: 0;
+  }
+
   .profile-name h1 {
     display: none;
   }
 
   .experience {
-    width: 150px;
+    width: 100px;
     height: 50px;
   }
 
