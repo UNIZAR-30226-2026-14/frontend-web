@@ -7,7 +7,7 @@ function Profile({ onClose, currentAvatar, onSelectAvatar, avatarList }) {
   return (
     <div className="profile-stats">
       <button className="close-button" onClick={onClose}>
-        x
+        X
       </button>
 
       {/* Si no estoy editando, muestro el perfil y las estadísticas */}

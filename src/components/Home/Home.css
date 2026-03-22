@@ -4,8 +4,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   overflow: hidden;
+}
+
+.home-screen .gamemodes {
+  justify-content: center;
+  align-items: center;
 }
 
 .profile-name {
@@ -21,16 +26,44 @@
 
 .top-menu {
   width: 100%;
-  height: 80px;
-  padding: 20px;
+  height: 100px;
+  padding: 10px 20px;
   background-color: rgba(0, 0, 0, 0.3);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-sizing: border-box;
 }
 
-.top-menu-right {
+.top-menu svg,
+.top-menu img {
+  display: block;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.top-left,
+.top-middle,
+.top-right {
+  flex: 1;
   display: flex;
+  align-items: center;
+}
+
+.top-left {
+  justify-content: flex-start;
+  gap: 20px;
+}
+
+.top-middle {
+  justify-content: center;
+}
+
+.top-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
 }
 
 .level-bg {
@@ -46,10 +79,16 @@
 .title {
   font-family: "Arial Black", sans-serif;
   user-select: none;
+  font-size: 50px;
 }
 
-.friends {
+.friends,
+.settings img,
+.profile-name svg,
+.profile svg {
   cursor: pointer;
+  width: 75px;
+  height: auto;
 }
 
 .friends-icon {
@@ -60,6 +99,16 @@
 .shop {
   fill: white;
   cursor: pointer;
+  width: 150px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  overflow: visible;
+}
+
+.shop svg {
+  width: 100%;
+  height: 100%;
 }
 
 .coins {
@@ -75,20 +124,17 @@
   stroke-linecap: round;
 }
 
-.settings img {
-  width: 85px;
-  height: auto;
-}
-
 .gamemodes {
   display: flex;
+  flex: 1;
   align-items: center;
   justify-content: center;
-  padding-bottom: 50px;
 }
 
-.gamemode-card {
+.gamemode-card svg {
   cursor: pointer;
+  width: 300px;
+  height: auto;
   transition: transform 0.2s ease;
 }
 
@@ -128,50 +174,49 @@
 
 .close-button {
   position: absolute;
-  top: 5px;
-  right: 5px;
-  border: none;
-  background: none;
-  font-size: 30px;
-  color: gray;
-  cursor: pointer;
-  user-select: none;
-}
-
-/* Contenedor principal de la experiencia */
-.experience {
+  top: 10px;
+  right: 10px;
+  width: 50px;
+  height: 50px;
   display: flex;
   align-items: center;
-  gap: 5px;
-  width: 250px; /* Ajusta según tu diseño */
+  justify-content: center;
+  border: none;
+  background: none;
+  font-size: 35px;
+  color: white;
+  cursor: pointer;
+  user-select: none;
+  z-index: 100;
+}
+
+.experience {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 15px;
+  width: 250px;
   margin: 10px 0;
 }
 
-/* El "hueco" de la barra */
 .xp-bar-container {
+  flex: 1;
   width: 100%;
   height: 18px;
-  background: #1a1a1a; /* Fondo muy oscuro */
+  background: #1a1a1a;
   border: 2px solid #444;
   border-radius: 10px;
-  overflow: hidden; /* Corta la barra si se sale */
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5); /* Sombra interna para dar profundidad */
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
   position: relative;
 }
 
-/* La parte de color que se llena */
 .xp-fill {
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    #3498db,
-    #2ecc71
-  ); /* Degradado de azul a verde */
+  background: linear-gradient(90deg, #3498db, #2ecc71);
   border-radius: 8px;
-  transition: width 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Animación elástica */
-  box-shadow: 0 0 10px rgba(46, 204, 113, 0.5); /* Resplandor */
-
-  /* Animación de brillo pasando por encima */
+  transition: width 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
   position: relative;
   overflow: hidden;
 }
@@ -198,8 +243,8 @@
   }
 }
 
-/* Texto de la experiencia (0/100 XP) */
 .experience span {
+  white-space: nowrap;
   font-size: 0.8rem;
   color: #ecf0f1;
   font-weight: bold;
@@ -207,7 +252,66 @@
   font-family: "Arial Black", sans-serif;
 }
 
-/* Estilo para el número de nivel sobre el avatar */
+.xp {
+  display: flex;
+  flex-direction: row;
+}
+
 .level-circle {
   filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.5));
+}
+
+.profile-name h1 {
+  font-size: 30px;
+}
+
+@media (max-width: 768px) {
+  .top-menu {
+    padding: 10px 5px;
+  }
+
+  .top-left {
+    gap: 0;
+  }
+
+  .profile-name h1 {
+    display: none;
+  }
+
+  .experience {
+    width: 100px;
+    height: 50px;
+  }
+
+  .xp {
+    display: none;
+  }
+
+  .friends svg,
+  .profile-name svg {
+    width: 70px;
+    height: 70px;
+  }
+
+  .settings img {
+    width: 65px;
+    height: 65px;
+  }
+
+  .shop {
+    width: 80px;
+    height: 80px;
+  }
+
+  .title {
+    font-size: 28px;
+  }
+
+  .gamemode-card svg {
+    width: 35vw;
+  }
+
+  .gamemode-title {
+    font-size: 24px;
+  }
 }

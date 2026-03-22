@@ -88,7 +88,7 @@ function Home({ onStart, username, onLogout }) {
     if (newXp >= xpToNextLevel) {
       newXp -= xpToNextLevel;
       newLevel++;
-      setCoins(coins + 100)
+      setCoins(coins + 100);
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 3000);
     }
@@ -112,79 +112,83 @@ function Home({ onStart, username, onLogout }) {
     <div className="home-screen">
       {/* Barra superior */}
       <div className="top-menu">
-        {/* Perfil */}
-        <div className="profile-name">
-          <svg width={100} height={100} viewBox="-50 -50 100 100">
-            <defs>
-              {/* Patrón para mostrar el avatar en el círculo designado para ello. */}
-              <pattern
-                id="userProfilePattern"
-                x="0"
-                y="0"
-                width="1"
-                height="1"
-                viewBox="0 0 100 100"
-              >
-                <image
+        <div className="top-left">
+          {/* Perfil */}
+          <div className="profile-name">
+            <svg viewBox="-50 -50 100 100">
+              <defs>
+                {/* Patrón para mostrar el avatar en el círculo designado para ello. */}
+                <pattern
+                  id="userProfilePattern"
                   x="0"
                   y="0"
-                  width="100"
-                  height="100"
-                  href={userAvatar}
-                  preserveAspectRatio="xMidYMid slice"
-                />
-              </pattern>
-            </defs>
-            <circle
-              key={userAvatar}
-              className="profile"
-              cx={0}
-              cy={-5}
-              r={40}
-              fill="url(#userProfilePattern)"
-              onClick={() => togglePopup("profile")}
-            />
+                  width="1"
+                  height="1"
+                  viewBox="0 0 100 100"
+                >
+                  <image
+                    x="0"
+                    y="0"
+                    width="100"
+                    height="100"
+                    href={userAvatar}
+                    preserveAspectRatio="xMidYMid slice"
+                  />
+                </pattern>
+              </defs>
+              <circle
+                key={userAvatar}
+                className="profile"
+                cx={0}
+                cy={-5}
+                r={40}
+                fill="url(#userProfilePattern)"
+                onClick={() => togglePopup("profile")}
+              />
 
-            {/* Nivel */}
-            <g>
-              <circle className="level-bg" cx={35} cy={-30} r={15} />
-              <text
-                className="level"
-                x={35}
-                y={-30}
-                textAnchor="middle"
-                alignmentBaseline="central"
-              >
-                {level}
-              </text>
-            </g>
-          </svg>
+              {/* Nivel */}
+              <g>
+                <circle className="level-bg" cx={35} cy={-30} r={15} />
+                <text
+                  className="level"
+                  x={35}
+                  y={-30}
+                  textAnchor="middle"
+                  alignmentBaseline="central"
+                >
+                  {level}
+                </text>
+              </g>
+            </svg>
 
-          {/* Nombre de usuario */}
-          <h1>{username || "Invitado"}</h1>
-        </div>
-
-        {/* Barra de experiencia */}
-        <div className="experience">
-          <div className="xp-bar-container">
-            <div
-              className="xp-fill"
-              style={{ width: `${(xp / xpToNextLevel) * 100}%` }}
-            />
+            {/* Nombre de usuario */}
+            <h1>{username || "Invitado"}</h1>
           </div>
-          <span>
-            {xp} / {xpToNextLevel} XP
-          </span>
+
+          {/* Barra de experiencia */}
+          <div className="experience">
+            <div className="xp-bar-container">
+              <div
+                className="xp-fill"
+                style={{ width: `${(xp / xpToNextLevel) * 100}%` }}
+              />
+            </div>
+            <span className="xp">
+              {xp} / {xpToNextLevel} XP
+            </span>
+          </div>
         </div>
 
-        {/* Título */}
-        <h1 className="title">RUMMIPLUS</h1>
-
+        <div className="top-middle">
+          {/* Título */}
+          <h1 className="title">RUMMIPLUS</h1>
+        </div>
+        
         {/* Menú arriba derecha */}
-        <div className="top-menu-right">
+        <div className="top-right">
           {/* Amigos */}
           <div className="friends" onClick={() => togglePopup("friends")}>
-            <svg width={100} height={100} viewBox="-50 -50 100 100">
+            <svg viewBox="-50 -50 100 100">
               <circle className="friends-background" cx={0} cy={-5} r={40} />
               <g className="friends-icon">
                 <circle cy="-25" r="15" />
@@ -195,14 +199,14 @@ function Home({ onStart, username, onLogout }) {
 
           {/* Tienda */}
           <div className="shop" onClick={() => togglePopup("shop")}>
-            <svg width={150} height={100} viewBox="0 0 200 50">
-              <rect x={0} y={-15} width={200} height={50} rx={12} />
-              <text x={60} y={20} className="coins">
+            <svg viewBox="0 0 200 50">
+              <rect x={0} y={5} width={200} height={50} rx={12} />
+              <text x={40} y={37} className="coins">
                 {coins}💰
               </text>
               <path
                 className="shop-add"
-                d="M 157 11 L 183 11 M 170 -2 L 170 24"
+                d="M 157 30 L 183 30 M 170 17 L 170 43"
               />
             </svg>
           </div>
@@ -252,7 +256,7 @@ function Home({ onStart, username, onLogout }) {
       <div className="gamemodes">
         {/* Modo normal */}
         <div className="gamemode-card" onClick={onStart}>
-          <svg width={300} height={450}>
+          <svg viewBox="0 0 300 450">
             <g>
               <rect
                 className="regular-background"
@@ -287,7 +291,7 @@ function Home({ onStart, username, onLogout }) {
 
         {/* Modo con power-ups */}
         <div className="gamemode-card">
-          <svg width={300} height={450}>
+          <svg viewBox="0 0 300 450">
             <g>
               <rect
                 className="enhanced-background"
