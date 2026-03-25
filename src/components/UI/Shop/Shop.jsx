@@ -41,7 +41,7 @@ function Shop({
   setCurrentBackground,
   addXp,
   ownedBgs,
-  setOwnedBgs
+  setOwnedBgs,
 }) {
   // Maneja la accion de comprar o equipar un fondo
   const handleAction = (bg) => {
@@ -53,12 +53,12 @@ function Shop({
         addXp(50);
         const updatedOwned = [...ownedBgs, bg.id];
         setOwnedBgs(updatedOwned);
-        localStorage.setItem("rummi-bgs", JSON.stringify(updatedOwned))
+        localStorage.setItem("rummi-bgs", JSON.stringify(updatedOwned));
         setCurrentBackground(bg.value);
         sileo.success({
           title: "¡Compra realizada!",
-          description: `Has desbloqueado ${bg.name}`
-        })
+          description: `Has desbloqueado ${bg.name}`,
+        });
       } else {
         sileo.error({
           title: "Fondos insuficientes",
