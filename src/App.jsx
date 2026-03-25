@@ -4,8 +4,8 @@ import Board from "./components/Game/Board";
 import Home from "./components/Home/Home";
 import Loading from "./components/Loading/Loading";
 import Login from "./components/Login/Login";
-import alex from "../../assets/avatars/alex.png";
-import Realistic from "react-canvsas-confetti/dist/presets/realistic";
+import alex from "./assets/avatars/alex.png";
+import Realistic from "react-canvas-confetti/dist/presets/realistic";
 
 function App() {
   // Monedas
@@ -121,7 +121,8 @@ function App() {
           xp={xp}
           addXp={addXp}
           xpToNextLevel={xpToNextLevel}
-          userAvatar={setUserAvatar}
+          userAvatar={userAvatar}
+          setUserAvatar={setUserAvatar}
           ownedBgs={ownedBgs}
           setOwnedBgs={setOwnedBgs}
           showConfetti={showConfetti}

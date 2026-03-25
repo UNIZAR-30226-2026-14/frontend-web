@@ -1,5 +1,5 @@
 import "./friendsList.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // Datos de test (simulan la respuesta del Backend)
 const MOCK_FRIENDS = [
@@ -33,6 +33,8 @@ function FriendsList({ onClose }) {
   // Estado para controlar el boton de retar
   const [challengeId, setChallengeId] = useState(null);
   const [search, setSearch] = useState("");
+  const [friends, setFriends] = useState(MOCK_FRIENDS);
+  const [newFriendName, setNewFriendName] = useState("");
 
   // Simula el proceso de retar a un amigo (aquí irá la lógica de enviar la solicitud al Backend)
   const handleChallenge = (id) => {
@@ -43,9 +45,31 @@ function FriendsList({ onClose }) {
     }, 2000);
   };
 
-  const filteredFriends = MOCK_FRIENDS.filter((friend) =>
-    friend.name.toLowerCase().includes(search.toLowerCase()),
-  );
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  });
+
+  const handleAddFriend = (e) => {
+    e.preventDefault();
+    if (!newFriendName.trim()) return;
+    const newFriend = {
+      id: Date.now(),
+      name: newFriendName,
+      status: "offline",
+      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${newFriendName}`,
+    };
+
+    setFriends([newFriend, ...friends]);
+    setNewFriendName("");
+  };
+
+  const filteredFriends = friends
+    .filter((f) => f.name.toLowerCase().includes(search.toLowerCase()))
+    .sort((a, b) => (a.status === "online" ? -1 : 1));
 
   return (
     <>
@@ -55,6 +79,7 @@ function FriendsList({ onClose }) {
         <button className="close-button" onClick={onClose}>
           X
         </button>
+
         <div className="searchbar">
           <input
             type="text"
@@ -64,6 +89,7 @@ function FriendsList({ onClose }) {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
+
         <div className="friends-list">
           {filteredFriends.length > 0 ? (
             filteredFriends.map((friend) => (
@@ -92,6 +118,8 @@ function FriendsList({ onClose }) {
             <p className="no-results">No se han encontrado amigos</p>
           )}
         </div>
+
+        <button type="submit">Añadir</button>
       </div>
     </>
   );

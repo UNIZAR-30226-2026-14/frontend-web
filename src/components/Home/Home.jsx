@@ -168,7 +168,7 @@ function Home({
         <Profile
           onClose={() => togglePopup("profile")}
           currentAvatar={userAvatar}
-          onSelectAvatar={setUserAvatar}
+          setUserAvatar={setUserAvatar}
           avatarList={AVATAR_LIST}
         />
       )}
