@@ -1,0 +1,25 @@
+.powerup-inventory {
+    position: relative;
+}
+
+.slots-grid {
+    display: flex;
+    gap: 10px;
+}
+
+.slot {
+    background-color: gray;
+    border: 2px dashed;
+}
+
+.slot-selected {
+    border: 2px dashed;
+}
+
+.slot-selected:hover {
+    transform: scale(1.1);
+}
+
+.confirmation-popup {
+
+}

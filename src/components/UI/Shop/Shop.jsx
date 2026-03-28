@@ -19,7 +19,7 @@ const BACKGROUNDS = [
   },
   {
     id: "lava",
-    name: "Rojo Condente",
+    name: "Rojo Candente",
     price: 1000,
     value: "#d32f2f",
     owned: false,
@@ -43,7 +43,6 @@ function Shop({
   ownedBgs,
   setOwnedBgs
 }) {
-  // Maneja la accion de comprar o equipar un fondo
   const handleAction = (bg) => {
     if (ownedBgs.includes(bg.id)) {
       setCurrentBackground(bg.value);
@@ -75,54 +74,64 @@ function Shop({
 
   return (
     <div className="shop-popup">
-      {/* Toaster para las notificaciones */}
-      <Toaster position="top-center" />
-      <h2 className="shop-title">Tienda</h2>
-      <button className="close-button" onClick={onClose}>
-        X
-      </button>
-      {/* Sección de tableros */}
-      <div className="shop-sections">
-        <h3 className="bg-title">Tableros</h3>
-        <div className="backgrounds-list">
-          {BACKGROUNDS.map((bg) => (
-            <div
-              key={bg.id}
-              className={`background-card ${currentBackground === bg.value ? "active" : ""}`}
-            >
-              <div className="color-preview" style={{ background: bg.value }} />
-              <span className="background-name">{bg.name}</span>
-              <button onClick={() => handleAction(bg)}>
-                {ownedBgs.includes(bg.id)
-                  ? currentBackground === bg.value
-                    ? "Equipado"
-                    : "Equipar"
-                  : `${bg.price}`}
-              </button>
-            </div>
-          ))}
-        </div>
-
-        {/* Skins para las fichas */}
+      <div className="shop-content">
+        <Toaster position="top-center" />
+        <h2 className="shop-title">Tienda</h2>
+        <button className="close-button" onClick={onClose}>
+          X
+        </button>
         <div className="shop-sections">
-          <h3 className="tile-title">Skins de Fichas</h3>
-          <div className="skins-list">
-            <p className="coming-soon">Próximamente...</p>
+          <h3 className="bg-title">Tableros</h3>
+          <div className="backgrounds-list">
+            {BACKGROUNDS.map((bg) => {
+              const isOwned = ownedBgs.includes(bg.id);
+              const isEquipped = currentBackground === bg.value;
+              let buttonText = isOwned
+                ? isEquipped
+                  ? "Equipado"
+                  : "Equipar"
+                : bg.price;
+              return (
+                <div
+                  key={bg.id}
+                  className={`background-card ${isEquipped ? "active" : ""}`}
+                >
+                  <div
+                    className="color-preview"
+                    style={{ background: bg.value }}
+                  />
+                  <span className="background-name">{bg.name}</span>
+                  <button
+                    className={isEquipped ? "btn-active" : ""}
+                    onClick={() => handleAction(bg)}
+                    disabled={isEquipped}
+                  >
+                    {buttonText}
+                  </button>
+                </div>
+              );
+            })}
           </div>
-        </div>
 
-        {/* Sección de monedas */}
-        <div className="shop-sections real-money">
-          <h3 className="coins-title">Obtener Monedas</h3>
-          <div className="money-packs">
-            <div className="pack-card">
-              <span>5000 💰</span>
-              <button
-                className="fake-pay"
-                onClick={() => setCoins(coins + 5000)}
-              >
-                4.99€
-              </button>
+          <div className="shop-sections">
+            <h3 className="tile-title">Skins de Fichas</h3>
+            <div className="skins-list">
+              <p className="coming-soon">Próximamente...</p>
+            </div>
+          </div>
+
+          <div className="shop-sections real-money">
+            <h3 className="coins-title">Obtener Monedas</h3>
+            <div className="money-packs">
+              <div className="pack-card">
+                <span>5000 💰</span>
+                <button
+                  className="fake-pay"
+                  onClick={() => setCoins(coins + 5000)}
+                >
+                  4.99€
+                </button>
+              </div>
             </div>
           </div>
         </div>
