@@ -265,9 +265,9 @@
   font-size: 30px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1000px) {
   .top-menu {
-    padding: 10px 5px;
+    padding: 5vw;
   }
 
   .top-left {
@@ -309,6 +309,7 @@
 
   .gamemode-card svg {
     width: 35vw;
+    height: 35vw;
   }
 
   .gamemode-title {
