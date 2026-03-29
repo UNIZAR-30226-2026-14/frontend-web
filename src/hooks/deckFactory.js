@@ -17,14 +17,15 @@ export const createDeck = () => {
           id: `${color}-${num}-${i}`, // ID único (ej: red-5-1)
           color: color,
           number: num,
+          placed: false, // variable de ficha para indicar que fue dejada en el tablero definitivamente
         });
       }
     }
   });
 
   // Añadir los 2 comodines
-  deck.push({ id: "joker-1", color: "black", number: "J" });
-  deck.push({ id: "joker-2", color: "red", number: "J" });
+  deck.push({ id: "joker-1", color: "black", number: "J", placed: false});
+  deck.push({ id: "joker-2", color: "red", number: "J", placed: false});
 
   return shuffle(deck);
 };
