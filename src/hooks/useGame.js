@@ -14,7 +14,7 @@ export const useGame = () => {
     const hand = bag.slice(0, 14); // Tomamos las primeras 14 fichas
     const aux = [...hand, ...Array(6).fill("")];
     setPlayerHand(aux); // Asignamos la mano al jugador
-    setGameBoard(Array(40).fill(""));
+    setGameBoard(Array(70).fill(""));
     setBag(bag.slice(14)); // Actualizamos el mazo eliminando las fichas repartidas
   };
 

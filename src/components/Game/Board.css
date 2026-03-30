@@ -40,10 +40,28 @@
   position: absolute; 
   top: 90px;
   display: grid;
-  grid-template-columns: repeat(10, 55px); 
-  grid-template-rows: repeat(4, 75px);
+  grid-template-columns: repeat(14, 45px); 
+  grid-template-rows: repeat(5, 60px);
   gap: 10px;
-  padding: 20px;
+  padding: 12px;
+}
+
+/* 2. Todas las fichas válidas intentan moverse a la izquierda */
+.hand-container.tile-joined {
+  /* Si el gap es 10px, movemos -12px para que se solapen 2px */
+  transform: translateX(-12px);
+  transition: transform 0.2s ease-out;
+  z-index: 10;
+}
+
+/* 3. EXCEPCIÓN CRUCIAL: 
+   Si una ficha unida NO tiene otra ficha unida justo a su izquierda, 
+   o es la primera de la fila, se queda en su sitio (X=0). 
+   Esto hace que el grupo se pegue a la primera ficha. */
+
+.hand-container:not(.tile-joined) + .hand-container.tile-joined,
+.hand-container.tile-joined:nth-child(14n+1) {
+  transform: translateX(0) !important;
 }
 
 /* Soporte inferior */

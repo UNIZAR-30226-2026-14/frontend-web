@@ -104,6 +104,57 @@ export const isMoveValid = (tiles) => {
   return isValidSameNumberGroup(tiles) || isValidLadderGroup(tiles);
 };
 
+
+// funciones para ver si se unen las fichas (literalmente lo mismo de arriba pero sin que sean 3)
+export const isValidSameNumber = (tiles) => {
+  if (tiles.length > 1) {
+    const firstTile = tiles.find((t) => t.number !== "J");
+    const sameNumber = tiles.every(
+      (ficha) => ficha.number === "J" || ficha.number === firstTile.number,
+    );
+    const colors = tiles.map((t) => t.color);
+    const uniqueColors = new Set(colors);
+    return sameNumber && uniqueColors.size === tiles.length;
+  } else {
+    return false;
+  }
+};
+
+
+export const isValidLadder = (tiles) => {
+  if (tiles.length > 1) {
+    // Buscamos la primera ficha que no sea un Joker
+    const firstRealIndex = tiles.findIndex((t) => t.number !== "J");
+    const firstRealTile = tiles[firstRealIndex];
+
+    // Comprobamos que todas las fichas sean del mismo color (sin contar los Jokers)
+    const sameColor = tiles.every(
+      (ficha) => ficha.number === "J" || ficha.color === firstRealTile.color,
+    );
+
+    // Calculamos cual deberia ser el número de la primera ficha si se empieza por Joker
+    let expected = firstRealTile.number - firstRealIndex;
+    if (expected >= 1) {
+      let isLadder = true;
+      for (let i = 0; i < tiles.length && isLadder; i++) {
+        isLadder =
+          (expected === tiles[i].number || tiles[i].number === "J") && isLadder;
+        expected++;
+      }
+      return isLadder && sameColor && expected - 1 <= 13;
+    } else {
+      return false;
+    }
+  } else {
+    return false;
+  }
+};
+
+
+export const areCompatible = (tiles) => {
+  return isValidSameNumber(tiles) || isValidLadder(tiles);
+};
+
 /**
  * Calcula el valor de un grupo de fichas para la apertura. El valor se basa en la suma de los números de las fichas,
  * donde los Jokers toman el valor del número que le correspondería si no fueran Jokers. Para grupos del mismo número,
