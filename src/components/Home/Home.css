@@ -274,7 +274,7 @@
   font-size: 30px;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1070px) {
   .top-menu {
     padding: 0;
     height: 75px;
