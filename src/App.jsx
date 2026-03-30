@@ -106,6 +106,14 @@ function App() {
 
   return (
     <>
+      <div className="orientation-warning">
+        <div className="phone-icon">
+          📱<span>🔄</span>
+        </div>
+        <p>Por favor, gira tu dispositivo.</p>
+        <p className="subtext">RUMMIPLUS se ve mejor en horizontal.</p>
+      </div>
+      
       {screen === "login" && <Login onLogin={handleLogin} />}
 
       {screen === "home" && (

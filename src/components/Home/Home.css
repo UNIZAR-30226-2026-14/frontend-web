@@ -25,7 +25,7 @@
 }
 
 .top-menu {
-  width: 100%;
+  width: 100vw;
   height: 100px;
   padding: 10px 20px;
   background-color: rgba(0, 0, 0, 0.3);
@@ -127,14 +127,26 @@
 .gamemodes {
   display: flex;
   flex: 1;
-  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  z-index: 1;
+  overflow-y: auto;
+}
+
+.gamemode-card {
+  flex: 0 1 350px;
+  max-width: 45%;
+  display: flex;
   justify-content: center;
 }
 
 .gamemode-card svg {
   cursor: pointer;
-  width: 300px;
+  width: 100%;
   height: auto;
+  max-height: 70vh;
   transition: transform 0.2s ease;
 }
 
@@ -265,9 +277,10 @@
   font-size: 30px;
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1070px) {
   .top-menu {
-    padding: 5vw;
+    padding: 0;
+    height: 75px;
   }
 
   .top-left {
@@ -308,8 +321,69 @@
   }
 
   .gamemode-card svg {
-    width: 35vw;
-    height: 35vw;
+    width: 30vw;
+    height: 30vw;
+  }
+
+  .gamemode-title {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 650px) {
+  .top-menu {
+    padding: 0;
+  }
+
+  .top-left {
+    gap: 0;
+  }
+
+  .profile-name h1 {
+    display: none;
+  }
+
+  .experience {
+    width: 100px;
+    height: 50px;
+  }
+
+  .xp {
+    display: none;
+  }
+
+  .friends svg,
+  .profile-name svg {
+    width: 70px;
+    height: 70px;
+  }
+
+  .settings img {
+    width: 65px;
+    height: 65px;
+  }
+
+  .shop {
+    width: 80px;
+    height: 80px;
+  }
+
+  .title {
+    font-size: 28px;
+  }
+
+  .gamemodes {
+    gap: 10px;
+    padding-top: 10px;
+  }
+
+  .gamemode-card {
+    max-width: 80%;
+    flex: 0 0 auto;
+  }
+
+  .gamemode-card svg {
+    max-height: 35vh;
   }
 
   .gamemode-title {

@@ -9,12 +9,16 @@
 }
 
 .spinner {
-  height: 200px;
   width: 200px;
-  border: 12px solid transparent;
+  height: 200px;
+  min-width: 200px;
+  min-height: 200px;
+  width: auto;
+  border: 10px solid transparent;
   border-radius: 50%;
   border-right-color: aqua;
-  animation: spin 1.5s ease infinite;
+  box-sizing: border-box;
+  animation: spin 1.5s linear infinite;
 }
 
 @keyframes spin {
@@ -26,7 +30,7 @@
 .loading-text::after {
   content: "";
   display: inline-block;
-  width: 20px; /* Para que el texto se quede fijo*/
+  width: 20px;
   text-align: left;
   animation: dots 2s steps(4) infinite;
 }
@@ -51,4 +55,13 @@
 
 .cancel-button {
   flex-direction: column;
+}
+
+@media (max-height: 500px) {
+  .spinner {
+    width: 100px;
+    height: 100px;
+    min-width: 100px;
+    min-height: 100px;
+  }
 }

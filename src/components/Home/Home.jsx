@@ -44,6 +44,52 @@ function Home({
 }) {
   const [activePopup, setActivePopup] = useState(null);
 
+  // Avatar
+  const [userAvatar, setUserAvatar] = useState(() => {
+    const saved = localStorage.getItem("rummi-avatar");
+    return saved ? saved : alex;
+  });
+
+  // Monedas
+  const [coins, setCoins] = useState(() => {
+    const saved = localStorage.getItem("rummi-coins");
+    return saved ? parseInt(saved) : 1000;
+  });
+
+  // Fondo de la mesa de juego
+  const [currentBackground, setCurrentBackground] = useState(() => {
+    const saved = localStorage.getItem("rummi-bg");
+    return saved ? saved : "#2e7d32";
+  });
+
+  // 
+  const [currentSkin, setCurrentSkin] = useState(() => {
+    const saved = localStorage.getItem("rummi-skin");
+    return saved ? saved : "";
+  })
+
+  // Nivel
+  const [level, setLevel] = useState(() => {
+    const saved = localStorage.getItem("rummi-lvl");
+    return saved ? parseInt(saved) : 1;
+  });
+
+  // Experiencia del nivel actual
+  const [xp, setXp] = useState(() => {
+    const saved = localStorage.getItem("rummi-xp");
+    return saved ? parseInt(saved) : 0;
+  });
+
+  const [showConfetti, setShowConfetti] = useState(false);
+
+  const [ownedBgs, setOwnedBgs] = useState(() => {
+    const saved = localStorage.getItem("rummi-bgs");
+    return saved ? JSON.parse(saved) : ["classic"];
+  });
+
+  // Experiencia para subir al siguiente nivel
+  const xpToNextLevel = (level - 1) ** 2 * 50 + 100;
+
   /**
    * Alterna la visibilidad de los popups. Si el popup ya está abierto,
    * lo cierra.
@@ -205,18 +251,18 @@ function Home({
             <g>
               <rect
                 className="regular-background"
-                x={50}
+                x={25}
                 y={25}
                 width={250}
                 height={400}
                 rx={10}
               />
-              <text className="gamemode-title" x={100} y={75}>
+              <text className="gamemode-title" x={75} y={75}>
                 Modo Clásico
               </text>
               <rect
                 className="tile-bottom"
-                x={120}
+                x={95}
                 y={125}
                 width={150}
                 height={200}
@@ -224,7 +270,7 @@ function Home({
               />
               <rect
                 className="tile-top"
-                x={120}
+                x={95}
                 y={125}
                 width={150}
                 height={200}
@@ -240,13 +286,13 @@ function Home({
             <g>
               <rect
                 className="enhanced-background"
-                x={50}
+                x={25}
                 y={25}
                 width={250}
                 height={400}
                 rx={10}
               />
-              <text className="gamemode-title" x={100} y={75}>
+              <text className="gamemode-title" x={75} y={75}>
                 Modo Arcade
               </text>
             </g>
