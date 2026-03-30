@@ -260,18 +260,18 @@ function Home({ onStart, username, onLogout }) {
             <g>
               <rect
                 className="regular-background"
-                x={50}
+                x={25}
                 y={25}
                 width={250}
                 height={400}
                 rx={10}
               />
-              <text className="gamemode-title" x={100} y={75}>
+              <text className="gamemode-title" x={75} y={75}>
                 Modo Clásico
               </text>
               <rect
                 className="tile-bottom"
-                x={120}
+                x={95}
                 y={125}
                 width={150}
                 height={200}
@@ -279,7 +279,7 @@ function Home({ onStart, username, onLogout }) {
               />
               <rect
                 className="tile-top"
-                x={120}
+                x={95}
                 y={125}
                 width={150}
                 height={200}
@@ -295,13 +295,13 @@ function Home({ onStart, username, onLogout }) {
             <g>
               <rect
                 className="enhanced-background"
-                x={50}
+                x={25}
                 y={25}
                 width={250}
                 height={400}
                 rx={10}
               />
-              <text className="gamemode-title" x={100} y={75}>
+              <text className="gamemode-title" x={75} y={75}>
                 Modo Arcade
               </text>
             </g>
