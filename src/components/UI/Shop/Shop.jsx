@@ -33,6 +33,12 @@ const BACKGROUNDS = [
   },
 ];
 
+const TILE_SKINS = [
+  { id: "default", name: "Original", price: 0, value: "skin-default" },
+  { id: "neon", name: "Cibernético", price: 800, value: "skin-neon" },
+  { id: "marble", name: "Mármol Real", price: 2000, value: "skin-marble" },
+];
+
 function Shop({
   onClose,
   coins,
@@ -41,30 +47,49 @@ function Shop({
   setCurrentBackground,
   addXp,
   ownedBgs,
-  setOwnedBgs
+  setOwnedBgs,
+  currentSkin,
+  setCurrentSkin,
+  ownedSkins,
+  setOwnedSkins,
 }) {
-  // Maneja la accion de comprar o equipar un fondo
-  const handleAction = (bg) => {
-    if (ownedBgs.includes(bg.id)) {
-      setCurrentBackground(bg.value);
+  //
+  const handlePurchase = (item, type) => {
+    const isOwned =
+      type === "bg" ? ownedBgs.includes(item.id) : ownedSkins.includes(item.id);
+
+    if (isOwned) {
+      type === "bg"
+        ? setCurrentBackground(item.value)
+        : setCurrentSkin(item.value);
     } else {
-      if (coins >= bg.price) {
-        setCoins(coins - bg.price);
+      if (coins >= item.price) {
+        setCoins(coins - item.price);
         addXp(50);
-        const updatedOwned = [...ownedBgs, bg.id];
-        setOwnedBgs(updatedOwned);
-        localStorage.setItem("rummi-bgs", JSON.stringify(updatedOwned))
-        setCurrentBackground(bg.value);
+
+        let updatedOwned;
+        if (type === "bg") {
+          updatedOwned = [...ownedBgs, item.id];
+          setOwnedBgs(updatedOwned);
+          localStorage.setItem("rummi-bgs", JSON.stringify(updatedOwned));
+          setCurrentBackground(item.value);
+        } else {
+          updatedOwned = [...ownedSkins, item.id];
+          setOwnedSkins(updatedOwned);
+          localStorage.setItem("rummi-skins", JSON.stringify(updatedOwned));
+          setCurrentSkin(item.value);
+        }
+
         sileo.success({
           title: "¡Compra realizada!",
-          description: `Has desbloqueado ${bg.name}`
-        })
+          description: `Has desbloqueado ${item.name}`,
+        });
       } else {
         sileo.error({
           title: "Fondos insuficientes",
           description: (
             <span className="insufficent-founds">
-              No tienes suficientes monedas para comprar este fondo. ¡Sigue
+              No tienes suficientes monedas para comprar este ${type}. ¡Sigue
               jugando para ganar más!
             </span>
           ),
@@ -92,7 +117,7 @@ function Shop({
             >
               <div className="color-preview" style={{ background: bg.value }} />
               <span className="background-name">{bg.name}</span>
-              <button onClick={() => handleAction(bg)}>
+              <button onClick={() => handlePurchase(bg, "bg")}>
                 {ownedBgs.includes(bg.id)
                   ? currentBackground === bg.value
                     ? "Equipado"
@@ -107,7 +132,25 @@ function Shop({
         <div className="shop-sections">
           <h3 className="tile-title">Skins de Fichas</h3>
           <div className="skins-list">
-            <p className="coming-soon">Próximamente...</p>
+            {TILE_SKINS.map((skin) => (
+              <div
+                key={skin.id}
+                className={`skin-card ${currentSkin === skin.value ? "active" : ""}`}
+              >
+                <div
+                  className="skin-preview"
+                  style={{ background: skin.value }}
+                />
+                <span className="skin-name">{skin.name}</span>
+                <button onClick={() => handlePurchase(skin, "skin")}>
+                  {ownedSkins.includes(skin.id)
+                    ? currentSkin === skin.value
+                      ? "Equipado"
+                      : "Equipar"
+                    : `${skin.price}`}
+                </button>
+              </div>
+            ))}
           </div>
         </div>
 

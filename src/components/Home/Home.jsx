@@ -46,6 +46,12 @@ function Home({ onStart, username, onLogout }) {
     return saved ? saved : "#2e7d32";
   });
 
+  // 
+  const [currentSkin, setCurrentSkin] = useState(() => {
+    const saved = localStorage.getItem("rummi-skin");
+    return saved ? saved : "";
+  })
+
   // Nivel
   const [level, setLevel] = useState(() => {
     const saved = localStorage.getItem("rummi-lvl");
