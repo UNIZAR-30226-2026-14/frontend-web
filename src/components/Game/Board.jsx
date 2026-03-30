@@ -5,6 +5,7 @@ import { useGame } from '../../hooks/useGame.js';
 import './Board.css';
 import { useDraggable, DndContext, DragOverlay } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
+import { areCompatible } from '../../hooks/deckFactory.js'
 
 //-------------------ESTO LUEGO IRÁ APARTE
 function DraggableTile({ tile }) { // Versión de ficha ya draggeable
@@ -37,18 +38,19 @@ function Board() {
   // Obtenemos el estado del juego y las funciones para manipularlo
   const { bag, playerHand, setPlayerHand, gameBoard, setGameBoard, drawTile, dealInitialHand } = useGame();
   const [activeId, setActiveId] = useState(null); // Para rastrear qué ficha se arrastra
+  const [joinedSlots, setJoinedSlots] = useState([]);
 
   const [handPositions, setHandPositions] = useState(() => {
     // Inicializamos 20 huecos vacíos
     const initial = {};
-    for (let i = 0; i < 20; i++) initial[`hand-slot-${i}`] = null;
+    for (let i = 0; i < 20; i++) initial[`hand-slot-${i}`] = '';
     return initial;
   });
 
   const [boardPositions, setBoardPositions] = useState(() => {
     // Inicializamos 40 huecos vacíos
     const initial = {};
-    for (let i = 0; i < 40; i++) initial[`board-slot-${i}`] = null;
+    for (let i = 0; i < 70; i++) initial[`board-slot-${i}`] = '';
     return initial;
   });
 
@@ -62,6 +64,40 @@ function Board() {
       setHandPositions(newPositions);
     }
   }, [playerHand]);
+
+  useEffect(() => {
+  const newJoined = [];
+  
+  // Recorremos el tablero por filas (5 filas de 14)
+  for (let row = 0; row < 5; row++) {
+    let currentRowIndices = [];
+    let currentRowTiles = [];
+
+    for (let col = 0; col < 14; col++) {
+      const index = row * 14 + col;
+      const slotId = `board-slot-${index}`;
+      const tile = boardPositions[slotId];
+
+      if (tile !== '') {
+        currentRowIndices.push(slotId);
+        currentRowTiles.push(tile);
+      } else {
+        // Al encontrar un hueco vacío, validamos el grupo acumulado hasta ahora
+        if (areCompatible(currentRowTiles)) {
+          newJoined.push(...currentRowIndices);
+        }
+        currentRowIndices = [];
+        currentRowTiles = [];
+      }
+    }
+    // Validar si quedó un grupo al final de la fila
+    if (areCompatible(currentRowTiles)) {
+      newJoined.push(...currentRowIndices);
+    }
+  }
+
+  setJoinedSlots(newJoined);
+}, [boardPositions]); // Se ejecuta cada vez que el tablero cambie
 
   // Repartimos las 14 fichas iniciales
   useEffect(() => {
@@ -91,11 +127,9 @@ function Board() {
 
     // si se suleta en tablero
     if (overId.startsWith('board-slot')) {
-
-      //setBoardPositions(prev => ({ ...prev, [overId]: tile }));
-      //if (handKey) setHandPositions(prev => ({ ...prev, [handKey]: null })); // La quitamos de la mano
+      
       if (fromHandKey) {
-        if (boardPositions[overId] !== null) {
+        if (boardPositions[overId] !== '') {
           return;
         }
         const tileMoving = handPositions[fromHandKey];
@@ -114,9 +148,6 @@ function Board() {
         setBoardPositions((prev) => {
           // IMPORTANTE: Clonamos el objeto anterior para no mutar el estado directamente
           const newPositions = { ...prev };
-          // aqui es el huevo
-          const oldSlot = Object.keys(prev).find(key => prev[key]?.id === overId);
-          // 3. Intercambio de fichas (Swap logic)
           newPositions[overId] = tileMoving;
           // 4. Actualizamos el playerHand del hook useGame (opcional)
           // Extraemos solo las fichas que no son null para mantener la lista plana sincronizada
@@ -155,8 +186,46 @@ function Board() {
     // si se suelta en mano
     else if (overId.startsWith('hand-slot')) {
 
-      //si pillas ficha del tablero a la mano, no pasa anada
-      if (fromBoardKey) return;
+      //si pillas ficha del tablero a la mano
+      if (fromBoardKey) {
+        //if (active.placed) return;
+        //else {
+
+
+          if (handPositions[overId] !== '') {
+            return;
+          }
+          const tileMoving = boardPositions[fromBoardKey];
+          setBoardPositions((prev) => {
+            // IMPORTANTE: Clonamos el objeto anterior para no mutar el estado directamente
+            const newPositions = { ...prev };
+            // 2. Buscamos en qué hueco estaba la ficha que estamos moviendo
+            newPositions[fromBoardKey] = '';
+            // 4. Actualizamos el playerHand del hook useGame (opcional)
+            // Extraemos solo las fichas que no son null para mantener la lista plana sincronizada
+            const updatedTilesArray = Object.values(newPositions).filter(tile => tile !== null);
+            setGameBoard(updatedTilesArray);
+            return newPositions;
+          })
+
+          setHandPositions((prev) => {
+            // IMPORTANTE: Clonamos el objeto anterior para no mutar el estado directamente
+            const newPositions = { ...prev };
+            // aqui es el huevo
+            const oldSlot = Object.keys(prev).find(key => prev[key]?.id === overId);
+            // 3. Intercambio de fichas (Swap logic)
+            newPositions[overId] = tileMoving;
+            // 4. Actualizamos el playerHand del hook useGame (opcional)
+            // Extraemos solo las fichas que no son null para mantener la lista plana sincronizada
+            const updatedTilesArray = Object.values(newPositions).filter(tile => tile !== null);
+            setPlayerHand(updatedTilesArray);
+            return newPositions;
+          })
+
+        //}
+
+      };
+        
 
       //si es una que mueves dentro de la mano, todo bien
       if (fromHandKey && fromHandKey !== overId) {
@@ -258,19 +327,24 @@ function Board() {
         {/* ÁREA DEL TABLERO */}
         <main className='board-area'>
           {/* El SVG de fondo */}
-          <svg width="650" height="350" className='board-svg'>
+          <svg width="760" height="350" className='board-svg'>
             <rect width="800" height="800" fill="#073600" />
           </svg>
 
           {/* FICHAS DINÁMICAS (Las que el jugador tiene en la mano) */}
           <div className='board-grid'>
             {Object.keys(boardPositions).map((slotId) => (
-              <Hand key={slotId} id={slotId}>
+              <Hand 
+                key={slotId} 
+                id={slotId} 
+                className={joinedSlots.includes(slotId) ? 'tile-joined' : ''}
+              >
                 {boardPositions[slotId] && (
                   <DraggableTile tile={boardPositions[slotId]} />
                 )}
               </Hand>
-            ))}</div>
+            ))}
+          </div>
         </main>
 
         {/* Baraja con las fichas restantes */}
@@ -313,6 +387,7 @@ function Board() {
           <Tile
             number={activeTile.number}
             color={activeTile.color}
+            placed={activeTile.placed}
           />
         ) : null}
       </DragOverlay>

@@ -57,3 +57,24 @@
 .insufficent-founds {
   color: black;
 }
+
+.background-card {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 15px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 2px solid transparent;
+  transition: transform 0.2s ease-in-out;
+  transform: translateZ(0);
+}
+
+.background-card.active {
+  border-color: #00ff1a;
+  background: rgba(255, 215, 0, 0.05);
+}
+
+.background-card:hover {
+  transform: translateY(-5px);
+}

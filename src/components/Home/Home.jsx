@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "./home.css";
 import FriendsList from "../UI/FriendsList/FriendsList.jsx";
 import Shop from "../UI/Shop/Shop.jsx";
@@ -13,8 +13,6 @@ import fernando from "../../assets/avatars/fernando.png";
 import gonzalo from "../../assets/avatars/gonzalo.png";
 import miguel from "../../assets/avatars/miguel.png";
 
-import Realistic from "react-canvas-confetti/dist/presets/realistic";
-
 // Lista de avatares disponibles para el perfil
 const AVATAR_LIST = [
   { id: 1, url: alex, name: "Alex" },
@@ -25,7 +23,25 @@ const AVATAR_LIST = [
   { id: 6, url: miguel, name: "Miguel" },
 ];
 
-function Home({ onStart, username, onLogout }) {
+function Home({
+  onStart,
+  username,
+  onLogout,
+  setCurrentBackground,
+  currentBackground,
+  coins,
+  setCoins,
+  level,
+  xp,
+  addXp,
+  xpToNextLevel,
+  userAvatar,
+  setUserAvatar,
+  ownedBgs,
+  setOwnedBgs,
+  showConfetti,
+  setShowConfetti,
+}) {
   const [activePopup, setActivePopup] = useState(null);
 
   // Avatar
@@ -82,37 +98,6 @@ function Home({ onStart, username, onLogout }) {
   const togglePopup = (popupName) => {
     setActivePopup(activePopup === popupName ? null : popupName);
   };
-
-  /**
-   * Añade XP al jugador y gestiona la subida de nivel con efectos visuales.
-   * @param {number} ammount - Cantidad de XP ganada.
-   */
-  const addXp = (ammount) => {
-    let newXp = xp + ammount;
-    let newLevel = level;
-
-    if (newXp >= xpToNextLevel) {
-      newXp -= xpToNextLevel;
-      newLevel++;
-      setCoins(coins + 100);
-      setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 3000);
-    }
-
-    setXp(newXp);
-    setLevel(newLevel);
-  };
-
-  /**
-   * Sincroniza automáticamente cualquier cambio en el estado con el LocalStorage
-   */
-  useEffect(() => {
-    localStorage.setItem("rummi-coins", coins);
-    localStorage.setItem("rummi-bg", currentBackground);
-    localStorage.setItem("rummi-avatar", userAvatar);
-    localStorage.setItem("rummi-lvl", level);
-    localStorage.setItem("rummi-xp", xp);
-  }, [coins, currentBackground, userAvatar, level, xp]);
 
   return (
     <div className="home-screen">
@@ -189,7 +174,7 @@ function Home({ onStart, username, onLogout }) {
           {/* Título */}
           <h1 className="title">RUMMIPLUS</h1>
         </div>
-        
+
         {/* Menú arriba derecha */}
         <div className="top-right">
           {/* Amigos */}
@@ -229,7 +214,7 @@ function Home({ onStart, username, onLogout }) {
         <Profile
           onClose={() => togglePopup("profile")}
           currentAvatar={userAvatar}
-          onSelectAvatar={setUserAvatar}
+          setUserAvatar={setUserAvatar}
           avatarList={AVATAR_LIST}
         />
       )}
@@ -314,22 +299,6 @@ function Home({ onStart, username, onLogout }) {
           </svg>
         </div>
       </div>
-
-      {/* Efecto de confetti */}
-      {showConfetti && (
-        <Realistic
-          autorun={{ speed: 0.3, duration: 3000 }}
-          style={{
-            position: "fixed",
-            pointerEvents: "none",
-            width: "100%",
-            height: "100%",
-            top: 0,
-            left: 0,
-            zIndex: 9999,
-          }}
-        />
-      )}
     </div>
   );
 }
