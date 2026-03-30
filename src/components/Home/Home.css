@@ -126,24 +126,27 @@
 
 .gamemodes {
   display: flex;
+  flex: 1;
   gap: 20px;
+  padding: 20px;
   width: 100%;
-  height: calc(100vh - 100px);
-  position: absolute;
-  top: 100px;
-  left: 0;
+  box-sizing: border-box;
   z-index: 1;
+  overflow-y: auto;
 }
 
 .gamemode-card {
-  flex: 0 0 300px;
-  max-width: 90vw;
+  flex: 0 1 350px;
+  max-width: 45%;
+  display: flex;
+  justify-content: center;
 }
 
 .gamemode-card svg {
   cursor: pointer;
-  width: 300px;
+  width: 100%;
   height: auto;
+  max-height: 70vh;
   transition: transform 0.2s ease;
 }
 
@@ -327,9 +330,6 @@
   }
 }
 
-@media (max-height: 100px) {
-}
-
 @media (max-width: 650px) {
   .top-menu {
     padding: 0;
@@ -372,9 +372,18 @@
     font-size: 28px;
   }
 
+  .gamemodes {
+    gap: 10px;
+    padding-top: 10px;
+  }
+
+  .gamemode-card {
+    max-width: 80%;
+    flex: 0 0 auto;
+  }
+
   .gamemode-card svg {
-    width: 35vw;
-    height: 35vw;
+    max-height: 35vh;
   }
 
   .gamemode-title {
