@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./profile.css";
 
-function Profile({ onClose, currentAvatar, onSelectAvatar, avatarList }) {
+function Profile({ onClose, currentAvatar, setUserAvatar, avatarList }) {
   const [isEditing, setIsEditing] = useState(false);
 
   return (
@@ -49,7 +49,7 @@ function Profile({ onClose, currentAvatar, onSelectAvatar, avatarList }) {
                     : "avatar-item"
                 }
                 onClick={() => {
-                  onSelectAvatar(avatar.url);
+                  setUserAvatar(avatar.url);
                   setIsEditing(false);
                 }}
               />
