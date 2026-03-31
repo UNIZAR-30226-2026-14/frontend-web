@@ -27,6 +27,10 @@
   }
 }
 
+.loading-text {
+  user-select: none;
+}
+
 .loading-text::after {
   content: "";
   display: inline-block;
@@ -55,6 +59,7 @@
 
 .cancel-button {
   flex-direction: column;
+  user-select: none;
 }
 
 @media (max-height: 500px) {
