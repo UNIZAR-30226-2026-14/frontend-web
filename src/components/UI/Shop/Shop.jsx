@@ -62,10 +62,6 @@ function Shop({
       type === "bg"
         ? setCurrentBackground(item.value)
         : setCurrentSkin(item.value);
-}) {
-  const handleAction = (bg) => {
-    if (ownedBgs.includes(bg.id)) {
-      setCurrentBackground(bg.value);
     } else {
       if (coins >= item.price) {
         setCoins(coins - item.price);
@@ -87,13 +83,6 @@ function Shop({
         sileo.success({
           title: "¡Compra realizada!",
           description: `Has desbloqueado ${item.name}`,
-        const updatedOwned = [...ownedBgs, bg.id];
-        setOwnedBgs(updatedOwned);
-        localStorage.setItem("rummi-bgs", JSON.stringify(updatedOwned));
-        setCurrentBackground(bg.value);
-        sileo.success({
-          title: "¡Compra realizada!",
-          description: `Has desbloqueado ${bg.name}`,
         });
       } else {
         sileo.error({
@@ -110,105 +99,76 @@ function Shop({
   };
 
   return (
-    <div className="shop-popup">
-      {/* Toaster para las notificaciones */}
-      <Toaster position="top-center" />
-      <h2 className="shop-title">Tienda</h2>
-      <button className="close-button" onClick={onClose}>
-        X
-      </button>
-      {/* Sección de tableros */}
-      <div className="shop-sections">
-        <h3 className="bg-title">Tableros</h3>
-        <div className="backgrounds-list">
-          {BACKGROUNDS.map((bg) => (
-            <div
-              key={bg.id}
-              className={`background-card ${currentBackground === bg.value ? "active" : ""}`}
-            >
-              <div className="color-preview" style={{ background: bg.value }} />
-              <span className="background-name">{bg.name}</span>
-              <button onClick={() => handlePurchase(bg, "bg")}>
-                {ownedBgs.includes(bg.id)
-                  ? currentBackground === bg.value
-                    ? "Equipado"
-                    : "Equipar"
-                  : `${bg.price}`}
-              </button>
-            </div>
-          ))}
-        </div>
-
-        {/* Skins para las fichas */}
-        <div className="shop-sections">
-          <h3 className="tile-title">Skins de Fichas</h3>
-          <div className="skins-list">
-            {TILE_SKINS.map((skin) => (
-              <div
-                key={skin.id}
-                className={`skin-card ${currentSkin === skin.value ? "active" : ""}`}
-              >
-                <div
-                  className="skin-preview"
-                  style={{ background: skin.value }}
-                />
-                <span className="skin-name">{skin.name}</span>
-                <button onClick={() => handlePurchase(skin, "skin")}>
-                  {ownedSkins.includes(skin.id)
-                    ? currentSkin === skin.value
-                      ? "Equipado"
-                      : "Equipar"
-                    : `${skin.price}`}
-                </button>
-              </div>
-            ))}
-      <div className="shop-content">
-        <Toaster position="top-center" />
-        <h2 className="shop-title">Tienda</h2>
-        <button className="close-button" onClick={onClose}>
-          X
-        </button>
-        <div className="shop-sections">
-          <h3 className="bg-title">Tableros</h3>
-          <div className="backgrounds-list">
-            {BACKGROUNDS.map((bg) => {
-              const isOwned = ownedBgs.includes(bg.id);
-              const isEquipped = currentBackground === bg.value;
-              let buttonText = isOwned
-                ? isEquipped
-                  ? "Equipado"
-                  : "Equipar"
-                : bg.price;
-              return (
-                <div
-                  key={bg.id}
-                  className={`background-card ${isEquipped ? "active" : ""}`}
-                >
-                  <div
-                    className="color-preview"
-                    style={{ background: bg.value }}
-                  />
-                  <span className="background-name">{bg.name}</span>
-                  <button
-                    className={isEquipped ? "btn-active" : ""}
-                    onClick={() => handleAction(bg)}
-                    disabled={isEquipped}
-                  >
-                    {buttonText}
-                  </button>
-                </div>
-              );
-            })}
-          </div>
+    <div className="shop-bg">
+      <div className="shop-popup">
+        <div className="shop-content">
+          {/* Toaster para las notificaciones */}
+          <Toaster position="top-center" />
+          <h2 className="shop-title">Tienda</h2>
+          <button className="close-button" onClick={onClose}>
+            X
+          </button>
 
           <div className="shop-sections">
+            {/* SECCIÓN TABLEROS */}
+            <h3 className="bg-title">Tableros</h3>
+            <div className="backgrounds-list">
+              {BACKGROUNDS.map((bg) => {
+                const isEquipped = currentBackground === bg.value;
+                const isOwned = ownedBgs.includes(bg.id);
+                return (
+                  <div
+                    key={bg.id}
+                    className={`background-card ${isEquipped ? "active" : ""}`}
+                  >
+                    <div
+                      className="color-preview"
+                      style={{ background: bg.value }}
+                    />
+                    <span className="background-name">{bg.name}</span>
+                    <button
+                      onClick={() => handlePurchase(bg, "bg")}
+                      disabled={isEquipped}
+                    >
+                      {isOwned
+                        ? isEquipped
+                          ? "Equipado"
+                          : "Equipar"
+                        : bg.price}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* SECCIÓN SKINS DE FICHAS */}
             <h3 className="tile-title">Skins de Fichas</h3>
             <div className="skins-list">
-              <p className="coming-soon">Próximamente...</p>
+              {TILE_SKINS.map((skin) => {
+                const isEquipped = currentSkin === skin.value;
+                const isOwned = ownedSkins.includes(skin.id);
+                return (
+                  <div
+                    key={skin.id}
+                    className={`skin-card ${isEquipped ? "active" : ""}`}
+                  >
+                    <div className={`skin-preview ${skin.value}`}>7</div>
+                    <span className="skin-name">{skin.name}</span>
+                    <button
+                      onClick={() => handlePurchase(skin, "skin")}
+                      disabled={isEquipped}
+                    >
+                      {isOwned
+                        ? isEquipped
+                          ? "Equipado"
+                          : "Equipar"
+                        : skin.price}
+                    </button>
+                  </div>
+                );
+              })}
             </div>
-          </div>
 
-          <div className="shop-sections real-money">
             <h3 className="coins-title">Obtener Monedas</h3>
             <div className="money-packs">
               <div className="pack-card">

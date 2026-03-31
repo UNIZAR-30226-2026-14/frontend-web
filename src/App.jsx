@@ -40,15 +40,28 @@ function App() {
     return saved ? saved : "#2e7d32";
   });
 
+  // Fondos de tablero comprados
+  const [ownedBgs, setOwnedBgs] = useState(() => {
+    const saved = localStorage.getItem("rummi-bgs");
+    return saved ? JSON.parse(saved) : ["classic"];
+  });
+
+  // Skin de fichas actual
+  const [currentSkin, setCurrentSkin] = useState(() => {
+    const saved = localStorage.getItem("rummi-skin");
+    return saved ? saved : "";
+  });
+
+  // Fondos de tablero comprados
+  const [ownedSkins, setOwnedSkins] = useState(() => {
+    const saved = localStorage.getItem("rummi-skins");
+    return saved ? JSON.parse(saved) : ["default"];
+  });
+
   // Avatar
   const [userAvatar, setUserAvatar] = useState(() => {
     const saved = localStorage.getItem("rummi-avatar");
     return saved ? saved : alex;
-  });
-
-  const [ownedBgs, setOwnedBgs] = useState(() => {
-    const saved = localStorage.getItem("rummi-bgs");
-    return saved ? JSON.parse(saved) : ["classic"];
   });
 
   const [showConfetti, setShowConfetti] = useState(false);
@@ -99,6 +112,7 @@ function App() {
   useEffect(() => {
     localStorage.setItem("rummi-coins", coins);
     localStorage.setItem("rummi-bg", currentBackground);
+    localStorage.setItem("rummi-skin", currentSkin);
     localStorage.setItem("rummi-avatar", userAvatar);
     localStorage.setItem("rummi-lvl", level);
     localStorage.setItem("rummi-xp", xp);
@@ -113,7 +127,7 @@ function App() {
         <p>Por favor, gira tu dispositivo.</p>
         <p className="subtext">RUMMIPLUS se ve mejor en horizontal.</p>
       </div>
-      
+
       {screen === "login" && <Login onLogin={handleLogin} />}
 
       {screen === "home" && (
@@ -133,6 +147,10 @@ function App() {
           setUserAvatar={setUserAvatar}
           ownedBgs={ownedBgs}
           setOwnedBgs={setOwnedBgs}
+          currentSkin={currentSkin}
+          setCurrentSkin={setCurrentSkin}
+          ownedSkins={ownedSkins}
+          setOwnedSkins={setOwnedSkins}
           showConfetti={showConfetti}
           setShowConfetti={setShowConfetti}
         />
@@ -151,7 +169,7 @@ function App() {
           currentBackground={currentBackground}
           onWin={(puntosGanados) => {
             addXp(puntosGanados); // Sumar XP según los puntos conseguidos
-            setCoins(prev => prev + 50);
+            setCoins((prev) => prev + 50);
             setShowConfetti(true);
             setTimeout(() => {
               setShowConfetti(false);

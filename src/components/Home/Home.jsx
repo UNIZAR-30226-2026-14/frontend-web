@@ -39,56 +39,15 @@ function Home({
   setUserAvatar,
   ownedBgs,
   setOwnedBgs,
+  currentSkin,
+  setCurrentSkin,
+  ownedSkins,
+  setOwnedSkins,
   showConfetti,
   setShowConfetti,
 }) {
+  // Estado para controlar qué popup está abierto actualmente.
   const [activePopup, setActivePopup] = useState(null);
-
-  // Avatar
-  const [userAvatar, setUserAvatar] = useState(() => {
-    const saved = localStorage.getItem("rummi-avatar");
-    return saved ? saved : alex;
-  });
-
-  // Monedas
-  const [coins, setCoins] = useState(() => {
-    const saved = localStorage.getItem("rummi-coins");
-    return saved ? parseInt(saved) : 1000;
-  });
-
-  // Fondo de la mesa de juego
-  const [currentBackground, setCurrentBackground] = useState(() => {
-    const saved = localStorage.getItem("rummi-bg");
-    return saved ? saved : "#2e7d32";
-  });
-
-  // 
-  const [currentSkin, setCurrentSkin] = useState(() => {
-    const saved = localStorage.getItem("rummi-skin");
-    return saved ? saved : "";
-  })
-
-  // Nivel
-  const [level, setLevel] = useState(() => {
-    const saved = localStorage.getItem("rummi-lvl");
-    return saved ? parseInt(saved) : 1;
-  });
-
-  // Experiencia del nivel actual
-  const [xp, setXp] = useState(() => {
-    const saved = localStorage.getItem("rummi-xp");
-    return saved ? parseInt(saved) : 0;
-  });
-
-  const [showConfetti, setShowConfetti] = useState(false);
-
-  const [ownedBgs, setOwnedBgs] = useState(() => {
-    const saved = localStorage.getItem("rummi-bgs");
-    return saved ? JSON.parse(saved) : ["classic"];
-  });
-
-  // Experiencia para subir al siguiente nivel
-  const xpToNextLevel = (level - 1) ** 2 * 50 + 100;
 
   /**
    * Alterna la visibilidad de los popups. Si el popup ya está abierto,
@@ -235,6 +194,10 @@ function Home({
           addXp={addXp}
           ownedBgs={ownedBgs}
           setOwnedBgs={setOwnedBgs}
+          currentSkin={currentSkin}
+          setCurrentSkin={setCurrentSkin}
+          ownedSkins={ownedSkins}
+          setOwnedSkins={setOwnedSkins}
         />
       )}
 

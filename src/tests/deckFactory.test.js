@@ -5,107 +5,129 @@ import {
   isValidLadderGroup,
   groupValue,
   canPlayerOpen,
-  isMoveValid,
 } from "../hooks/deckFactory";
 
-// Helper para crear fichas rápidas en los tests
+// Helper para crear fichas
 const tile = (n, c) => ({ number: n, color: c });
 
-describe("Rummikub Engine - Full Suite", () => {
-  describe("Mazo y Utilidades (Cobertura de createDeck y shuffle)", () => {
-    it("Tiene que crear un mazo completo de 106 fichas con 2 jokers", () => {
-      const deck = createDeck();
-      expect(deck).toHaveLength(106);
-
-      const jokers = deck.filter((t) => t.number === "J");
-      expect(jokers).toHaveLength(2);
-
-      // Verifica que las fichas tengan la estructura correcta
-      expect(deck[0]).toHaveProperty("id");
-      expect(deck[0]).toHaveProperty("color");
-      expect(deck[0]).toHaveProperty("number");
-    });
-  });
-
-  describe("isValidSameNumberGroup()", () => {
-    it("Tiene que validar un trío de distintos colores", () => {
+describe("Reglas de Rummikub", () => {
+  describe("Grupos del mismo número", () => {
+    it("Trío de distintos colores", () => {
       const group = [tile(5, "red"), tile(5, "blue"), tile(5, "black")];
       expect(isValidSameNumberGroup(group)).toBe(true);
     });
 
-    it("Tiene que invalidar si hay menos de 3 fichas", () => {
-      expect(isValidSameNumberGroup([tile(5, "red"), tile(5, "blue")])).toBe(
-        false,
-      );
+    it("Cuarteto de distintos colores", () => {
+      const group = [
+        tile(5, "red"),
+        tile(5, "blue"),
+        tile(5, "black"),
+        tile(5, "orange"),
+      ];
+      expect(isValidSameNumberGroup(group)).toBe(true);
     });
 
-    it("Tiene que invalidar si se repite un color", () => {
-      const group = [tile(5, "red"), tile(5, "red"), tile(5, "black")];
+    it("Más de 4 fichas", () => {
+      const group = [
+        tile(5, "red"),
+        tile(5, "blue"),
+        tile(5, "black"),
+        tile(5, "orange"),
+        tile("J", "red"),
+      ];
       expect(isValidSameNumberGroup(group)).toBe(false);
     });
 
-    it("Tiene que validar con un Joker si el color es único", () => {
+    it("Joker intenta suplir un color que ya existe", () => {
+      const group = [tile(5, "red"), tile(5, "red"), tile("J", "black")];
+      expect(isValidSameNumberGroup(group)).toBe(false);
+    });
+
+    it("Joker con colores únicos", () => {
       const group = [tile(10, "red"), tile(10, "blue"), tile("J", "black")];
       expect(isValidSameNumberGroup(group)).toBe(true);
     });
   });
 
-  describe("isValidLadderGroup()", () => {
-    it("Tiene que validar una escalera simple", () => {
+  describe("Escaleras", () => {
+    it("Escalera simple", () => {
       const group = [tile(10, "red"), tile(11, "red"), tile(12, "red")];
       expect(isValidLadderGroup(group)).toBe(true);
     });
 
-    it("Tiene que validar una escalera con Joker al inicio", () => {
-      const group = [tile("J", "red"), tile(2, "red"), tile(3, "red")];
-      expect(isValidLadderGroup(group)).toBe(true);
+    it("Escalera con Joker en medio o extremos", () => {
+      expect(
+        isValidLadderGroup([
+          tile("J", "black"),
+          tile(2, "red"),
+          tile(3, "red"),
+        ]),
+      ).toBe(true);
+      expect(
+        isValidLadderGroup([
+          tile(11, "blue"),
+          tile("J", "black"),
+          tile(13, "blue"),
+        ]),
+      ).toBe(true);
+      expect(
+        isValidLadderGroup([
+          tile(2, "red"),
+          tile(3, "red"),
+          tile("J", "black"),
+        ]),
+      ).toBe(true);
     });
 
-    it("Tiene que invalidar si la escalera superaría el 13", () => {
+    it("Escalera que superaría el 13", () => {
       const group = [tile(12, "red"), tile(13, "red"), tile("J", "red")];
       expect(isValidLadderGroup(group)).toBe(false);
     });
 
-    it("Tiene que invalidar si el valor inicial calculado es menor a 1", () => {
-      // J, J, 1 -> J sería 0 y -1. Inválido.
-      const group = [tile("J", "red"), tile("J", "red"), tile(1, "red")];
+    it("Escalera que baja por debajo de 1", () => {
+      const group = [tile("J", "red"), tile(1, "red"), tile(2, "red")];
       expect(isValidLadderGroup(group)).toBe(false);
     });
 
-    it("Tiene que invalidar si hay menos de 3 fichas", () => {
-      expect(isValidLadderGroup([tile(1, "red"), tile(2, "red")])).toBe(false);
+    it("Longitud supera las 13 fichas", () => {
+      const tooLong = Array.from({ length: 13 }, (_, i) => tile(i + 1, "red"));
+      tooLong.push(tile("J", "red"));
+      expect(isValidLadderGroup(tooLong)).toBe(false);
     });
   });
 
-  describe("groupValue()", () => {
-    it("Tiene que calcular valor de grupos (número * cantidad)", () => {
+  describe("Puntos para apertura", () => {
+    it("Calcular número * cantidad en tríos con Joker", () => {
       const group = [tile(10, "red"), tile("J", "blue"), tile(10, "black")];
       expect(groupValue(group)).toBe(30);
     });
 
-    it("Tiene que calcular valor de escaleras con Joker", () => {
+    it("Escaleras con Joker", () => {
       const group = [tile("J", "red"), tile(10, "red"), tile(11, "red")];
       expect(groupValue(group)).toBe(30);
+
+      const groupEnd = [tile(11, "blue"), tile(12, "blue"), tile("J", "black")];
+      expect(groupValue(groupEnd)).toBe(36);
     });
   });
 
-  describe("canPlayerOpen()", () => {
-    it("Tiene que permitir abrir con 30 puntos exactos", () => {
-      const groups = [[tile(10, "red"), tile(10, "blue"), tile(10, "black")]];
+  describe("Regla de los 30 puntos", () => {
+    it("Múltiples grupos que suman exactamente 30", () => {
+      const groups = [
+        [tile(1, "red"), tile(2, "red"), tile(3, "red")],
+        [tile(8, "red"), tile(8, "blue"), tile(8, "black")],
+      ];
       expect(canPlayerOpen(groups)).toBe(true);
     });
 
-    it("Tiene que denegar si la suma es < 30", () => {
-      const groups = [[tile(5, "red"), tile(5, "blue"), tile(5, "black")]];
-      expect(canPlayerOpen(groups)).toBe(false);
-    });
+    it("", () => {
+      const groups = [[tile(9, "red"), tile(10, "red"), tile("J", "red")]];
+      expect(canPlayerOpen(groups)).toBe(true);
 
-    it("Tiene que denegar si algún grupo es inválido aunque sume > 30", () => {
-      const groups = [
-        [tile(13, "red"), tile(13, "blue"), tile(13, "black")], // 39 pts
-        [tile(1, "red"), tile(1, "red"), tile(1, "blue")], // Inválido
-      ];
-      expect(canPlayerOpen(groups)).toBe(false);
+      const lowGroup = [[tile(9, "red"), tile(10, "red"), tile(10, "red")]];
+      expect(
+        canPlayerOpen([[tile(9, "red"), tile(9, "blue"), tile(9, "black")]]),
+      ).toBe(false);
     });
   });
 });

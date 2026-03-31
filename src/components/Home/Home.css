@@ -91,6 +91,10 @@
   height: auto;
 }
 
+.settings {
+  user-select: none;
+}
+
 .friends-icon {
   cursor: pointer;
   fill: #2776f5;
@@ -116,6 +120,7 @@
   font-family: Arial, Helvetica, sans-serif;
   font-size: 24px;
   font-weight: bold;
+  user-select: none;
 }
 
 .shop-add {
@@ -267,6 +272,7 @@
 .xp {
   display: flex;
   flex-direction: row;
+  user-select: none;
 }
 
 .level-circle {
