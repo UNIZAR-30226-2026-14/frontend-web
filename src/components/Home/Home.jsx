@@ -23,31 +23,96 @@ const AVATAR_LIST = [
   { id: 6, url: miguel, name: "Miguel" },
 ];
 
+const PENDING_GAMES = [
+  {
+    id: "game1",
+    mode: "classic",
+    turn: "Maria_Rumi",
+    turnNumber: 8,
+    date: "31 mar 2026, 14:32",
+    players: [
+      { name: "Tú", avatar: null },
+      { name: "Maria_Rumi", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Maria" },
+      { name: "JugadorPro", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Pro" },
+    ],
+  },
+  {
+    id: "game2",
+    mode: "classic",
+    turn: "Tú",
+    turnNumber: 5,
+    date: "30 mar 2026, 21:10",
+    players: [
+      { name: "Lucas G.", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Lucas" },
+      { name: "Tú", avatar: null },
+    ],
+  },
+];
+
+const PARTY_PREVIEW_SLOTS = [
+  { name: "Tú", avatar: null },
+  {
+    name: "Maria_Rumi",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Maria",
+  },
+  { name: "Invitar", avatar: null, isInviteSlot: true },
+];
+
 function Home({
   onStart,
   username,
   onLogout,
-  setCurrentBackground,
-  currentBackground,
-  coins,
-  setCoins,
-  level,
-  xp,
   addXp,
-  xpToNextLevel,
-  userAvatar,
-  setUserAvatar,
-  ownedBgs,
-  setOwnedBgs,
-  currentSkin,
-  setCurrentSkin,
-  ownedSkins,
-  setOwnedSkins,
-  showConfetti,
-  setShowConfetti,
 }) {
-  // Estado para controlar qué popup está abierto actualmente.
   const [activePopup, setActivePopup] = useState(null);
+  const [selectedGame, setSelectedGame] = useState(null);
+  const [pendingDropdownOpen, setPendingDropdownOpen] = useState(false);
+
+  // Avatar
+  const [userAvatar, setUserAvatar] = useState(() => {
+    const saved = localStorage.getItem("rummi-avatar");
+    return saved ? saved : alex;
+  });
+
+  // Monedas
+  const [coins, setCoins] = useState(() => {
+    const saved = localStorage.getItem("rummi-coins");
+    return saved ? parseInt(saved) : 1000;
+  });
+
+  // Fondo de la mesa de juego
+  const [currentBackground, setCurrentBackground] = useState(() => {
+    const saved = localStorage.getItem("rummi-bg");
+    return saved ? saved : "#2e7d32";
+  });
+
+  // 
+  const [currentSkin, setCurrentSkin] = useState(() => {
+    const saved = localStorage.getItem("rummi-skin");
+    return saved ? saved : "";
+  })
+
+  // Nivel
+  const [level, setLevel] = useState(() => {
+    const saved = localStorage.getItem("rummi-lvl");
+    return saved ? parseInt(saved) : 1;
+  });
+
+  // Experiencia del nivel actual
+  const [xp, setXp] = useState(() => {
+    const saved = localStorage.getItem("rummi-xp");
+    return saved ? parseInt(saved) : 0;
+  });
+
+  const [showConfetti, setShowConfetti] = useState(false);
+
+  const [ownedBgs, setOwnedBgs] = useState(() => {
+    const saved = localStorage.getItem("rummi-bgs");
+    return saved ? JSON.parse(saved) : ["classic"];
+  });
+
+  // Experiencia para subir al siguiente nivel
+  const xpToNextLevel = (level - 1) ** 2 * 50 + 100;
 
   /**
    * Alterna la visibilidad de los popups. Si el popup ya está abierto,
@@ -63,11 +128,10 @@ function Home({
       {/* Barra superior */}
       <div className="top-menu">
         <div className="top-left">
-          {/* Perfil */}
-          <div className="profile-name">
-            <svg viewBox="-50 -50 100 100">
+          <div className="profile-section">
+            {/* Avatar */}
+            <svg className="profile-avatar" viewBox="-50 -50 100 100">
               <defs>
-                {/* Patrón para mostrar el avatar en el círculo designado para ello. */}
                 <pattern
                   id="userProfilePattern"
                   x="0"
@@ -90,42 +154,29 @@ function Home({
                 key={userAvatar}
                 className="profile"
                 cx={0}
-                cy={-5}
-                r={40}
+                cy={0}
+                r={45}
                 fill="url(#userProfilePattern)"
                 onClick={() => togglePopup("profile")}
               />
-
-              {/* Nivel */}
-              <g>
-                <circle className="level-bg" cx={35} cy={-30} r={15} />
-                <text
-                  className="level"
-                  x={35}
-                  y={-30}
-                  textAnchor="middle"
-                  alignmentBaseline="central"
-                >
-                  {level}
-                </text>
-              </g>
             </svg>
 
-            {/* Nombre de usuario */}
-            <h1>{username || "Invitado"}</h1>
-          </div>
-
-          {/* Barra de experiencia */}
-          <div className="experience">
-            <div className="xp-bar-container">
-              <div
-                className="xp-fill"
-                style={{ width: `${(xp / xpToNextLevel) * 100}%` }}
-              />
+            {/* Info: nombre + barra XP + nivel */}
+            <div className="profile-info">
+              <h1 className="profile-username">{username || "Invitado"}</h1>
+              <div className="xp-row">
+                <div className="xp-bar-container">
+                  <div
+                    className="xp-fill"
+                    style={{ width: `${(xp / xpToNextLevel) * 100}%` }}
+                  />
+                  <span className="xp-text">
+                    {xp}/{xpToNextLevel}xp
+                  </span>
+                </div>
+                <span className="xp-level">Nivel {level}</span>
+              </div>
             </div>
-            <span className="xp">
-              {xp} / {xpToNextLevel} XP
-            </span>
           </div>
         </div>
 
@@ -136,17 +187,6 @@ function Home({
 
         {/* Menú arriba derecha */}
         <div className="top-right">
-          {/* Amigos */}
-          <div className="friends" onClick={() => togglePopup("friends")}>
-            <svg viewBox="-50 -50 100 100">
-              <circle className="friends-background" cx={0} cy={-5} r={40} />
-              <g className="friends-icon">
-                <circle cy="-25" r="15" />
-                <path d="M -25 25 C -25 -17 25 -17 25 25 Z" />
-              </g>
-            </svg>
-          </div>
-
           {/* Tienda */}
           <div className="shop" onClick={() => togglePopup("shop")}>
             <svg viewBox="0 0 200 50">
@@ -164,6 +204,19 @@ function Home({
           {/* Ajustes */}
           <div className="settings" onClick={() => togglePopup("settings")}>
             <img src={settings_icon} alt="settings_icon" />
+          </div>
+
+          {/* Amigos */}
+          <div className="friends-menu">
+            <button
+              className="hamburger-button"
+              aria-label="Abrir lista de amigos"
+              onClick={() => setActivePopup("friends")}
+            >
+              <span className="hamburger-bar" />
+              <span className="hamburger-bar" />
+              <span className="hamburger-bar" />
+            </button>
           </div>
         </div>
       </div>
@@ -194,10 +247,6 @@ function Home({
           addXp={addXp}
           ownedBgs={ownedBgs}
           setOwnedBgs={setOwnedBgs}
-          currentSkin={currentSkin}
-          setCurrentSkin={setCurrentSkin}
-          ownedSkins={ownedSkins}
-          setOwnedSkins={setOwnedSkins}
         />
       )}
 
@@ -206,60 +255,135 @@ function Home({
         <Settings onClose={() => togglePopup("settings")} onLogout={onLogout} />
       )}
 
+      {/* Partidas pendientes */}
+      {PENDING_GAMES.length > 0 && (() => {
+        return (
+          <div className="pending-wrapper">
+            <div className={`pending-capsule ${selectedGame ? "has-selection" : ""}`}>
+              {PARTY_PREVIEW_SLOTS.map((slot, i) =>
+                slot.isInviteSlot ? (
+                  <button
+                    key={i}
+                    className="pending-circle invite-slot"
+                    onClick={() => setActivePopup("friends")}
+                    aria-label="Invitar amigo"
+                  >
+                    <span className="pending-invite-plus">+</span>
+                  </button>
+                ) : (
+                  <div key={i} className="pending-circle">
+                    <img
+                      className="pending-avatar"
+                      src={slot.avatar || userAvatar}
+                      alt={slot.name}
+                    />
+                  </div>
+                ),
+              )}
+
+              <div className="pending-circle pending-select-btn" onClick={() => setPendingDropdownOpen((v) => !v)}>
+                <span className={`pending-arrow ${pendingDropdownOpen ? "open" : ""}`}>▼</span>
+              </div>
+
+              {pendingDropdownOpen && (
+                <div className="pending-dropdown">
+                  {PENDING_GAMES.map((game) => {
+                    const isActive = selectedGame?.id === game.id;
+                    return (
+                      <div
+                        key={game.id}
+                        className={`pending-dropdown-row ${isActive ? "active" : ""}`}
+                        onClick={() => {
+                          setSelectedGame(isActive ? null : game);
+                          setPendingDropdownOpen(false);
+                        }}
+                      >
+                        <div className="pending-dropdown-avatars">
+                          {game.players.map((p, i) => (
+                            <div key={i} className="pending-circle mini">
+                              <img className="pending-avatar" src={p.avatar || userAvatar} alt={p.name} />
+                            </div>
+                          ))}
+                        </div>
+                        <div className="pending-dropdown-text">
+                          <span className="pending-dropdown-main">
+                            {game.players.map((p) => p.name).join(", ")}
+                          </span>
+                          <span className="pending-dropdown-meta">
+                            {game.date} · Turno {game.turnNumber}
+                          </span>
+                        </div>
+                        {isActive && <span className="pending-dropdown-check">✓</span>}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {selectedGame && (
+              <div className="pending-details">
+                <div className="pending-details-row">
+                  <span className="pending-details-label">Jugadores</span>
+                  <span className="pending-details-value">{selectedGame.players.map((p) => p.name).join(", ")}</span>
+                </div>
+                <div className="pending-details-row">
+                  <span className="pending-details-label">Turno de</span>
+                  <span className="pending-details-value highlight">
+                    {selectedGame.turn} ({selectedGame.turnNumber})
+                  </span>
+                </div>
+                <div className="pending-details-row">
+                  <span className="pending-details-label">Fecha</span>
+                  <span className="pending-details-value">{selectedGame.date}</span>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })()}
+
       {/* Selector de modos de juego */}
       <div className="gamemodes">
-        {/* Modo normal */}
-        <div className="gamemode-card" onClick={onStart}>
-          <svg viewBox="0 0 300 450">
-            <g>
-              <rect
-                className="regular-background"
-                x={25}
-                y={25}
-                width={250}
-                height={400}
-                rx={10}
-              />
-              <text className="gamemode-title" x={75} y={75}>
-                Modo Clásico
-              </text>
-              <rect
-                className="tile-bottom"
-                x={95}
-                y={125}
-                width={150}
-                height={200}
-                rx={8}
-              />
-              <rect
-                className="tile-top"
-                x={95}
-                y={125}
-                width={150}
-                height={200}
-                rx={8}
-              />
-            </g>
-          </svg>
+        <div
+          className={`gamemode-card classic ${selectedGame ? "" : ""} ${selectedGame && selectedGame.mode !== "classic" ? "disabled" : ""}`}
+          onClick={() => {
+            if (selectedGame && selectedGame.mode !== "classic") return;
+            onStart();
+          }}
+        >
+          <div className="gamemode-glow" />
+          <div className="gamemode-icon">
+            <svg viewBox="0 0 100 120" className="tile-icon">
+              <rect x="10" y="10" width="80" height="100" rx="8" className="tile-back" />
+              <rect x="18" y="18" width="64" height="84" rx="5" className="tile-front" />
+              <text x="50" y="72" textAnchor="middle" className="tile-number">7</text>
+            </svg>
+          </div>
+          <h2 className="gamemode-title">Modo Clásico</h2>
+          <p className="gamemode-desc">Las reglas de siempre</p>
+          <span className="gamemode-badge">
+            {selectedGame && selectedGame.mode === "classic" ? "CONTINUAR" : "JUGAR"}
+          </span>
         </div>
 
-        {/* Modo con power-ups */}
-        <div className="gamemode-card">
-          <svg viewBox="0 0 300 450">
-            <g>
-              <rect
-                className="enhanced-background"
-                x={25}
-                y={25}
-                width={250}
-                height={400}
-                rx={10}
-              />
-              <text className="gamemode-title" x={75} y={75}>
-                Modo Arcade
-              </text>
-            </g>
-          </svg>
+        <div
+          className={`gamemode-card arcade ${selectedGame && selectedGame.mode !== "arcade" ? "disabled" : ""}`}
+          onClick={() => {
+            if (selectedGame && selectedGame.mode !== "arcade") return;
+          }}
+        >
+          <div className="gamemode-glow" />
+          <div className="gamemode-icon">
+            <svg viewBox="0 0 100 120" className="tile-icon">
+              <rect x="10" y="10" width="80" height="100" rx="8" className="tile-back" />
+              <rect x="18" y="18" width="64" height="84" rx="5" className="tile-front" />
+              <text x="50" y="72" textAnchor="middle" className="tile-number">★</text>
+            </svg>
+          </div>
+          <h2 className="gamemode-title">Modo Arcade</h2>
+          <p className="gamemode-desc">Power-ups y caos</p>
+          <span className="gamemode-badge coming-soon">PRONTO</span>
         </div>
       </div>
     </div>
