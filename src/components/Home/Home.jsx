@@ -5,67 +5,11 @@ import Shop from "../UI/Shop/Shop.jsx";
 import Profile from "../UI/Profile/Profile.jsx";
 import Settings from "../UI/Settings/Settings.jsx";
 import TopMenu from "../UI/TopMenu/TopMenu.jsx";
+import PendingGames from "../UI/PendingGames/PendingGames.jsx";
 
 import alex from "../../assets/avatars/alex.png";
-import dani from "../../assets/avatars/dani.png";
-import dian from "../../assets/avatars/dian.png";
-import fernando from "../../assets/avatars/fernando.png";
-import gonzalo from "../../assets/avatars/gonzalo.png";
-import miguel from "../../assets/avatars/miguel.png";
-
-// Lista de avatares disponibles para el perfil
-const AVATAR_LIST = [
-  { id: 1, url: alex, name: "Alex" },
-  { id: 2, url: dani, name: "Dani" },
-  { id: 3, url: dian, name: "Dian" },
-  { id: 4, url: fernando, name: "Fernando" },
-  { id: 5, url: gonzalo, name: "Gonzalo" },
-  { id: 6, url: miguel, name: "Miguel" },
-];
-
-const PENDING_GAMES = [
-  {
-    id: "game1",
-    mode: "classic",
-    turn: "Maria_Rumi",
-    turnNumber: 8,
-    date: "31 mar 2026, 14:32",
-    players: [
-      { name: "Tú", avatar: null },
-      {
-        name: "Maria_Rumi",
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Maria",
-      },
-      {
-        name: "JugadorPro",
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Pro",
-      },
-    ],
-  },
-  {
-    id: "game2",
-    mode: "classic",
-    turn: "Tú",
-    turnNumber: 5,
-    date: "30 mar 2026, 21:10",
-    players: [
-      {
-        name: "Lucas G.",
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Lucas",
-      },
-      { name: "Tú", avatar: null },
-    ],
-  },
-];
-
-const PARTY_PREVIEW_SLOTS = [
-  { name: "Tú", avatar: null },
-  {
-    name: "Maria_Rumi",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Maria",
-  },
-  { name: "Invitar", avatar: null, isInviteSlot: true },
-];
+import { AVATAR_LIST } from "../../data/itemData.js";
+import { PENDING_GAMES } from "../../data/itemData.js";
 
 function Home({ onStart, username, onLogout, addXp }) {
   const [activePopup, setActivePopup] = useState(null);
@@ -245,113 +189,14 @@ function Home({ onStart, username, onLogout, addXp }) {
         <Settings onClose={() => togglePopup("settings")} onLogout={onLogout} />
       )}
 
-      {/* Partidas pendientes */}
-      {PENDING_GAMES.length > 0 &&
-        (() => {
-          return (
-            <div className="pending-wrapper">
-              <div
-                className={`pending-capsule ${selectedGame ? "has-selection" : ""}`}
-              >
-                {PARTY_PREVIEW_SLOTS.map((slot, i) =>
-                  slot.isInviteSlot ? (
-                    <button
-                      key={i}
-                      className="pending-circle invite-slot"
-                      onClick={() => setActivePopup("friends")}
-                      aria-label="Invitar amigo"
-                    >
-                      <span className="pending-invite-plus">+</span>
-                    </button>
-                  ) : (
-                    <div key={i} className="pending-circle">
-                      <img
-                        className="pending-avatar"
-                        src={slot.avatar || userAvatar}
-                        alt={slot.name}
-                      />
-                    </div>
-                  ),
-                )}
-
-                <div
-                  className="pending-circle pending-select-btn"
-                  onClick={() => setPendingDropdownOpen((v) => !v)}
-                >
-                  <span
-                    className={`pending-arrow ${pendingDropdownOpen ? "open" : ""}`}
-                  >
-                    ▼
-                  </span>
-                </div>
-
-                {pendingDropdownOpen && (
-                  <div className="pending-dropdown">
-                    {PENDING_GAMES.map((game) => {
-                      const isActive = selectedGame?.id === game.id;
-                      return (
-                        <div
-                          key={game.id}
-                          className={`pending-dropdown-row ${isActive ? "active" : ""}`}
-                          onClick={() => {
-                            setSelectedGame(isActive ? null : game);
-                            setPendingDropdownOpen(false);
-                          }}
-                        >
-                          <div className="pending-dropdown-avatars">
-                            {game.players.map((p, i) => (
-                              <div key={i} className="pending-circle mini">
-                                <img
-                                  className="pending-avatar"
-                                  src={p.avatar || userAvatar}
-                                  alt={p.name}
-                                />
-                              </div>
-                            ))}
-                          </div>
-                          <div className="pending-dropdown-text">
-                            <span className="pending-dropdown-main">
-                              {game.players.map((p) => p.name).join(", ")}
-                            </span>
-                            <span className="pending-dropdown-meta">
-                              {game.date} · Turno {game.turnNumber}
-                            </span>
-                          </div>
-                          {isActive && (
-                            <span className="pending-dropdown-check">✓</span>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-
-              {selectedGame && (
-                <div className="pending-details">
-                  <div className="pending-details-row">
-                    <span className="pending-details-label">Jugadores</span>
-                    <span className="pending-details-value">
-                      {selectedGame.players.map((p) => p.name).join(", ")}
-                    </span>
-                  </div>
-                  <div className="pending-details-row">
-                    <span className="pending-details-label">Turno de</span>
-                    <span className="pending-details-value highlight">
-                      {selectedGame.turn} ({selectedGame.turnNumber})
-                    </span>
-                  </div>
-                  <div className="pending-details-row">
-                    <span className="pending-details-label">Fecha</span>
-                    <span className="pending-details-value">
-                      {selectedGame.date}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        })()}
+      <PendingGames
+        userAvatar={userAvatar}
+        selectedGame={selectedGame}
+        setSelectedGame={setSelectedGame}
+        pendingDropdownOpen={pendingDropdownOpen}
+        setPendingDropdownOpen={setPendingDropdownOpen}
+        onInvite={() => setActivePopup("friends")}
+      />
 
       {/* Selector de modos de juego */}
       <div className="gamemodes">
