@@ -56,7 +56,7 @@ function Shop({
   //
   const handlePurchase = (item, type) => {
     const isOwned =
-      type === "bg" ? ownedBgs.includes(item.id) : ownedSkins.includes(item.id);
+      type === "bg" ? ownedBgs?.includes(item.id) : ownedSkins?.includes(item.id);
 
     if (isOwned) {
       type === "bg"
@@ -146,7 +146,7 @@ function Shop({
             <div className="skins-list">
               {TILE_SKINS.map((skin) => {
                 const isEquipped = currentSkin === skin.value;
-                const isOwned = ownedSkins.includes(skin.id);
+                const isOwned = ownedSkins?.includes(skin.id);
                 return (
                   <div
                     key={skin.id}
