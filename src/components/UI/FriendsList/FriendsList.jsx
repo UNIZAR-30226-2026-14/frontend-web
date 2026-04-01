@@ -33,7 +33,7 @@ const MOCK_FRIENDS = [
   },
 ];
 
-function FriendsList({ onClose }) {
+function FriendsList({ onClose, onOpenProfile }) {
   // Estado para controlar el boton de retar
   const [challengeId, setChallengeId] = useState(null);
   const [search, setSearch] = useState("");
@@ -154,17 +154,23 @@ function FriendsList({ onClose }) {
               {filteredFriends.length > 0 ? (
                 filteredFriends.map((friend) => (
                   <div key={friend.id} className="friend-card">
-                    <img
-                      src={friend.avatar}
-                      alt={friend.name}
-                      className="friend-avatar"
-                    />
-                    <div className="friend-info">
-                      <span className="friend-name">{friend.name}</span>
-                      <span
-                        className={`status-indicator ${friend.status}`}
-                      ></span>
-                    </div>
+                    <button
+                      className="friend-profile-hit"
+                      onClick={() => onOpenProfile?.(friend)}
+                      type="button"
+                    >
+                      <img
+                        src={friend.avatar}
+                        alt={friend.name}
+                        className="friend-avatar"
+                      />
+                      <div className="friend-info">
+                        <span className="friend-name">{friend.name}</span>
+                        <span
+                          className={`status-indicator ${friend.status}`}
+                        ></span>
+                      </div>
+                    </button>
                     {friend.status === "online" && (
                       <button
                         className="challenge-button"

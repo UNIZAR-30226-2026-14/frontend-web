@@ -67,6 +67,7 @@ function Home({
   const [activePopup, setActivePopup] = useState(null);
   const [selectedGame, setSelectedGame] = useState(null);
   const [pendingDropdownOpen, setPendingDropdownOpen] = useState(false);
+  const [selectedFriendProfile, setSelectedFriendProfile] = useState(null);
 
   // Avatar
   const [userAvatar, setUserAvatar] = useState(() => {
@@ -86,12 +87,6 @@ function Home({
     return saved ? saved : "#2e7d32";
   });
 
-  // 
-  const [currentSkin, setCurrentSkin] = useState(() => {
-    const saved = localStorage.getItem("rummi-skin");
-    return saved ? saved : "";
-  })
-
   // Nivel
   const [level, setLevel] = useState(() => {
     const saved = localStorage.getItem("rummi-lvl");
@@ -104,12 +99,31 @@ function Home({
     return saved ? parseInt(saved) : 0;
   });
 
+  const [userId] = useState(() => {
+    const saved = localStorage.getItem("rummi-user-id");
+    if (saved) return parseInt(saved);
+
+    const generatedId = Math.floor(100000 + Math.random() * 900000);
+    localStorage.setItem("rummi-user-id", generatedId.toString());
+    return generatedId;
+  });
+
+  const [matchStats] = useState(() => {
+    const wins = parseInt(localStorage.getItem("rummi-wins") || "24");
+    const losses = parseInt(localStorage.getItem("rummi-losses") || "13");
+    const draws = parseInt(localStorage.getItem("rummi-draws") || "6");
+
+    return { wins, losses, draws };
+  });
+
   const [showConfetti, setShowConfetti] = useState(false);
 
   const [ownedBgs, setOwnedBgs] = useState(() => {
     const saved = localStorage.getItem("rummi-bgs");
     return saved ? JSON.parse(saved) : ["classic"];
   });
+
+  const partidasFinalizadas = matchStats.wins + matchStats.losses + matchStats.draws;
 
   // Experiencia para subir al siguiente nivel
   const xpToNextLevel = (level - 1) ** 2 * 50 + 100;
@@ -121,6 +135,42 @@ function Home({
    */
   const togglePopup = (popupName) => {
     setActivePopup(activePopup === popupName ? null : popupName);
+  };
+
+  const openOwnProfile = () => {
+    setSelectedFriendProfile(null);
+    setActivePopup("profile");
+  };
+
+  const openFriendProfile = (friend) => {
+    const idNumber = Number(friend.id) || 0;
+    const wins = 10 + idNumber * 3;
+    const losses = 4 + idNumber;
+    const draws = 2 + (idNumber % 4);
+    const pending = idNumber % 3;
+    const finished = wins + losses + draws;
+
+    setSelectedFriendProfile({
+      userId: friend.id,
+      username: friend.name,
+      avatar: friend.avatar,
+      coins: 200 + idNumber * 120,
+      level: 3 + idNumber,
+      stats: { wins, losses, draws, pending, finished },
+    });
+    setActivePopup("profile");
+  };
+
+  const handleRemoveFriend = (friendId) => {
+    const saved = localStorage.getItem("rummi-friends");
+    const currentFriends = saved ? JSON.parse(saved) : [];
+    const updatedFriends = currentFriends.filter(
+      (friend) => String(friend.id) !== String(friendId),
+    );
+
+    localStorage.setItem("rummi-friends", JSON.stringify(updatedFriends));
+    setSelectedFriendProfile(null);
+    setActivePopup("friends");
   };
 
   return (
@@ -157,7 +207,7 @@ function Home({
                 cy={0}
                 r={45}
                 fill="url(#userProfilePattern)"
-                onClick={() => togglePopup("profile")}
+                onClick={openOwnProfile}
               />
             </svg>
 
@@ -224,16 +274,36 @@ function Home({
       {/* Pop-up del perfil */}
       {activePopup === "profile" && (
         <Profile
-          onClose={() => togglePopup("profile")}
-          currentAvatar={userAvatar}
-          setUserAvatar={setUserAvatar}
-          avatarList={AVATAR_LIST}
+          onClose={() => {
+            setSelectedFriendProfile(null);
+            setActivePopup(null);
+          }}
+          currentAvatar={selectedFriendProfile?.avatar || userAvatar}
+          setUserAvatar={selectedFriendProfile ? null : setUserAvatar}
+          avatarList={selectedFriendProfile ? [] : AVATAR_LIST}
+          userId={selectedFriendProfile?.userId || userId}
+          username={selectedFriendProfile?.username || username}
+          coins={selectedFriendProfile?.coins ?? coins}
+          level={selectedFriendProfile?.level ?? level}
+          stats={
+            selectedFriendProfile?.stats || {
+              wins: matchStats.wins,
+              losses: matchStats.losses,
+              draws: matchStats.draws,
+              pending: PENDING_GAMES.length,
+              finished: partidasFinalizadas,
+            }
+          }
+          onRemoveFriend={selectedFriendProfile ? handleRemoveFriend : null}
         />
       )}
 
       {/* Pop-up de los amigos */}
       {activePopup === "friends" && (
-        <FriendsList onClose={() => togglePopup("friends")} />
+        <FriendsList
+          onClose={() => togglePopup("friends")}
+          onOpenProfile={openFriendProfile}
+        />
       )}
 
       {/* Pop-up de la tienda */}
