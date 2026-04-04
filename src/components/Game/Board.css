@@ -46,24 +46,6 @@
   padding: 12px;
 }
 
-/* 2. Todas las fichas válidas intentan moverse a la izquierda */
-.hand-container.tile-joined {
-  /* Si el gap es 10px, movemos -12px para que se solapen 2px */
-  transform: translateX(-12px);
-  transition: transform 0.2s ease-out;
-  z-index: 10;
-}
-
-/* 3. EXCEPCIÓN CRUCIAL: 
-   Si una ficha unida NO tiene otra ficha unida justo a su izquierda, 
-   o es la primera de la fila, se queda en su sitio (X=0). 
-   Esto hace que el grupo se pegue a la primera ficha. */
-
-.hand-container:not(.tile-joined) + .hand-container.tile-joined,
-.hand-container.tile-joined:nth-child(14n+1) {
-  transform: translateX(0) !important;
-}
-
 /* Soporte inferior */
 .player-rack {
   position: fixed;
@@ -91,6 +73,20 @@
   justify-content: center;
   max-width: 520px;
   margin-bottom: 15px;
+  position: relative;
+  transition: transform 0.2s ease-out;
+}
+
+/* Solo las fichas unidas aplican el cálculo */
+.hand-container.tile-joined {
+  /* CALCULO:
+     Multiplicamos el índice por el valor que queremos reducir.
+     Si el gap es 10px y queremos que se solapen 2px (total 12px de movimiento):
+  */
+  transform: translateX(calc(var(--tile-index) * -10px));
+  
+  /* Aseguramos que la ficha de la derecha esté siempre encima de la anterior */
+  z-index: calc(10 + var(--tile-index));
 }
 
 .player-Hand {

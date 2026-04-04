@@ -333,17 +333,37 @@ function Board() {
 
           {/* FICHAS DINÁMICAS (Las que el jugador tiene en la mano) */}
           <div className='board-grid'>
-            {Object.keys(boardPositions).map((slotId) => (
-              <Hand 
-                key={slotId} 
-                id={slotId} 
-                className={joinedSlots.includes(slotId) ? 'tile-joined' : ''}
-              >
-                {boardPositions[slotId] && (
-                  <DraggableTile tile={boardPositions[slotId]} />
-                )}
-              </Hand>
-            ))}
+            {(() => {
+              const slots = Object.keys(boardPositions);
+              let groupCounter = 0; // Contador para el índice dentro del grupo
+            
+              return slots.map((slotId, index) => {
+                const isJoined = joinedSlots.includes(slotId);
+                
+                // Lógica de conteo:
+                // Si la ficha está unida, aumentamos el contador.
+                // Si no está unida o es inicio de fila, reseteamos a 0.
+                if (!isJoined || index % 14 === 0) {
+                  groupCounter = 0;
+                } else {
+                  groupCounter++;
+                }
+              
+                return (
+                  <Hand 
+                    key={slotId} 
+                    id={slotId} 
+                    // Pasamos la variable CSS directamente al style
+                    style={{ '--tile-index': groupCounter }}
+                    className={isJoined ? 'tile-joined' : ''}
+                  >
+                    {boardPositions[slotId] && (
+                      <DraggableTile tile={boardPositions[slotId]} />
+                    )}
+                  </Hand>
+                );
+              });
+            })()}
           </div>
         </main>
 
