@@ -1,8 +1,26 @@
 import { useState } from "react";
 import "./profile.css";
 
-function Profile({ onClose, currentAvatar, setUserAvatar, avatarList }) {
+function Profile({
+  onClose,
+  currentAvatar,
+  setUserAvatar,
+  avatarList,
+  userId,
+  username,
+  coins,
+  level,
+  stats,
+  onRemoveFriend,
+}) {
   const [isEditing, setIsEditing] = useState(false);
+  const [isHoveringRemove, setIsHoveringRemove] = useState(false);
+  const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
+  const canEditAvatar = Boolean(setUserAvatar) && avatarList.length > 0;
+  const isFriendProfile = !canEditAvatar;
+
+  const porcentajeVictorias =
+    stats.finished > 0 ? Math.round((stats.wins / stats.finished) * 100) : 0;
 
   return (
     <div className="profile-stats">
@@ -10,25 +28,113 @@ function Profile({ onClose, currentAvatar, setUserAvatar, avatarList }) {
         X
       </button>
 
-      {/* Si no estoy editando, muestro el perfil y las estadísticas */}
       {!isEditing ? (
-        <div className="stats-view">
-          <h1>Perfil</h1>
-          <div className="avatar-container">
-            <img src={currentAvatar} alt="avatar" className="main-avatar" />
-            <button className="edit-pencil" onClick={() => setIsEditing(true)}>
-              ✎
-            </button>
+        <div className="profile-card">
+          <div className="profile-header">
+            <h1>Perfil de jugador</h1>
           </div>
 
-          {/* Estadísticas: Nivel, Victorias, etc. */}
-          <div className="user-info">
-            <h3 className="level">Nivel 15</h3>
-            <p className="wins">Partidas ganadas: 24</p>
+          {isFriendProfile && (
+            <div className="friend-action-row">
+              <button
+                className={`friend-action-button ${isHoveringRemove ? "danger" : ""}`}
+                onMouseEnter={() => setIsHoveringRemove(true)}
+                onMouseLeave={() => setIsHoveringRemove(false)}
+                onClick={() => setShowRemoveConfirm(true)}
+                type="button"
+              >
+                {isHoveringRemove ? "Eliminar" : "Amigos"}
+              </button>
+            </div>
+          )}
+
+          <div className="avatar-container">
+            <img src={currentAvatar} alt="Avatar de perfil" className="main-avatar" />
+            {canEditAvatar && (
+              <button
+                className="edit-pencil"
+                onClick={() => setIsEditing(true)}
+                title="Cambiar avatar"
+              >
+                ✎
+              </button>
+            )}
           </div>
+
+          <div className="profile-main-data">
+            <div className="data-row">
+              <span className="data-label">ID</span>
+              <span className="data-value">#{userId}</span>
+            </div>
+            <div className="data-row">
+              <span className="data-label">Nombre</span>
+              <span className="data-value">{username || "Invitado"}</span>
+            </div>
+            <div className="data-row">
+              <span className="data-label">Monedas</span>
+              <span className="data-value">{coins}</span>
+            </div>
+            <div className="data-row">
+              <span className="data-label">Nivel</span>
+              <span className="data-value">{level}</span>
+            </div>
+          </div>
+
+          <div className="stats-grid">
+            <div className="stat-box">
+              <p className="stat-label">Partidas ganadas</p>
+              <p className="stat-value">{stats.wins}</p>
+            </div>
+            <div className="stat-box">
+              <p className="stat-label">Partidas perdidas</p>
+              <p className="stat-value">{stats.losses}</p>
+            </div>
+            <div className="stat-box">
+              <p className="stat-label">Partidas empatadas</p>
+              <p className="stat-value">{stats.draws}</p>
+            </div>
+            <div className="stat-box">
+              <p className="stat-label">Partidas pendientes</p>
+              <p className="stat-value">{stats.pending}</p>
+            </div>
+            <div className="stat-box">
+              <p className="stat-label">Partidas finalizadas</p>
+              <p className="stat-value">{stats.finished}</p>
+            </div>
+            <div className="stat-box highlight">
+              <p className="stat-label">% de victoria</p>
+              <p className="stat-value">{porcentajeVictorias}%</p>
+            </div>
+          </div>
+
+          {showRemoveConfirm && (
+            <div className="confirm-remove-overlay">
+              <div className="confirm-remove-card">
+                <p>Seguro que quieres eliminar a este amigo?</p>
+                <div className="confirm-remove-actions">
+                  <button
+                    type="button"
+                    className="confirm-cancel"
+                    onClick={() => setShowRemoveConfirm(false)}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    className="confirm-delete"
+                    onClick={() => {
+                      onRemoveFriend?.(userId);
+                      setShowRemoveConfirm(false);
+                    }}
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-      ) : (
-        /* Si estoy editando, muestro la galería de avatares */
+      ) : canEditAvatar ? (
         <div className="avatar-selector">
           <div className="selector-header">
             <h3>Elige tu avatar</h3>
@@ -56,7 +162,7 @@ function Profile({ onClose, currentAvatar, setUserAvatar, avatarList }) {
             ))}
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
