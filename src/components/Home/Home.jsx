@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./home.css";
 import FriendsList from "../UI/FriendsList/FriendsList.jsx";
 import Shop from "../UI/Shop/Shop.jsx";
@@ -69,6 +69,7 @@ function Home({ onStart, user, onLogout, addXp }) {
   const [showLobby, setShowLobby] = useState(false);
   const [roomCode, setRoomCode] = useState("");
   const [joinCode, setJoinCode] = useState("");
+  const [isWaitingForStart, setIsWaitingForStart] = useState(false);
 
   const partidasFinalizadas = user.partidasFinalizadas;
 
@@ -179,11 +180,20 @@ function Home({ onStart, user, onLogout, addXp }) {
         `http://localhost:8080/api/partidas/${idPartida}/iniciar`,
         {
           method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         },
       );
+
       if (resIniciar.ok) {
         setShowLobby(false);
         onStart(idPartida);
+        console.log(
+          "Iniciando con Token:",
+          localStorage.getItem("rummi-token")?.substring(0, 10) + "...",
+        );
       }
     } catch (error) {
       alert("Error al iniciar la partida.");
@@ -214,8 +224,10 @@ function Home({ onStart, user, onLogout, addXp }) {
       );
 
       if (resParticipacion.ok) {
-        console.log("Te has unido a la partida:", idPartida);
-        onStart(idPartida);
+        setActivePopup("loading");
+        console.log("Unido con éxito. Esperando al anfitrión...");
+        setIsWaitingForStart(true);
+        setRoomCode(`RUM-${idPartidaNumerico}`);
       } else {
         alert("No se pudo encontrar la partida o ya está llena.");
       }
@@ -224,6 +236,28 @@ function Home({ onStart, user, onLogout, addXp }) {
       alert("Error de conexión al intentar unirse.");
     }
   };
+
+  useEffect(() => {
+    let interval;
+    if (isWaitingForStart) {
+      interval = setInterval(async () => {
+        const id = roomCode.replace("RUM-", "");
+        try {
+          const res = await fetch(`http://localhost:8080/api/partidas/${id}`);
+          const partida = await res.json();
+
+          if (partida.estado === "RUNNING") {
+            clearInterval(interval);
+            setIsWaitingForStart(false);
+            onStart(id);
+          }
+        } catch (e) {
+          console.error("Error comprobando estado:", e);
+        }
+      }, 2000);
+    }
+    return () => clearInterval(interval);
+  }, [isWaitingForStart, roomCode]);
 
   return (
     <div className="home-screen">
