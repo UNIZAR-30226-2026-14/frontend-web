@@ -8,19 +8,54 @@ const Login = ({ onLogin }) => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (username.trim() === "" || password.trim() === "") {
       setError(true);
-    } else {
-      onLogin(username, isLogin ? "login" : "register");
+      return;
+    }
+
+    try {
+      const url = "http://localhost:8080/api/jugadores";
+      
+      if (!isLogin) {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            nombre: username,
+            contrasena: password,
+          }),
+        });
+
+        if (response.ok) {
+          alert("¡Cuenta creada con éxito! Ahora puedes iniciar sesión.");
+          setIsLogin(true);
+          setPassword("");
+        } else {
+          alert("Error al registrar: El usuario ya existe.");
+        }
+      } else {
+        const res = await fetch(url);
+        const jugadores = await res.json();
+        const usuarioEncontrado = jugadores.find(j => j.nombre === username);
+
+        if (usuarioEncontrado) {
+          onLogin(usuarioEncontrado); 
+        } else {
+          alert("Usuario no encontrado. Por favor, regístrate.");
+        }
+      }
+    } catch (error) {
+      console.error("Fallo de conexión:", error);
+      alert("No se pudo conectar con el servidor.");
     }
   };
 
   return (
     <div className="login">
       <div className="login-title">Rummiplus</div>
-      <img className="logo" src={logo} alt="Rummiplus logo"/>
+      <img className="logo" src={logo} alt="Rummiplus logo" />
       <form className="login-form" onSubmit={handleSubmit}>
         <h2>{isLogin ? "Iniciar sesión" : "Crear cuenta"}</h2>
         <div className="form-group">
