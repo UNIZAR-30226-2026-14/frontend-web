@@ -11,7 +11,7 @@ import alex from "../../assets/avatars/alex.png";
 import { AVATAR_LIST } from "../../data/itemData.js";
 import { PENDING_GAMES } from "../../data/itemData.js";
 
-function Home({ onStart, username, onLogout, addXp }) {
+function Home({ onStart, user, onLogout, addXp }) {
   const [activePopup, setActivePopup] = useState(null);
   const [selectedGame, setSelectedGame] = useState(null);
   const [pendingDropdownOpen, setPendingDropdownOpen] = useState(false);
@@ -24,10 +24,7 @@ function Home({ onStart, username, onLogout, addXp }) {
   });
 
   // Monedas
-  const [coins, setCoins] = useState(() => {
-    const saved = localStorage.getItem("rummi-coins");
-    return saved ? parseInt(saved) : 1000;
-  });
+  const [coins, setCoins] = useState(user.monedas);
 
   // Fondo de la mesa de juego
   const [currentBackground, setCurrentBackground] = useState(() => {
@@ -57,9 +54,9 @@ function Home({ onStart, username, onLogout, addXp }) {
   });
 
   const [matchStats] = useState(() => {
-    const wins = parseInt(localStorage.getItem("rummi-wins") || "24");
-    const losses = parseInt(localStorage.getItem("rummi-losses") || "13");
-    const draws = parseInt(localStorage.getItem("rummi-draws") || "6");
+    const wins = user.partidasGanadas;
+    const losses = user.partidasPerdidas;
+    const draws = user.partidasEmpatadas;
 
     return { wins, losses, draws };
   });
@@ -69,8 +66,7 @@ function Home({ onStart, username, onLogout, addXp }) {
     return saved ? JSON.parse(saved) : ["classic"];
   });
 
-  const partidasFinalizadas =
-    matchStats.wins + matchStats.losses + matchStats.draws;
+  const partidasFinalizadas = user.partidasFinalizadas;
 
   // Experiencia para subir al siguiente nivel
   const xpToNextLevel = (level - 1) ** 2 * 50 + 100;
@@ -99,7 +95,7 @@ function Home({ onStart, username, onLogout, addXp }) {
 
     setSelectedFriendProfile({
       userId: friend.id,
-      username: friend.name,
+      user: friend.name,
       avatar: friend.avatar,
       coins: 200 + idNumber * 120,
       level: 3 + idNumber,
@@ -120,16 +116,70 @@ function Home({ onStart, username, onLogout, addXp }) {
     setActivePopup("friends");
   };
 
+  const handleCreateGame = async () => {
+    if (selectedGame) {
+      onStart(selectedGame.id);
+      return;
+    }
+
+    try {
+      const urlPartidas = "http://localhost:8080/api/partidas";
+
+      const resPartida = await fetch(urlPartidas, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          idPartida: 9,
+          turno: 0,
+          fecha: new Date().toISOString(),
+          corriendo: false,
+        }),
+      });
+
+      if (!resPartida.ok) throw new Error("Error al crear la sala");
+      const nuevaPartida = await resPartida.json();
+
+      const resParticipacion = await fetch(
+        "http://localhost:8080/api/participaciones",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            idJugador: user.id,
+            idPartida: resPartida.id,
+            fichasActuales: 14,
+            habilidadesActuales: "",
+          }),
+        },
+      );
+
+      if (resParticipacion.ok) {
+        console.log("Partida creada y unido con éxito:", resPartida.id);
+        const resIniciar = await fetch(
+          `http://localhost:8080/api/partidas/${resPartida.id}/iniciar`,
+          {
+            method: "POST",
+          },
+        );
+        if (resIniciar.ok) {
+          onStart(resPartida.id);
+        }
+      }
+    } catch (error) {
+      console.error("Error en el flujo de creación:", error);
+      alert("Hubo un problema al conectar con el servidor de juegos.");
+    }
+  };
+
   return (
     <div className="home-screen">
       {/* Barra superior */}
       <TopMenu
         userAvatar={userAvatar}
-        username={username}
+        user={user}
         xp={xp}
         xpToNextLevel={xpToNextLevel}
         level={level}
-        coins={coins}
         togglePopup={togglePopup}
         openOwnProfile={openOwnProfile}
         setActivePopup={setActivePopup}
@@ -146,7 +196,7 @@ function Home({ onStart, username, onLogout, addXp }) {
           setUserAvatar={selectedFriendProfile ? null : setUserAvatar}
           avatarList={selectedFriendProfile ? [] : AVATAR_LIST}
           userId={selectedFriendProfile?.userId || userId}
-          username={selectedFriendProfile?.username || username}
+          user={selectedFriendProfile?.user || user}
           coins={selectedFriendProfile?.coins ?? coins}
           level={selectedFriendProfile?.level ?? level}
           stats={
@@ -202,10 +252,7 @@ function Home({ onStart, username, onLogout, addXp }) {
       <div className="gamemodes">
         <div
           className={`gamemode-card classic ${selectedGame ? "" : ""} ${selectedGame && selectedGame.mode !== "classic" ? "disabled" : ""}`}
-          onClick={() => {
-            if (selectedGame && selectedGame.mode !== "classic") return;
-            onStart();
-          }}
+          onClick={handleCreateGame}
         >
           <div className="gamemode-glow" />
           <div className="gamemode-icon">

@@ -49,7 +49,11 @@ function Profile({
           )}
 
           <div className="avatar-container">
-            <img src={currentAvatar} alt="Avatar de perfil" className="main-avatar" />
+            <img
+              src={currentAvatar}
+              alt="Avatar de perfil"
+              className="main-avatar"
+            />
             {canEditAvatar && (
               <button
                 className="edit-pencil"

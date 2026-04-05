@@ -18,6 +18,16 @@
     user-select: none;
     transition: transform 0.2s ease;
 }
+
+/* Estado para las fichas colocadas */
+.tile.tile-placed {
+    background-color: #e2e2d5; 
+    border: 1px solid #b8b8a0;
+    box-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    filter: saturate(0.6) brightness(0.9);
+    cursor: help;
+    transform: scale(0.98);
+}
 /* Efecto al pasar el ratón */
 .tile:hover {
   transform: scale(1.05) translateY(-5px);

@@ -6,6 +6,7 @@ import './Board.css';
 import { useDraggable, DndContext, DragOverlay } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import { areCompatible } from '../../hooks/deckFactory.js'
+import { act } from 'react';
 
 //-------------------ESTO LUEGO IRÁ APARTE
 function DraggableTile({ tile }) { // Versión de ficha ya draggeable
@@ -28,7 +29,7 @@ function DraggableTile({ tile }) { // Versión de ficha ya draggeable
       {...listeners}
       {...attributes}
     >
-      <Tile key={tile.id} number={tile.number} color={tile.color} />
+      <Tile key={tile.id} number={tile.number} color={tile.color} placed={tile.placed} />
     </div>
   );
 }
@@ -39,6 +40,13 @@ function Board() {
   const { bag, playerHand, setPlayerHand, gameBoard, setGameBoard, drawTile, dealInitialHand } = useGame();
   const [activeId, setActiveId] = useState(null); // Para rastrear qué ficha se arrastra
   const [joinedSlots, setJoinedSlots] = useState([]);
+  const [miTurno, setMiTurno] = useState(true); // pa turnos
+  const [processing, setProcessing] = useState(false); // Para que se pueda o no usar el botón de robar y tal
+
+
+
+
+  const delay = ms => new Promise(res => setTimeout(res, ms));// pa pruebas
 
   const [handPositions, setHandPositions] = useState(() => {
     // Inicializamos 20 huecos vacíos
@@ -66,38 +74,38 @@ function Board() {
   }, [playerHand]);
 
   useEffect(() => {
-  const newJoined = [];
-  
-  // Recorremos el tablero por filas (5 filas de 14)
-  for (let row = 0; row < 5; row++) {
-    let currentRowIndices = [];
-    let currentRowTiles = [];
+    const newJoined = [];
 
-    for (let col = 0; col < 14; col++) {
-      const index = row * 14 + col;
-      const slotId = `board-slot-${index}`;
-      const tile = boardPositions[slotId];
+    // Recorremos el tablero por filas (5 filas de 14)
+    for (let row = 0; row < 5; row++) {
+      let currentRowIndices = [];
+      let currentRowTiles = [];
 
-      if (tile !== '') {
-        currentRowIndices.push(slotId);
-        currentRowTiles.push(tile);
-      } else {
-        // Al encontrar un hueco vacío, validamos el grupo acumulado hasta ahora
-        if (areCompatible(currentRowTiles)) {
-          newJoined.push(...currentRowIndices);
+      for (let col = 0; col < 14; col++) {
+        const index = row * 14 + col;
+        const slotId = `board-slot-${index}`;
+        const tile = boardPositions[slotId];
+
+        if (tile !== '') {
+          currentRowIndices.push(slotId);
+          currentRowTiles.push(tile);
+        } else {
+          // Al encontrar un hueco vacío, validamos el grupo acumulado hasta ahora
+          if (areCompatible(currentRowTiles)) {
+            newJoined.push(...currentRowIndices);
+          }
+          currentRowIndices = [];
+          currentRowTiles = [];
         }
-        currentRowIndices = [];
-        currentRowTiles = [];
+      }
+      // Validar si quedó un grupo al final de la fila
+      if (areCompatible(currentRowTiles)) {
+        newJoined.push(...currentRowIndices);
       }
     }
-    // Validar si quedó un grupo al final de la fila
-    if (areCompatible(currentRowTiles)) {
-      newJoined.push(...currentRowIndices);
-    }
-  }
 
-  setJoinedSlots(newJoined);
-}, [boardPositions]); // Se ejecuta cada vez que el tablero cambie
+    setJoinedSlots(newJoined);
+  }, [boardPositions]); // Se ejecuta cada vez que el tablero cambie
 
   // Repartimos las 14 fichas iniciales
   useEffect(() => {
@@ -111,7 +119,7 @@ function Board() {
 
   function handleDragEnd(event) {
     const { active, over } = event;
-    console.log("Ficha movida:", active.id);
+    console.log("Ficha movida:", active.id, activeTile.placed);
     setActiveId(null);
 
     if (!over) return;
@@ -127,7 +135,7 @@ function Board() {
 
     // si se suleta en tablero
     if (overId.startsWith('board-slot')) {
-      
+      if (!miTurno) return; // no podemos alterar el tablero si no nos toca
       if (fromHandKey) {
         if (boardPositions[overId] !== '') {
           return;
@@ -188,8 +196,7 @@ function Board() {
 
       //si pillas ficha del tablero a la mano
       if (fromBoardKey) {
-        //if (active.placed) return;
-        //else {
+          if (!miTurno || activeTile.placed) return; // no podemos alterar el tablero si no nos toca
 
 
           if (handPositions[overId] !== '') {
@@ -222,8 +229,6 @@ function Board() {
             return newPositions;
           })
 
-        //}
-
       };
         
 
@@ -249,6 +254,7 @@ function Board() {
         })
       };
     }
+  
   }
 
   const activeTile = Object.values(handPositions).find(t => t?.id === activeId) || Object.values(boardPositions).find(t => t?.id === activeId);
@@ -313,9 +319,43 @@ function Board() {
       // Si son de distinto color, ordenamos alfabéticamente por el nombre del color
       return a.color.localeCompare(b.color);
     });
-
     setPlayerHand(sorted);
   };
+
+
+
+  const cambiarTurno = async () => { // esto temporal pa ponerle algo
+    setMiTurno(false);
+    setProcessing(true);
+      //marcar todas las fichas de tablero como placed
+    setBoardPositions((prev) => {
+      const nextState = {};
+      for (const id in prev) {
+        const currentTile = prev[id];
+        if (currentTile && typeof currentTile === 'object') {
+          // Creamos una copia profunda de la ficha con el nuevo atributo
+          nextState[id] = { 
+            ...currentTile, 
+            placed: true 
+          };
+        } else {
+          nextState[id] = currentTile;
+        }
+      }
+      return nextState;
+    });
+
+    console.log("Fin de turno");
+    await delay(3000); 
+    setMiTurno(true);
+    setProcessing(false);
+    console.log("Empieza turno");
+  };
+
+  const drawTileButton = () => {
+    drawTile(); //cambiarTurno();
+  }
+
 
   return (
     <DndContext onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
@@ -368,16 +408,20 @@ function Board() {
         </main>
 
         {/* Baraja con las fichas restantes */}
-        <div className='deck-container' onClick={drawTile} title='Robar ficha'>
+        <button className='deck-container' disabled={processing} onClick={drawTileButton} title='Robar ficha'>
           <div className='deck-stack'>
             <div className='deck-count'>{bag.length}</div>
           </div>
-        </div>
+        </button>
+        
 
         {/* Botones para ordenar las fichas */}
         <div className='order-container'>
           <button onClick={sortByColor} title='Ordenar por palo'>♤♤♤</button>
           <button onClick={sortByNumber} title='Ordenar numéricamente'>789</button>
+
+          <button disabled={processing} onClick={cambiarTurno} title='fin turno'>FIN</button>
+
         </div>
 
         {/* SOPORTE DEL JUGADOR */}

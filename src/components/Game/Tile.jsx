@@ -35,8 +35,9 @@ function comodin(number, color) {
     return (number);
 }
 
-const Tile = ({ number, color }) => (
-  <div className='tile' style={{color: color}}>
+const Tile = ({ number, color, placed }) => (
+  <div className={`tile ${placed ? 'tile-placed' : ''}`}
+   style={{color: color}}>
     {comodin(number,color)}
     {sign(number,color)}
     

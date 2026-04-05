@@ -17,7 +17,7 @@ const Login = ({ onLogin }) => {
 
     try {
       const url = "http://localhost:8080/api/jugadores";
-      
+
       if (!isLogin) {
         const response = await fetch(url, {
           method: "POST",
@@ -31,19 +31,25 @@ const Login = ({ onLogin }) => {
         if (response.ok) {
           alert("¡Cuenta creada con éxito! Ahora puedes iniciar sesión.");
           setIsLogin(true);
-          setPassword("");
         } else {
           alert("Error al registrar: El usuario ya existe.");
         }
       } else {
-        const res = await fetch(url);
-        const jugadores = await res.json();
-        const usuarioEncontrado = jugadores.find(j => j.nombre === username);
+        const res = await fetch("http://localhost:8080/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            nombre: username,
+            contrasena: password,
+          }),
+        });
 
-        if (usuarioEncontrado) {
-          onLogin(usuarioEncontrado); 
+        if (res.ok) {
+          const data = await res.json();
+          localStorage.setItem("rummi-token", data.token);
+          onLogin(data.jugador);
         } else {
-          alert("Usuario no encontrado. Por favor, regístrate.");
+          alert("Usuario o contraseña incorrectos.");
         }
       }
     } catch (error) {

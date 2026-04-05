@@ -3,11 +3,10 @@ import settings_icon from "../../../assets/settings-icon.svg";
 
 function TopMenu({
   userAvatar,
-  username,
+  user,
   xp,
   xpToNextLevel,
   level,
-  coins,
   togglePopup,
   openOwnProfile,
   setActivePopup,
@@ -50,7 +49,7 @@ function TopMenu({
 
           {/* Info: nombre + barra XP + nivel */}
           <div className="profile-info">
-            <h1 className="profile-username">{username || "Invitado"}</h1>
+            <h1 className="profile-username">{user.nombre || "Invitado"}</h1>
             <div className="xp-row">
               <div className="xp-bar-container">
                 <div
@@ -79,7 +78,7 @@ function TopMenu({
           <svg viewBox="0 0 200 50">
             <rect x={0} y={5} width={200} height={50} rx={12} />
             <text x={40} y={37} className="coins">
-              {coins}💰
+              {user.monedas}💰
             </text>
             <path
               className="shop-add"

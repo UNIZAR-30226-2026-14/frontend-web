@@ -27,12 +27,13 @@ function App() {
   });
 
   // Nombre de usuario
-  const [username, setUsername] = useState(
-    () => localStorage.getItem("rummi-username") || "",
-  );
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem("rummi-user-object");
+    return saved ? JSON.parse(saved) : null;
+  });
 
   // Pantalla actual
-  const [screen, setScreen] = useState(username ? "home" : "login");
+  const [screen, setScreen] = useState(user ? "home" : "login");
 
   // Fondo del tablero actual
   const [currentBackground, setCurrentBackground] = useState(() => {
@@ -94,15 +95,15 @@ function App() {
     setLevel(newLevel);
   };
 
-  const handleLogin = (username) => {
-    setUsername(username);
-    localStorage.setItem("rummi-username", username);
+  const handleLogin = (user) => {
+    setUser(user);
+    localStorage.setItem("rummi-username", user);
     setScreen("home");
   };
 
   const handleLogout = () => {
     localStorage.clear();
-    setUsername("");
+    setUser("");
     setScreen("login");
   };
 
@@ -110,6 +111,7 @@ function App() {
    * Sincroniza automáticamente cualquier cambio en el estado con el LocalStorage
    */
   useEffect(() => {
+    localStorage.setItem("rummi-username", user)
     localStorage.setItem("rummi-coins", coins);
     localStorage.setItem("rummi-bg", currentBackground);
     localStorage.setItem("rummi-skin", currentSkin);
@@ -133,7 +135,7 @@ function App() {
       {screen === "home" && (
         <Home
           onStart={() => setScreen("loading")}
-          username={username}
+          user={user}
           onLogout={handleLogout}
           setCurrentBackground={setCurrentBackground}
           currentBackground={currentBackground}
@@ -165,7 +167,7 @@ function App() {
 
       {screen === "game" && (
         <Board
-          username={username}
+          user={user}
           currentBackground={currentBackground}
           onWin={(puntosGanados) => {
             addXp(puntosGanados); // Sumar XP según los puntos conseguidos
