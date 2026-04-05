@@ -1,14 +1,49 @@
-import { useEffect, useState, act } from "react";
+import { useEffect, useState } from "react";
 import Tile from "./Tile.jsx";
 import Hand from "./Hand.jsx";
-import DraggableTile from "./draggableTile.jsx"
 import { useGame } from "../../hooks/useGame.js";
 import "./Board.css";
 import { useDraggable, DndContext, DragOverlay } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { areCompatible } from "../../hooks/deckFactory.js";
-import { shortColor, shortNum } from "./botones_f.js";
-import { handleDragLogic } from "./dragHandlers.js";
+import { act } from "react";
+
+//-------------------ESTO LUEGO IRÁ APARTE
+function DraggableTile({ tile }) {
+  // Versión de ficha ya draggeable
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useDraggable({
+    id: tile.id, // El ID único que ya tienes
+  });
+
+  // Estilo para que el componente se desplace visualmente
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    transition,
+    touchAction: "none",
+    opacity: isDragging ? 0 : 1, // La ficha original se vuelve traslúcida
+    cursor: "grab",
+    zIndex: isDragging ? 100 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
+      <Tile
+        key={tile.id}
+        number={tile.number}
+        color={tile.color}
+        placed={tile.placed}
+      />
+    </div>
+  );
+}
+//-----------------------------------------------------
 
 const parsearFichas = (stringFichas) => {
   if (!stringFichas) return [];
@@ -141,17 +176,159 @@ function Board({ idPartida, userId }) {
   }
 
   function handleDragEnd(event) {
+    const { active, over } = event;
+    console.log("Ficha movida:", active.id, activeTile.placed);
     setActiveId(null);
-    
-    // Empaquetamos estados y setters para pasarlos a la lógica externa
-    const states = {
-      handPositions, setHandPositions,
-      boardPositions, setBoardPositions,
-      setPlayerHand, setGameBoard,
-      miTurno, activeTile
-    };
 
-    handleDragLogic(event, states);
+    if (!over) return;
+
+    const activeId = active.id;
+    const overId = over.id; // El ID del hueco: "hand-slot-X"
+
+    const fromHandKey = Object.keys(handPositions).find(
+      (k) => handPositions[k]?.id === activeId,
+    );
+    const fromBoardKey = Object.keys(boardPositions).find(
+      (k) => boardPositions[k]?.id === activeId,
+    );
+
+    const tile = fromHandKey
+      ? handPositions[fromHandKey]
+      : boardPositions[fromBoardKey];
+    if (!tile) return;
+
+    // si se suleta en tablero
+    if (overId.startsWith("board-slot")) {
+      if (!miTurno) return; // no podemos alterar el tablero si no nos toca
+      if (fromHandKey) {
+        if (boardPositions[overId] !== "") {
+          return;
+        }
+        const tileMoving = handPositions[fromHandKey];
+        setHandPositions((prev) => {
+          // IMPORTANTE: Clonamos el objeto anterior para no mutar el estado directamente
+          const newPositions = { ...prev };
+          // 2. Buscamos en qué hueco estaba la ficha que estamos moviendo
+          newPositions[fromHandKey] = "";
+          // 4. Actualizamos el playerHand del hook useGame (opcional)
+          // Extraemos solo las fichas que no son null para mantener la lista plana sincronizada
+          const updatedTilesArray = Object.values(newPositions).filter(
+            (tile) => tile !== null,
+          );
+          setPlayerHand(updatedTilesArray);
+          return newPositions;
+        });
+
+        setBoardPositions((prev) => {
+          // IMPORTANTE: Clonamos el objeto anterior para no mutar el estado directamente
+          const newPositions = { ...prev };
+          newPositions[overId] = tileMoving;
+          // 4. Actualizamos el playerHand del hook useGame (opcional)
+          // Extraemos solo las fichas que no son null para mantener la lista plana sincronizada
+          const updatedTilesArray = Object.values(newPositions).filter(
+            (tile) => tile !== null,
+          );
+          setGameBoard(updatedTilesArray);
+          return newPositions;
+        });
+      }
+
+      // La movemos dentro del tablero
+      if (fromBoardKey && fromBoardKey !== overId) {
+        setBoardPositions((prev) => {
+          // IMPORTANTE: Clonamos el objeto anterior para no mutar el estado directamente
+          const newPositions = { ...prev };
+          // 2. Buscamos en qué hueco estaba la ficha que estamos moviendo
+          const oldSlot = Object.keys(prev).find(
+            (key) => prev[key]?.id === activeId,
+          );
+          // Si no se encuentra el origen (por ejemplo, viene de fuera), o es el mismo sitio, no hacemos nada
+          if (!oldSlot || oldSlot === overId) return prev;
+          // 3. Intercambio de fichas (Swap logic)
+          const tileMoving = prev[oldSlot]; // La ficha que arrastras
+          const tileAtTarget = prev[overId]; // Lo que haya en el destino (ficha o null)
+          newPositions[oldSlot] = tileAtTarget;
+          newPositions[overId] = tileMoving;
+          // 4. Actualizamos el playerHand del hook useGame (opcional)
+          // Extraemos solo las fichas que no son null para mantener la lista plana sincronizada
+          const updatedTilesArray = Object.values(newPositions).filter(
+            (tile) => tile !== null,
+          );
+          setGameBoard(updatedTilesArray);
+          return newPositions;
+        });
+      }
+    }
+
+    // si se suelta en mano
+    else if (overId.startsWith("hand-slot")) {
+      //si pillas ficha del tablero a la mano
+      if (fromBoardKey) {
+        if (!miTurno || activeTile.placed) return; // no podemos alterar el tablero si no nos toca
+
+        if (handPositions[overId] !== "") {
+          return;
+        }
+        const tileMoving = boardPositions[fromBoardKey];
+        setBoardPositions((prev) => {
+          // IMPORTANTE: Clonamos el objeto anterior para no mutar el estado directamente
+          const newPositions = { ...prev };
+          // 2. Buscamos en qué hueco estaba la ficha que estamos moviendo
+          newPositions[fromBoardKey] = "";
+          // 4. Actualizamos el playerHand del hook useGame (opcional)
+          // Extraemos solo las fichas que no son null para mantener la lista plana sincronizada
+          const updatedTilesArray = Object.values(newPositions).filter(
+            (tile) => tile !== null,
+          );
+          setGameBoard(updatedTilesArray);
+          return newPositions;
+        });
+
+        setHandPositions((prev) => {
+          // IMPORTANTE: Clonamos el objeto anterior para no mutar el estado directamente
+          const newPositions = { ...prev };
+          // aqui es el huevo
+          const oldSlot = Object.keys(prev).find(
+            (key) => prev[key]?.id === overId,
+          );
+          // 3. Intercambio de fichas (Swap logic)
+          newPositions[overId] = tileMoving;
+          // 4. Actualizamos el playerHand del hook useGame (opcional)
+          // Extraemos solo las fichas que no son null para mantener la lista plana sincronizada
+          const updatedTilesArray = Object.values(newPositions).filter(
+            (tile) => tile !== null,
+          );
+          setPlayerHand(updatedTilesArray);
+          return newPositions;
+        });
+      }
+
+      //si es una que mueves dentro de la mano, todo bien
+      if (fromHandKey && fromHandKey !== overId) {
+        setHandPositions((prev) => {
+          // IMPORTANTE: Clonamos el objeto anterior para no mutar el estado directamente
+          const newPositions = { ...prev };
+          // 2. Buscamos en qué hueco estaba la ficha que estamos moviendo
+          const oldSlot = Object.keys(prev).find(
+            (key) => prev[key]?.id === activeId,
+          );
+          // Si no se encuentra el origen (por ejemplo, viene de fuera), o es el mismo sitio, no hacemos nada
+          if (!oldSlot || oldSlot === overId) return prev;
+          // 3. Intercambio de fichas (Swap logic)
+          const tileMoving = prev[oldSlot]; // La ficha que arrastras
+          const tileAtTarget = prev[overId]; // Lo que haya en el destino (ficha o null)
+          newPositions[oldSlot] = tileAtTarget;
+          newPositions[overId] = tileMoving;
+          // 4. Actualizamos el playerHand del hook useGame (opcional)
+          // Extraemos solo las fichas que no son null para mantener la lista plana sincronizada
+          const updatedTilesArray = Object.values(newPositions).filter(
+            (tile) => tile !== null,
+          );
+          setPlayerHand(updatedTilesArray);
+          return newPositions;
+        });
+      }
+    }
   }
 
   const activeTile =
@@ -159,12 +336,60 @@ function Board({ idPartida, userId }) {
     Object.values(boardPositions).find((t) => t?.id === activeId);
 
   const sortByNumber = () => {
-    const sorted = [...playerHand].sort(shortNum(a, b));
+    const sorted = [...playerHand].sort((a, b) => {
+      const aIsJoker = a.number === "J";
+      const bIsJoker = b.number === "J";
+      const aIsNull = a === "";
+      const bIsNull = b === "";
+
+      if (aIsJoker && bIsNull) return -1;
+      if (bIsJoker && aIsNull) return 1;
+
+      // Si ambos son Jokers, se quedan igual entre ellos
+      if (aIsJoker && bIsJoker) return 0;
+
+      // Si 'a' es Joker, lo mandamos al final (positivo)
+      if (aIsJoker) return 1;
+
+      // Si 'b' es Joker, lo mandamos al final (negativo para que 'a' vaya antes)
+      if (bIsJoker) return -1;
+      if (aIsNull && bIsNull) return 0;
+      if (aIsNull) return 1;
+      if (bIsNull) return -1;
+
+      // Si ninguno es Joker, resta normal
+      return a.number - b.number;
+    });
     setPlayerHand(sorted);
   };
 
   const sortByColor = () => {
-    const sorted = [...playerHand].sort(shortColor(a, b));
+    const sorted = [...playerHand].sort((a, b) => {
+      const aIsJoker = a.number === "J";
+      const bIsJoker = b.number === "J";
+
+      const aIsNull = a === "";
+      const bIsNull = b === "";
+      if (aIsJoker && bIsNull) return -1;
+      if (bIsJoker && aIsNull) return 1;
+
+      // Si hay comodines, mandarlos al final
+      if (aIsJoker && bIsJoker) return 0;
+      if (aIsJoker) return 1;
+      if (bIsJoker) return -1;
+
+      if (aIsNull && bIsNull) return 0;
+      if (aIsNull) return 1;
+      if (bIsNull) return -1;
+
+      // Si son del mismo color, ordenamos por número dentro del grupo de color
+      if (a.color === b.color) {
+        return a.number - b.number;
+      }
+
+      // Si son de distinto color, ordenamos alfabéticamente por el nombre del color
+      return a.color.localeCompare(b.color);
+    });
     setPlayerHand(sorted);
   };
 
