@@ -55,7 +55,9 @@ export const isValidSameNumberGroup = (tiles) => {
     );
     const colors = tiles.map((t) => t.color);
     const uniqueColors = new Set(colors);
-    return sameNumber && uniqueColors.size === tiles.length;
+    const countJ = tiles.filter(t => t.number === 'J').length;
+
+    return sameNumber && (uniqueColors.size+countJ) === tiles.length;
   } else {
     return false;
   }
@@ -114,7 +116,9 @@ export const isValidSameNumber = (tiles) => {
     );
     const colors = tiles.map((t) => t.color);
     const uniqueColors = new Set(colors);
-    return sameNumber && uniqueColors.size === tiles.length;
+    const countJ = tiles.filter(t => t.number === 'J').length;
+
+    return sameNumber && (uniqueColors.size+countJ) === tiles.length;
   } else {
     return false;
   }
