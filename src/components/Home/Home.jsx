@@ -66,6 +66,10 @@ function Home({ onStart, user, onLogout, addXp }) {
     return saved ? JSON.parse(saved) : ["classic"];
   });
 
+  const [showLobby, setShowLobby] = useState(false);
+  const [roomCode, setRoomCode] = useState("");
+  const [joinCode, setJoinCode] = useState("");
+
   const partidasFinalizadas = user.partidasFinalizadas;
 
   // Experiencia para subir al siguiente nivel
@@ -129,15 +133,18 @@ function Home({ onStart, user, onLogout, addXp }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          idPartida: 9,
           turno: 0,
-          fecha: new Date().toISOString(),
+          fecha: new Date().toISOString().split("T")[0],
           corriendo: false,
+          mercado: "",
+          bolsa: "",
+          conjuntoMesa: "",
         }),
       });
 
       if (!resPartida.ok) throw new Error("Error al crear la sala");
       const nuevaPartida = await resPartida.json();
+      const idNuevaPartida = nuevaPartida.idPartida;
 
       const resParticipacion = await fetch(
         "http://localhost:8080/api/participaciones",
@@ -146,7 +153,7 @@ function Home({ onStart, user, onLogout, addXp }) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             idJugador: user.id,
-            idPartida: resPartida.id,
+            idPartida: idNuevaPartida,
             fichasActuales: 14,
             habilidadesActuales: "",
           }),
@@ -154,20 +161,67 @@ function Home({ onStart, user, onLogout, addXp }) {
       );
 
       if (resParticipacion.ok) {
-        console.log("Partida creada y unido con éxito:", resPartida.id);
-        const resIniciar = await fetch(
-          `http://localhost:8080/api/partidas/${resPartida.id}/iniciar`,
-          {
-            method: "POST",
-          },
-        );
-        if (resIniciar.ok) {
-          onStart(resPartida.id);
-        }
+        console.log("Partida creada y unido con éxito:", idNuevaPartida);
+        const codigo = `RUM-${idNuevaPartida}`;
+        setRoomCode(codigo);
+        setShowLobby(true);
       }
     } catch (error) {
       console.error("Error en el flujo de creación:", error);
       alert("Hubo un problema al conectar con el servidor de juegos.");
+    }
+  };
+
+  const handleStartLobbyGame = async () => {
+    const idPartida = roomCode.replace("RUM-", "");
+    try {
+      const resIniciar = await fetch(
+        `http://localhost:8080/api/partidas/${idPartida}/iniciar`,
+        {
+          method: "POST",
+        },
+      );
+      if (resIniciar.ok) {
+        setShowLobby(false);
+        onStart(idPartida);
+      }
+    } catch (error) {
+      alert("Error al iniciar la partida.");
+    }
+  };
+
+  const handleJoinByCode = async () => {
+    try {
+      const idLimpio = joinCode.toUpperCase().replace("RUM-", "").trim();
+      const idPartidaNumerico = parseInt(idLimpio);
+      if (isNaN(idPartidaNumerico)) {
+        alert("Formato de código inválido. Debe ser RUM-número");
+        return;
+      }
+
+      const resParticipacion = await fetch(
+        "http://localhost:8080/api/participaciones",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            idJugador: user.id,
+            idPartida: idPartidaNumerico,
+            fichasActuales: 14,
+            habilidadesActuales: "",
+          }),
+        },
+      );
+
+      if (resParticipacion.ok) {
+        console.log("Te has unido a la partida:", idPartida);
+        onStart(idPartida);
+      } else {
+        alert("No se pudo encontrar la partida o ya está llena.");
+      }
+    } catch (error) {
+      console.error("Error al unirse:", error);
+      alert("Error de conexión al intentar unirse.");
     }
   };
 
@@ -247,6 +301,41 @@ function Home({ onStart, user, onLogout, addXp }) {
         setPendingDropdownOpen={setPendingDropdownOpen}
         onInvite={() => setActivePopup("friends")}
       />
+
+      <div className="join-section">
+        <input
+          type="text"
+          placeholder="Código de amigo (RUM-123)"
+          value={joinCode}
+          onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+        />
+        <button onClick={handleJoinByCode}>UNIRSE A SALA</button>
+      </div>
+
+      {showLobby && (
+        <div className="lobby-overlay">
+          <div className="lobby-modal">
+            <h2>SALA DE ESPERA</h2>
+            <p>Comparte este código con tu amigo:</p>
+            <div className="room-code-display">{roomCode}</div>
+            <p className="hint">
+              Espera a que tu amigo se una antes de empezar.
+            </p>
+
+            <div className="lobby-actions">
+              <button className="start-btn" onClick={handleStartLobbyGame}>
+                EMPEZAR PARTIDA
+              </button>
+              <button
+                className="cancel-btn"
+                onClick={() => setShowLobby(false)}
+              >
+                CANCELAR
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Selector de modos de juego */}
       <div className="gamemodes">

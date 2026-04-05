@@ -67,6 +67,8 @@ function App() {
 
   const [showConfetti, setShowConfetti] = useState(false);
 
+  const [activeGameId, setActiveGameId] = useState(null);
+
   // Experiencia para subir al siguiente nivel
   const xpToNextLevel = (level - 1) ** 2 * 50 + 100;
 
@@ -111,14 +113,12 @@ function App() {
    * Sincroniza automáticamente cualquier cambio en el estado con el LocalStorage
    */
   useEffect(() => {
-    localStorage.setItem("rummi-username", user)
-    localStorage.setItem("rummi-coins", coins);
     localStorage.setItem("rummi-bg", currentBackground);
     localStorage.setItem("rummi-skin", currentSkin);
     localStorage.setItem("rummi-avatar", userAvatar);
     localStorage.setItem("rummi-lvl", level);
     localStorage.setItem("rummi-xp", xp);
-  }, [coins, currentBackground, userAvatar, level, xp]);
+  }, [currentBackground, currentSkin, userAvatar, level, xp]);
 
   return (
     <>
@@ -134,7 +134,10 @@ function App() {
 
       {screen === "home" && (
         <Home
-          onStart={() => setScreen("loading")}
+          onStart={(id) => {
+            setActiveGameId(id);
+            setScreen("loading");
+          }}
           user={user}
           onLogout={handleLogout}
           setCurrentBackground={setCurrentBackground}
@@ -161,7 +164,10 @@ function App() {
       {screen === "loading" && (
         <Loading
           onFinished={() => setScreen("game")}
-          onCancel={() => setScreen("home")}
+          onCancel={() => {
+            setActiveGameId(null);
+            setScreen("home");
+          }}
         />
       )}
 
@@ -170,12 +176,13 @@ function App() {
           user={user}
           currentBackground={currentBackground}
           onWin={(puntosGanados) => {
-            addXp(puntosGanados); // Sumar XP según los puntos conseguidos
+            addXp(puntosGanados);
             setCoins((prev) => prev + 50);
             setShowConfetti(true);
             setTimeout(() => {
               setShowConfetti(false);
-              setScreen("home"); // Volvemos al menú tras el festejo
+              setActiveGameId(null);
+              setScreen("home");
             }, 4000);
           }}
         />
