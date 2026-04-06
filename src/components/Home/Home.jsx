@@ -62,10 +62,6 @@ function Home({ onStart, user, onLogout, addXp }) {
   const [joinCode, setJoinCode] = useState("");
   const [isWaitingForStart, setIsWaitingForStart] = useState(false);
 
-  const [userId, setUserId] = useState(false);
-
-  const partidasFinalizadas = user.partidasFinalizadas;
-
   // Experiencia para subir al siguiente nivel
   const xpToNextLevel = (level - 1) ** 2 * 50 + 100;
 
@@ -276,7 +272,7 @@ function Home({ onStart, user, onLogout, addXp }) {
           currentAvatar={selectedFriendProfile?.avatar || userAvatar}
           setUserAvatar={selectedFriendProfile ? null : setUserAvatar}
           avatarList={selectedFriendProfile ? [] : AVATAR_LIST}
-          userId={selectedFriendProfile?.userId || userId}
+          userId={selectedFriendProfile?.userId || user.id}
           user={selectedFriendProfile?.user || user}
           coins={selectedFriendProfile?.coins ?? coins}
           level={selectedFriendProfile?.level ?? level}
@@ -285,8 +281,8 @@ function Home({ onStart, user, onLogout, addXp }) {
               wins: matchStats.wins,
               losses: matchStats.losses,
               draws: matchStats.draws,
-              pending: PENDING_GAMES.length,
-              finished: partidasFinalizadas,
+              pending: user.partidasPendientes,
+              finished: user.partidasFinalizadas,
             }
           }
           onRemoveFriend={selectedFriendProfile ? handleRemoveFriend : null}

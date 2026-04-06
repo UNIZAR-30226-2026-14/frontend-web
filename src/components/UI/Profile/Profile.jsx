@@ -7,7 +7,7 @@ function Profile({
   setUserAvatar,
   avatarList,
   userId,
-  username,
+  user,
   coins,
   level,
   stats,
@@ -72,7 +72,7 @@ function Profile({
             </div>
             <div className="data-row">
               <span className="data-label">Nombre</span>
-              <span className="data-value">{username || "Invitado"}</span>
+              <span className="data-value">{user.nombre || "Invitado"}</span>
             </div>
             <div className="data-row">
               <span className="data-label">Monedas</span>

@@ -62,7 +62,6 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
   const [activeId, setActiveId] = useState(null); // Para rastrear qué ficha se arrastra
   const [joinedSlots, setJoinedSlots] = useState([]);
   const [miTurno, setMiTurno] = useState(false); // pa turnos
-  const [idJugadorTurno, setIdJugadorTurno] = useState(null);
   const [processing, setProcessing] = useState(false); // Para que se pueda o no usar el botón de robar y tal
   const [ordenTurno, setOrdenTurno] = useState(null);
 
@@ -117,11 +116,18 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
   }, [boardPositions]); // Se ejecuta cada vez que el tablero cambie
 
   const actualizarManoVisual = (fichas) => {
-    const newPositions = {};
-    for (let i = 0; i < 20; i++) {
-      newPositions[`hand-slot-${i}`] = fichas[i] || "";
-    }
-    setHandPositions(newPositions);
+    if (!fichas || fichas.length === 0) return;
+
+    setHandPositions((prev) => {
+      const newPositions = { ...prev };
+      fichas.forEach((tile, index) => {
+        if (newPositions[`hand-slot-${index}`] === "") {
+          newPositions[`hand-slot-${index}`] = tile;
+        }
+      });
+      return newPositions;
+    });
+    setPlayerHand(fichas);
   };
 
   const actualizarTableroVisual = (tableroString) => {
@@ -258,7 +264,7 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
       if (res.ok) {
         const data = await res.json();
         const fichasNuevas = parsearFichas(data.manoActual);
-        actualizarManoVisual(fichasNuevas)
+        actualizarManoVisual(fichasNuevas);
 
         setHandPositions(newPositions);
         //setPlayerHand(Object.values(newPositions));
@@ -272,7 +278,7 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
     } catch (error) {
       console.error("Error al robar:", error);
     } finally {
-      setProcessing(false)   
+      setProcessing(false);
     }
   };
 
