@@ -1,54 +1,72 @@
 import { useEffect, useState, act } from "react";
 import Tile from "./Tile.jsx";
 import Hand from "./Hand.jsx";
-import DraggableTile from "./draggableTile.jsx"
+import DraggableTile from "./draggableTile.jsx";
 import { useGame } from "../../hooks/useGame.js";
 import "./Board.css";
 import { useDraggable, DndContext, DragOverlay } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { areCompatible } from "../../hooks/deckFactory.js";
-import { shortColor, shortNum } from "./botones_f.js";
+import { sortColor, sortNum } from "./botones_f.js";
 import { handleDragLogic } from "./dragHandlers.js";
 
 const parsearFichas = (stringFichas) => {
   if (!stringFichas) return [];
-  
+
   const coloresMap = {
-    'R': 'red',
-    'B': 'blue',
-    'O': 'orange',
-    'K': 'black'
+    R: "red",
+    B: "blue",
+    O: "orange",
+    K: "black",
   };
 
-  return stringFichas.split(',').map((f, index) => {
+  return stringFichas.split(",").map((f, index) => {
     const color = f[0];
-    const esJoker = color === 'J';
-    const numeroStr = f - color;
-    
+    const numero = f.substring(1);
+
     return {
-      id: `${f}-${index}-${Math.random()}`, // ID único
-      color: coloresMap[colorLetra] || 'black',
-      number: esJoker ? 'J' : parseInt(numeroStr),
-      placed: false
+      id: color === "J" ? `J-${index}` : `${color}-${numero}-${index}`, // ID único id
+      color: coloresMap[color] || "black",
+      number: color === "J" ? "J" : parseInt(numero),
+      placed: false,
     };
   });
 };
 
-function Board({ idPartida, userId }) {
+const enviarConjuntos = (stringFichas) => {
+  if (!stringFichas) return [];
+
+  const coloresMap = {
+    red: "R",
+    blue: "B",
+    orange: "O",
+    black: "K",
+  };
+
+  return stringFichas.split(",").map((f, index) => {
+    const color = f[0];
+    const numero = f.substring(1);
+
+    return {
+      id: color === "J" ? `J-${index}` : `${color}-${numero}-${index}`, // ID único id
+      color: coloresMap[color] || "black",
+      number: color === "J" ? "J" : parseInt(numero),
+      placed: false,
+    };
+  });
+};
+
+function Board({ idPartida, userId, currentBackground, onWin }) {
   // Obtenemos el estado del juego y las funciones para manipularlo
-  const {
-    bag,
-    playerHand,
-    setPlayerHand,
-    gameBoard,
-    setGameBoard,
-    drawTile,
-    dealInitialHand,
-  } = useGame();
+  console.log("PROPS EN BOARD:", { idPartida, userId });
+
+  const { bag, playerHand, setPlayerHand, gameBoard, setGameBoard, drawTile } =
+    useGame();
   const [activeId, setActiveId] = useState(null); // Para rastrear qué ficha se arrastra
   const [joinedSlots, setJoinedSlots] = useState([]);
   const [miTurno, setMiTurno] = useState(true); // pa turnos
   const [processing, setProcessing] = useState(false); // Para que se pueda o no usar el botón de robar y tal
+  const [ordenTurno, setOrdenTurno] = useState(null);
 
   const delay = (ms) => new Promise((res) => setTimeout(res, ms)); // pa pruebas
 
@@ -67,7 +85,7 @@ function Board({ idPartida, userId }) {
   });
 
   // Cuando recibas las 14 fichas iniciales, llénalas en los primeros huecos:
-  useEffect(() => {
+  /*useEffect(() => {
     if (playerHand.length > 0) {
       const newPositions = { ...handPositions };
       playerHand.forEach((tile, index) => {
@@ -75,7 +93,7 @@ function Board({ idPartida, userId }) {
       });
       setHandPositions(newPositions);
     }
-  }, [playerHand]);
+  }, [playerHand]);*/
 
   useEffect(() => {
     const newJoined = [];
@@ -112,29 +130,40 @@ function Board({ idPartida, userId }) {
   }, [boardPositions]); // Se ejecuta cada vez que el tablero cambie
 
   useEffect(() => {
+    if (!userId || !idPartida) {
+      console.warn("Fetch abortado: faltan datos", { userId, idPartida });
+      return;
+    }
+
     const fetchInitialHand = async () => {
       try {
+        console.log(userId);
+        console.log(idPartida);
         const res = await fetch(
           `http://localhost:8080/api/participaciones/${userId}/${idPartida}`,
         );
         const participacion = await res.json();
-        const fichas = parsearFichas(participacion.fichasActuales);
+        const fichas = parsearFichas(participacion.manoActual); 
 
-        const newPositions = { ...Board, handPositions };
+        const newPositions = { ...handPositions };
         fichas.forEach((tile, index) => {
           newPositions[`hand-slot-${index}`] = tile;
         });
 
         setHandPositions(newPositions);
+
+        const orden= participacion.ordenTurno;
+        //orden === 0 ? setMiTurno(true) : setMiTurno(false);
+        setOrdenTurno(orden);
+
+        //llamar a fichasActuales para el numero
       } catch (error) {
         console.error("Error al cargar la mano:", error);
       }
-
-      if (idPartida && userId) {
-        cargarPartida();
-      }
     };
-  }, [idPartida, userId, setPlayerHand]);
+
+    fetchInitialHand();
+  }, [idPartida, userId]);
 
   function handleDragStart(event) {
     setActiveId(event.active.id); // Guardamos el ID al empezar
@@ -142,13 +171,17 @@ function Board({ idPartida, userId }) {
 
   function handleDragEnd(event) {
     setActiveId(null);
-    
+
     // Empaquetamos estados y setters para pasarlos a la lógica externa
     const states = {
-      handPositions, setHandPositions,
-      boardPositions, setBoardPositions,
-      setPlayerHand, setGameBoard,
-      miTurno, activeTile
+      handPositions,
+      setHandPositions,
+      boardPositions,
+      setBoardPositions,
+      setPlayerHand,
+      setGameBoard,
+      miTurno,
+      activeTile,
     };
 
     handleDragLogic(event, states);
@@ -159,12 +192,12 @@ function Board({ idPartida, userId }) {
     Object.values(boardPositions).find((t) => t?.id === activeId);
 
   const sortByNumber = () => {
-    const sorted = [...playerHand].sort(shortNum(a, b));
+    const sorted = [...playerHand].sort(sortNum);
     setPlayerHand(sorted);
   };
 
   const sortByColor = () => {
-    const sorted = [...playerHand].sort(shortColor(a, b));
+    const sorted = [...playerHand].sort(sortColor);
     setPlayerHand(sorted);
   };
 

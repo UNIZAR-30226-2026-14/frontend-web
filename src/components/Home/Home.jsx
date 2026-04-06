@@ -24,7 +24,7 @@ function Home({ onStart, user, onLogout, addXp }) {
   });
 
   // Monedas
-  const [coins, setCoins] = useState(user.monedas);
+  const [coins, setCoins] = useState(user?.monedas);
 
   // Fondo de la mesa de juego
   const [currentBackground, setCurrentBackground] = useState(() => {
@@ -44,15 +44,6 @@ function Home({ onStart, user, onLogout, addXp }) {
     return saved ? parseInt(saved) : 0;
   });
 
-  const [userId] = useState(() => {
-    const saved = localStorage.getItem("rummi-user-id");
-    if (saved) return parseInt(saved);
-
-    const generatedId = Math.floor(100000 + Math.random() * 900000);
-    localStorage.setItem("rummi-user-id", generatedId.toString());
-    return generatedId;
-  });
-
   const [matchStats] = useState(() => {
     const wins = user.partidasGanadas;
     const losses = user.partidasPerdidas;
@@ -70,6 +61,8 @@ function Home({ onStart, user, onLogout, addXp }) {
   const [roomCode, setRoomCode] = useState("");
   const [joinCode, setJoinCode] = useState("");
   const [isWaitingForStart, setIsWaitingForStart] = useState(false);
+
+  const [userId, setUserId] = useState(false);
 
   const partidasFinalizadas = user.partidasFinalizadas;
 
@@ -182,7 +175,7 @@ function Home({ onStart, user, onLogout, addXp }) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${localStorage.getItem("rummi-token")}`,
           },
         },
       );

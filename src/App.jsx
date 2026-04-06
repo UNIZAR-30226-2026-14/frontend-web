@@ -28,8 +28,13 @@ function App() {
 
   // Nombre de usuario
   const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem("rummi-user-object");
-    return saved ? JSON.parse(saved) : null;
+    /*const saved = localStorage.getItem("rummi-user-object");
+    try {
+      return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+      return null;
+    }*/
+    return null;
   });
 
   // Pantalla actual
@@ -99,7 +104,7 @@ function App() {
 
   const handleLogin = (user) => {
     setUser(user);
-    localStorage.setItem("rummi-username", user);
+    localStorage.setItem("rummi-user-object", JSON.stringify(user));
     setScreen("home");
   };
 
@@ -135,6 +140,7 @@ function App() {
       {screen === "home" && (
         <Home
           onStart={(id) => {
+            console.log("ID de partida recibido en App:", id);
             setActiveGameId(id);
             setScreen("loading");
           }}
@@ -173,7 +179,8 @@ function App() {
 
       {screen === "game" && (
         <Board
-          user={user}
+          idPartida={activeGameId}
+          userId={user.id}
           currentBackground={currentBackground}
           onWin={(puntosGanados) => {
             addXp(puntosGanados);

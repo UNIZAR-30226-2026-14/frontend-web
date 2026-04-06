@@ -10,16 +10,15 @@ const Login = ({ onLogin }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     if (username.trim() === "" || password.trim() === "") {
       setError(true);
       return;
     }
 
     try {
-      const url = "http://localhost:8080/api/jugadores";
-
       if (!isLogin) {
-        const response = await fetch(url, {
+        const response = await fetch("http://localhost:8080/api/jugadores", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

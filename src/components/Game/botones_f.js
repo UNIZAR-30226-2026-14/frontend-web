@@ -1,4 +1,4 @@
-export const shortColor = (a,b) => {
+export const sortColor = (a,b) => {
     const aIsJoker = a.number === "J";
     const bIsJoker = b.number === "J";
     const aIsNull = a === "";
@@ -20,7 +20,7 @@ export const shortColor = (a,b) => {
     return a.color.localeCompare(b.color);
 };
 
-export const shortNum = (a, b) => {
+export const sortNum = (a, b) => {
     const aIsJoker = a.number === "J";
     const bIsJoker = b.number === "J";
     const aIsNull = a === "";
