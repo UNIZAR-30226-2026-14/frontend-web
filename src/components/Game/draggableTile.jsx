@@ -1,4 +1,7 @@
-//-------------------ESTO LUEGO IRÁ APARTE
+import { useDraggable } from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
+import Tile from "./Tile.jsx";
+
 function DraggableTile({ tile }) {
   // Versión de ficha ya draggeable
   const {
