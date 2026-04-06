@@ -5,19 +5,6 @@ export const useGame = () => {
   const [bag, setBag] = useState(createDeck()); // El mazo de fichas se inicializa con un nuevo mazo barajado creado por createDeck()
   const [playerHand, setPlayerHand] = useState(Array(20).fill("")); // La mano del jugador se inicializa como un array de 20 posiciones vacías, que se llenarán con las fichas repartidas al inicio del juego.
   const [gameBoard, setGameBoard] = useState(Array(40).fill(""));
-  /**
-   * Reparte la mano inicial al jugador. Toma las primeras 14 fichas del mazo y las asigna a la mano del jugador.
-   * Luego actualiza el mazo eliminando las fichas repartidas. Esta función se llama al iniciar una nueva partida.
-   * @returns void
-   */
-  const dealInitialHand = () => {
-    /*const hand = bag.slice(0, 14); // Tomamos las primeras 14 fichas
-    const aux = [...hand, ...Array(6).fill("")];
-    setPlayerHand(aux); // Asignamos la mano al jugador
-    setGameBoard(Array(70).fill(""));
-    setBag(bag.slice(14)); // Actualizamos el mazo eliminando las fichas repartidas
-    */
-  };
 
   /**
    * Permite al jugador robar una ficha del mazo. La ficha se añade a la primera posición vacía de su mano.
@@ -41,5 +28,5 @@ export const useGame = () => {
     });
   };
 
-  return { bag, playerHand, gameBoard, setGameBoard, setPlayerHand, drawTile, dealInitialHand };
+  return { bag, playerHand, gameBoard, setGameBoard, setPlayerHand, drawTile };
 };

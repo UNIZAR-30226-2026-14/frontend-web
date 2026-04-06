@@ -58,13 +58,11 @@ const enviarConjuntos = (stringFichas) => {
 
 function Board({ idPartida, userId, currentBackground, onWin }) {
   // Obtenemos el estado del juego y las funciones para manipularlo
-  console.log("PROPS EN BOARD:", { idPartida, userId });
-
-  const { bag, playerHand, setPlayerHand, gameBoard, setGameBoard, drawTile } =
-    useGame();
+  const { bag, playerHand, gameBoard, setGameBoard, setPlayerHand } = useGame();
   const [activeId, setActiveId] = useState(null); // Para rastrear qué ficha se arrastra
   const [joinedSlots, setJoinedSlots] = useState([]);
-  const [miTurno, setMiTurno] = useState(true); // pa turnos
+  const [miTurno, setMiTurno] = useState(false); // pa turnos
+  const [idJugadorTurno, setIdJugadorTurno] = useState(null);
   const [processing, setProcessing] = useState(false); // Para que se pueda o no usar el botón de robar y tal
   const [ordenTurno, setOrdenTurno] = useState(null);
 
@@ -83,17 +81,6 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
     for (let i = 0; i < 70; i++) initial[`board-slot-${i}`] = "";
     return initial;
   });
-
-  // Cuando recibas las 14 fichas iniciales, llénalas en los primeros huecos:
-  /*useEffect(() => {
-    if (playerHand.length > 0) {
-      const newPositions = { ...handPositions };
-      playerHand.forEach((tile, index) => {
-        newPositions[`hand-slot-${index}`] = tile;
-      });
-      setHandPositions(newPositions);
-    }
-  }, [playerHand]);*/
 
   useEffect(() => {
     const newJoined = [];
@@ -129,41 +116,74 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
     setJoinedSlots(newJoined);
   }, [boardPositions]); // Se ejecuta cada vez que el tablero cambie
 
-  useEffect(() => {
-    if (!userId || !idPartida) {
-      console.warn("Fetch abortado: faltan datos", { userId, idPartida });
-      return;
+  const actualizarManoVisual = (fichas) => {
+    const newPositions = {};
+    for (let i = 0; i < 20; i++) {
+      newPositions[`hand-slot-${i}`] = fichas[i] || "";
     }
+    setHandPositions(newPositions);
+  };
 
-    const fetchInitialHand = async () => {
+  const actualizarTableroVisual = (tableroString) => {
+    const fichas = parsearFichas(tableroString);
+    const newBoard = {};
+    // Inicializamos vacío
+    for (let i = 0; i < 70; i++) newBoard[`board-slot-${i}`] = "";
+    // Rellenamos (asumiendo que el string guarda posiciones, si no, los pone en orden)
+    fichas.forEach((ficha, index) => {
+      newBoard[`board-slot-${index}`] = { ...ficha, placed: true };
+    });
+    setBoardPositions(newBoard);
+  };
+
+  // Detectamos si es nuestro turno
+  useEffect(() => {
+    if (!idPartida) return;
+
+    const sincronizar = async () => {
       try {
-        console.log(userId);
-        console.log(idPartida);
+        // Pedimos el estado de la partida
         const res = await fetch(
-          `http://localhost:8080/api/participaciones/${userId}/${idPartida}`,
+          `http://localhost:8080/api/partidas/${idPartida}`,
         );
-        const participacion = await res.json();
-        const fichas = parsearFichas(participacion.manoActual); 
+        const partida = await res.json();
 
-        const newPositions = { ...handPositions };
-        fichas.forEach((tile, index) => {
-          newPositions[`hand-slot-${index}`] = tile;
-        });
+        // Si no tenemos turno, lo pedimos
+        if (ordenTurno === null) {
+          const resParti = await fetch(
+            `http://localhost:8080/api/participaciones/${userId}/${idPartida}`,
+          );
+          if (resParti.ok) {
+            const participacion = await resParti.json();
 
-        setHandPositions(newPositions);
+            if (participacion.ordenTurno !== null) {
+              console.log("Orden asignado: " + participacion.ordenTurno);
+              setOrdenTurno(participacion.ordenTurno);
+              const fichas = parsearFichas(participacion.manoActual);
+              actualizarManoVisual(fichas);
+            }
+          }
+        }
 
-        const orden= participacion.ordenTurno;
-        //orden === 0 ? setMiTurno(true) : setMiTurno(false);
-        setOrdenTurno(orden);
-
-        //llamar a fichasActuales para el numero
+        // Si ya tenemos turno, comparamos con el turno actual de la partida
+        if (ordenTurno !== null) {
+          if (partida.turnoActual === ordenTurno && !miTurno) {
+            setMiTurno(true);
+            // Actualizar tablero con lo que hizo el rival
+            //if (partida.tableroActual)
+            //  actualizarTableroVisual(partida.tableroActual);
+          }
+        } else if (partida.turnoActual !== ordenTurno && miTurno) {
+          setMiTurno(false);
+        }
       } catch (error) {
-        console.error("Error al cargar la mano:", error);
+        console.error("Error al obtener estado:", error);
       }
     };
 
-    fetchInitialHand();
-  }, [idPartida, userId]);
+    const interval = setInterval(sincronizar, 3000);
+    return () => clearInterval(interval);
+  }, [idPartida, userId, ordenTurno, miTurno]);
 
   function handleDragStart(event) {
     setActiveId(event.active.id); // Guardamos el ID al empezar
@@ -192,20 +212,97 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
     Object.values(boardPositions).find((t) => t?.id === activeId);
 
   const sortByNumber = () => {
-    const sorted = [...playerHand].sort(sortNum);
-    setPlayerHand(sorted);
+    const sorted = [
+      ...Object.values(handPositions).filter((t) => t !== ""),
+    ].sort(sortNum);
+
+    const newPositions = {};
+    for (let i = 0; i < 20; i++) {
+      newPositions[`hand-slot-${i}`] = sorted[i] || "";
+    }
+    setHandPositions(newPositions);
   };
 
   const sortByColor = () => {
-    const sorted = [...playerHand].sort(sortColor);
-    setPlayerHand(sorted);
+    const sorted = [
+      ...Object.values(handPositions).filter((t) => t !== ""),
+    ].sort(sortColor);
+
+    const newPositions = {};
+    for (let i = 0; i < 20; i++) {
+      newPositions[`hand-slot-${i}`] = sorted[i] || "";
+    }
+    setHandPositions(newPositions);
+  };
+
+  const drawTile = async () => {
+    if (!miTurno || processing) return;
+
+    try {
+      setProcessing(true);
+      const token = localStorage.getItem("rummi-token");
+      const res = await fetch(
+        `http://localhost:8080/api/partidas/${idPartida}/pasar`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            idJugador: userId,
+          }),
+        },
+      );
+
+      if (res.ok) {
+        const data = await res.json();
+        const fichasNuevas = parsearFichas(data.manoActual);
+        actualizarManoVisual(fichasNuevas)
+
+        setHandPositions(newPositions);
+        //setPlayerHand(Object.values(newPositions));
+
+        const orden = participacion.ordenTurno;
+        //orden === 0 ? setMiTurno(true) : setMiTurno(false);
+        setMiTurno(false);
+
+        //llamar a fichasActuales para el numero
+      }
+    } catch (error) {
+      console.error("Error al robar:", error);
+    } finally {
+      setProcessing(false)   
+    }
   };
 
   const cambiarTurno = async () => {
     // esto temporal pa ponerle algo
     setMiTurno(false);
     setProcessing(true);
-    //marcar todas las fichas de tablero como placed
+
+    const token = localStorage.getItem("rummi-token");
+
+    const res = await fetch(
+      `http://localhost:8080/api/partidas/${idPartida}/pasar`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          idJugador: userId,
+        }),
+      },
+    );
+
+    if (res.ok) {
+      setMiTurno(false);
+      console.log("Siguiente urno. Esperando al oponente...");
+    }
+
+    //marcar todas las fichas de tablero como placed ESTO IRÁ AL ACTUALIZAR TABLERO
     setBoardPositions((prev) => {
       const nextState = {};
       for (const id in prev) {
@@ -229,6 +326,8 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
     setProcessing(false);
     console.log("Empieza turno");
   };
+
+  useEffect(() => {});
 
   const drawTileButton = () => {
     drawTile(); //cambiarTurno();
