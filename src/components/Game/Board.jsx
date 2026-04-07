@@ -144,49 +144,49 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
 
   // Detectamos si es nuestro turno
   useEffect(() => {
-    if (!idPartida) return;
+    if (!idPartida || !userId) return;
 
     const sincronizar = async () => {
       try {
-        // Pedimos el estado de la partida
-        const res = await fetch(
-          `http://localhost:8080/api/partidas/${idPartida}`,
-        );
-        const partida = await res.json();
-
-        // Si no tenemos turno, lo pedimos
-        if (ordenTurno === null) {
-          const resParti = await fetch(
+        // Obtener datos de la partida y de tu participación
+        const [resP, resU] = await Promise.all([
+          fetch(`http://localhost:8080/api/partidas/${idPartida}`),
+          fetch(
             `http://localhost:8080/api/participaciones/${userId}/${idPartida}`,
-          );
-          if (resParti.ok) {
-            const participacion = await resParti.json();
+          ),
+        ]);
 
-            if (participacion.ordenTurno !== null) {
-              console.log("Orden asignado: " + participacion.ordenTurno);
-              setOrdenTurno(participacion.ordenTurno);
-              const fichas = parsearFichas(participacion.manoActual);
-              actualizarManoVisual(fichas);
-            }
-          }
+        if (!resP.ok || !resU.ok) return;
+
+        const partida = await resP.json();
+        const participacion = await resU.json();
+
+        const turnoDeLaPartida = Number(partida.turno);
+        const miOrdenAsignado = Number(participacion.ordenTurno);
+
+        // Actualizar el orden si no lo teníamos
+        if (ordenTurno === null) {
+          setOrdenTurno(miOrdenAsignado);
+          actualizarManoVisual(parsearFichas(participacion.manoActual));
         }
 
-        // Si ya tenemos turno, comparamos con el turno actual de la partida
-        if (ordenTurno !== null) {
-          if (partida.turnoActual === ordenTurno && !miTurno) {
-            setMiTurno(true);
-            // Actualizar tablero con lo que hizo el rival
-            //if (partida.tableroActual)
-            //  actualizarTableroVisual(partida.tableroActual);
-          }
-        } else if (partida.turnoActual !== ordenTurno && miTurno) {
-          setMiTurno(false);
+        // Lógica de cambio de turno
+        const esMiTurno = turnoDeLaPartida === miOrdenAsignado;
+
+        if (esMiTurno !== miTurno) {
+          setMiTurno(esMiTurno);
+
+          // Si acabamos de recibir el turno, actualizamos el tablero
+          //if (esMiTurno && partida.tableroActual) {
+          //  actualizarTableroVisual(partida.tableroActual);
+          //}
         }
       } catch (error) {
-        console.error("Error al obtener estado:", error);
+        console.error("Error en sincronización:", error);
       }
     };
 
+    sincronizar();
     const interval = setInterval(sincronizar, 3000);
     return () => clearInterval(interval);
   }, [idPartida, userId, ordenTurno, miTurno]);
@@ -242,18 +242,22 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
   };
 
   const drawTile = async () => {
-    if (!miTurno || processing) return;
+    if (!miTurno) {
+      console.log("No es tu turno");
+      return;
+    }
 
     try {
       setProcessing(true);
       const token = localStorage.getItem("rummi-token");
+      console.log("Enviando token:", `Bearer ${token}`);
       const res = await fetch(
-        `http://localhost:8080/api/partidas/${idPartida}/pasar`,
+        `http://localhost:8080/api/partidas/${idPartida}/robar`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            "Authorization": `Bearer ${token}`,
           },
           body: JSON.stringify({
             idJugador: userId,
@@ -261,17 +265,31 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
         },
       );
 
+      console.log("3");
+
       if (res.ok) {
         const data = await res.json();
-        const fichasNuevas = parsearFichas(data.manoActual);
-        actualizarManoVisual(fichasNuevas);
 
-        setHandPositions(newPositions);
+        const resParti = await fetch(
+          `http://localhost:8080/api/participaciones/${userId}/${idPartida}`,
+        );
+
+        if (resParti.ok) {
+          const participacion = await resParti.json();
+
+          actualizarManoVisual(parsearFichas(participacion.manoActual));
+          console.log(participacion.manoActual);
+          setMiTurno(false);
+        }
+        //const fichasNuevas = parsearFichas(data.manoActual);
+        //actualizarManoVisual(fichasNuevas);
+
+        //setHandPositions(newPositions);
         //setPlayerHand(Object.values(newPositions));
 
-        const orden = participacion.ordenTurno;
+        //const orden = participacion.ordenTurno;
         //orden === 0 ? setMiTurno(true) : setMiTurno(false);
-        setMiTurno(false);
+        //setMiTurno(false);
 
         //llamar a fichasActuales para el numero
       }
@@ -326,14 +344,12 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
       return nextState;
     });
 
-    console.log("Fin de turno");
-    await delay(3000);
-    setMiTurno(true);
-    setProcessing(false);
-    console.log("Empieza turno");
+    //console.log("Fin de turno");
+    //await delay(3000);
+    //setMiTurno(true);
+    //setProcessing(false);
+    //console.log("Empieza turno");
   };
-
-  useEffect(() => {});
 
   const drawTileButton = () => {
     drawTile(); //cambiarTurno();

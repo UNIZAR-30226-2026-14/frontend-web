@@ -294,6 +294,7 @@ function Home({ onStart, user, onLogout, addXp }) {
         <FriendsList
           onClose={() => togglePopup("friends")}
           onOpenProfile={openFriendProfile}
+          userId={user.id}
         />
       )}
 

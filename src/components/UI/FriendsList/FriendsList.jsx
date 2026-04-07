@@ -33,17 +33,59 @@ const MOCK_FRIENDS = [
   },
 ];
 
-function FriendsList({ onClose, onOpenProfile }) {
+function FriendsList({ onClose, onOpenProfile, userId }) {
   // Estado para controlar el boton de retar
   const [challengeId, setChallengeId] = useState(null);
   const [search, setSearch] = useState("");
-  const [friends, setFriends] = useState(() => {
-    const saved = localStorage.getItem("rummi-friends");
-    return saved ? JSON.parse(saved) : MOCK_FRIENDS;
-  });
+  const [friends, setFriends] = useState([
+    () => {
+      const saved = localStorage.getItem("rummi-friends");
+      return saved ? JSON.parse(saved) : MOCK_FRIENDS;
+    },
+  ]);
+
   const [newFriendId, setNewFriendId] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const [error, setError] = useState("");
+
+  const token = localStorage.getItem("rummi-token");
+
+  // Cargar amigos
+  useEffect(() => {
+    const fetchFriends = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:8080/api/amigos?idJugador=${userId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
+
+        if (res.ok) {
+          const amigos = await res.json();
+          const listaAmigos = amigos
+            .filter((rel) => rel.estado === "ACEPTADA")
+            .map((rel) => {
+              // Si soy jugador1, mi amigo es jugador2. Si no, al revés.
+              const amigoId =
+                rel.jugador1 === userId ? rel.jugador2 : rel.jugador1;
+
+              return {
+                id: amigoId,
+                name: `Usuario ${amigoId}`,
+                avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${amigoId}`,
+                status: "online",
+              };
+            });
+          setFriends(listaAmigos);
+        }
+      } catch (err) {
+        console.error("Error cargando amigos:", err);
+      }
+    };
+
+    if (userId) fetchFriends();
+  }, [userId, token]);
 
   // Simula el proceso de retar a un amigo (aquí irá la lógica de enviar la solicitud al Backend)
   const handleChallenge = (id) => {
@@ -54,7 +96,7 @@ function FriendsList({ onClose, onOpenProfile }) {
     }, 2000);
   };
 
-  //
+  // Escape
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape") {
@@ -73,15 +115,48 @@ function FriendsList({ onClose, onOpenProfile }) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onClose, isAdding, search]);
 
-  // Guarda los amigos cada vez que se añade uno nuevo
-  useEffect(() => {
-    localStorage.setItem("rummi-friends", JSON.stringify(friends));
-  }, [friends]);
-
-  const handleAddFriend = (e) => {
+  const handleAddFriend = async (e) => {
     e.preventDefault();
     setError("");
-    const foundUser = GLOBAL_USERS_DB.find(
+
+    if (!newFriendId.trim()) return;
+
+    try {
+      const res = await fetch(`http://localhost:8080/api/amigos`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          jugador1Id: userId,
+          jugador2Id: parseInt(newFriendId),
+          estado: "PENDIENTE",
+          fecha: new Date().toISOString().split("T")[0],
+        }),
+      });
+
+      if (res.ok) {
+        const nuevaAmistad = res.json();
+        setIsAdding(false);
+        setNewFriendId("");
+        alert("¡Amigo añadido!");
+      } else {
+        setError("No se pudo añadir al usuario.");
+      }
+    } catch (error) {
+      const errorData = await res.json();
+      console.error("Detalles del error 400:", errorData);
+      
+      // Si usas validaciones de Spring (@Valid), los errores vienen en un array llamado 'errors'
+      if (errorData.errors) {
+        const mensajes = errorData.errors.map(err => `${err.field}: ${err.defaultMessage}`);
+        setError(`Error en campos: ${mensajes.join(", ")}`);
+      } else {
+        setError(errorData.message || "Error 400: Datos inválidos");
+      }
+    }
+    /*const foundUser = GLOBAL_USERS_DB.find(
       (user) => user.id === newFriendId.trim(),
     );
 
@@ -99,7 +174,7 @@ function FriendsList({ onClose, onOpenProfile }) {
 
     setFriends([foundUser, ...friends]);
     setNewFriendId("");
-    setIsAdding(false);
+    setIsAdding(false);*/
   };
 
   const filteredFriends = friends
@@ -150,10 +225,12 @@ function FriendsList({ onClose, onOpenProfile }) {
               />
             </div>
 
+            {}
+
             <div className="friends-list">
               {filteredFriends.length > 0 ? (
                 filteredFriends.map((friend) => (
-                  <div key={friend.id} className="friend-card">
+                  <div key={`friend-${friend.id}`} className="friend-card">
                     <button
                       className="friend-profile-hit"
                       onClick={() => onOpenProfile?.(friend)}
