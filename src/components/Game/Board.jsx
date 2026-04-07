@@ -242,15 +242,11 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
   };
 
   const drawTile = async () => {
-    if (!miTurno) {
-      console.log("No es tu turno");
-      return;
-    }
+    if (!miTurno) return;
 
     try {
       setProcessing(true);
       const token = localStorage.getItem("rummi-token");
-      console.log("Enviando token:", `Bearer ${token}`);
       const res = await fetch(
         `http://localhost:8080/api/partidas/${idPartida}/robar`,
         {
@@ -265,8 +261,6 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
         },
       );
 
-      console.log("3");
-
       if (res.ok) {
         const data = await res.json();
 
@@ -278,7 +272,6 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
           const participacion = await resParti.json();
 
           actualizarManoVisual(parsearFichas(participacion.manoActual));
-          console.log(participacion.manoActual);
           setMiTurno(false);
         }
         //const fichasNuevas = parsearFichas(data.manoActual);
