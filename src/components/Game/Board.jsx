@@ -33,27 +33,20 @@ const parsearFichas = (stringFichas) => {
   });
 };
 
-const enviarConjuntos = (stringFichas) => {
-  if (!stringFichas) return [];
-
-  const coloresMap = {
-    red: "R",
-    blue: "B",
-    orange: "O",
-    black: "K",
-  };
-
-  return stringFichas.split(",").map((f, index) => {
-    const color = f[0];
-    const numero = f.substring(1);
-
-    return {
-      id: color === "J" ? `J-${index}` : `${color}-${numero}-${index}`, // ID único id
-      color: coloresMap[color] || "black",
-      number: color === "J" ? "J" : parseInt(numero),
-      placed: false,
-    };
-  });
+const enviarConjuntos = (boardPositions) => {
+  return Object.values(boardPositions)
+    .filter((tile) => tile !== "")
+    .map((tile) => {
+      const coloresMap = {
+        red: "R",
+        blue: "B",
+        orange: "O",
+        black: "K",
+      };
+      if (tile.number === "J") return "J*";
+      const color = coloresMap[tile.color] || "K";
+      return `${color}${tile.number}`;
+    });
 };
 
 function Board({ idPartida, userId, currentBackground, onWin }) {
@@ -253,7 +246,7 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             idJugador: userId,
