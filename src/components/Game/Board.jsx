@@ -21,14 +21,32 @@ const parsearFichas = (stringFichas) => {
   };
 
   return stringFichas.split(",").map((f, index) => {
+    if (f === "J*") {
+      return {
+        id: `J-${index}`,
+        color: "black",
+        number: "J",
+        placed: false,
+        habilidad: "joker",
+      };
+    }
+
     const color = f[0];
-    const numero = f.substring(1);
+    const numero = parseInt(f.substring(1, 3));
+    const habilidad = f[3];
+
+    const habilidadesMap = {
+      D: "dorada",
+      A: "arcoiris",
+      N: "negativa",
+    };
 
     return {
-      id: color === "J" ? `J-${index}` : `${color}-${numero}-${index}`, // ID único id
+      id: `${color}-${numero}-${index}`,
       color: coloresMap[color] || "black",
-      number: color === "J" ? "J" : parseInt(numero),
+      number: numero,
       placed: false,
+      habilidad: habilidadesMap[habilidad] || null,
     };
   });
 };
@@ -37,15 +55,22 @@ const enviarConjuntos = (boardPositions) => {
   return Object.values(boardPositions)
     .filter((tile) => tile !== "")
     .map((tile) => {
+      if (tile.number === "J" || tile.habilidad === "joker") return "J*";
       const coloresMap = {
         red: "R",
         blue: "B",
         orange: "O",
         black: "K",
       };
-      if (tile.number === "J") return "J*";
+      const habilidadesMap = {
+        dorada: "D",
+        arcoiris: "A",
+        negativa: "N",
+      };
       const color = coloresMap[tile.color] || "K";
-      return `${color}${tile.number}`;
+      const numStr = tile.number.padStart(2, "0");
+      const habilidad = habilidadesMap[tile.habilidad] || "";
+      return `${color}${numStr}${habilidad}`;
     });
 };
 
@@ -467,6 +492,7 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
             number={activeTile.number}
             color={activeTile.color}
             placed={activeTile.placed}
+            habilidad={activeTile.habilidad}
           />
         ) : null}
       </DragOverlay>

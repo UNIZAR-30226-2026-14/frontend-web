@@ -1,32 +1,71 @@
 .tile {
-    font-family: 'Arial', sans-serif;
-    width: 45px;
-    height: 65px;
-    background-color: #fdfcf0;
-    border-radius: 6px;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    font-size: 30px;
-    line-height: 1.4;
-    margin: 0;
-    font-weight: bold;
-    box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-    border: 1px solid #d1d1d1;
-    cursor: pointer;
-    user-select: none;
-    transition: transform 0.2s ease;
+  font-family: "Arial", sans-serif;
+  width: 45px;
+  height: 65px;
+  background-color: #fdfcf0;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  font-size: 30px;
+  line-height: 1.4;
+  margin: 0;
+  font-weight: bold;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  border: 1px solid #d1d1d1;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.2s ease;
+}
+
+/* Dorado */
+.tile.tile-gold {
+  border: 2px solid #d4af37;
+  background-color: #fffdf2;
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.6), inset 0 0 5px rgba(212, 175, 55, 0.3);
+}
+
+/* Arcoíris */
+.tile.tile-rainbow .tile-number,
+.tile.tile-rainbow h3 {
+  background: linear-gradient(
+    to right, 
+    #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff
+  );
+  background-size: 400% 100%;
+  color: transparent !important; /* Sobreescribe el color del style inline */
+  animation: rainbow-move 5s linear infinite;
+}
+
+@keyframes rainbow-move {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+/* Negativo */
+.tile.tile-negative {
+  border: 2px solid #ff4d4d;
+  background-color: #fff5f5;
+}
+
+/* Símbolo negativo */
+.negative-mark {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: 14px;
+  color: #ff4d4d;
 }
 
 /* Estado para las fichas colocadas */
 .tile.tile-placed {
-    background-color: #e2e2d5; 
-    border: 1px solid #b8b8a0;
-    box-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-    filter: saturate(0.6) brightness(0.9);
-    cursor: help;
-    transform: scale(0.98);
+  background-color: #e2e2d5;
+  border: 1px solid #b8b8a0;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+  filter: saturate(0.6) brightness(0.9);
+  cursor: help;
+  transform: scale(0.98);
 }
 /* Efecto al pasar el ratón */
 .tile:hover {
@@ -34,24 +73,23 @@
 }
 
 img {
-    margin-top: 13px;
-    width: 90%
+  margin-top: 13px;
+  width: 90%;
 }
 
 h3 {
-    justify-content: flex-end;
-    align-items: center;
-    display: flex;
-    font-size: 30px;
-    font-weight: bold;
-    margin-top: -15px;
+  justify-content: flex-end;
+  align-items: center;
+  display: flex;
+  font-size: 30px;
+  font-weight: bold;
+  margin-top: -15px;
 }
 
-
 @media (max-width: 1000px) {
-  .tile{
+  .tile {
     height: 5vw;
-    width: 3vw; 
+    width: 3vw;
     font-size: 2.5vw;
   }
 
@@ -62,7 +100,6 @@ h3 {
 
   img {
     margin-top: 1.2vw;
-    width: 90%
+    width: 90%;
   }
-
 }

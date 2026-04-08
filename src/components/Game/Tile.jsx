@@ -1,47 +1,44 @@
-import './tile.css'
-import rojo from '../../assets/j-rojo.svg'
-import negro from '../../assets/j-negro.svg'
+import "./tile.css";
+import rojo from "../../assets/j-rojo.svg";
+import negro from "../../assets/j-negro.svg";
 
 function sign(number, color) {
-  if (number != 'J') {
-    return(
+  if (number != "J") {
+    return (
       <h3>
-      { 
         {
-          'red' : '♡',
-          'blue': '♢',
-          'orange': '♧',
-          'black': '♤'
-        }[color]
-      }
-    </h3>);
-    }
-
-  else
-    return (<h3></h3>);
+          {
+            red: "♡",
+            blue: "♢",
+            orange: "♧",
+            black: "♤",
+          }[color]
+        }
+      </h3>
+    );
+  } else return <h3></h3>;
 }
 
 function comodin(number, color) {
-  if (number === 'J') {
-    if (color === 'red') {
-      return(<img src={rojo}/>);
-    }
-    else {
-      return(<img src={negro}/>);
-    }
-    
-    }
-  else 
-    return (number);
+  if (number === "J") {
+    return <img src={color === "black" ? negro : rojo} alt="joker" />;
+  }
+  return number;
 }
 
-const Tile = ({ number, color, placed }) => (
-  <div className={`tile ${placed ? 'tile-placed' : ''}`}
-   style={{color: color}}>
-    {comodin(number,color)}
-    {sign(number,color)}
-    
-  </div>
-);
+const Tile = ({ number, color, placed, habilidad }) => {
+  const isRainbow = habilidad === "arcoiris";
+  const isNegative = habilidad === "negativa";
+  return (
+    <div
+      className={`tile ${placed ? "tile-placed" : ""} ${habilidad ? `tile-${habilidad}` : ""}`}
+      style={{ color: isRainbow ? "transparent" : color }}
+    >
+      <span className="tile-number">{comodin(number, color)}</span>
+      {sign(number, color)}
+      {isNegative && <div className="negative-sign">-</div>}
+    </div>
+  );
+};
 
 export default Tile;
