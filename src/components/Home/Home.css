@@ -189,48 +189,34 @@
 }
 
 @media (max-width: 1070px) {
+
   .gamemode-card {
     flex: 0 1 260px;
     padding: 28px 20px 26px;
+    width: 20vw !important;
+    height: 15vw !important;
+    padding: 0  !important;
   }
 
   .gamemode-icon {
-    width: 85px;
-    height: 105px;
+    width: 50px;
+    height: 50px;
+    gap: 0;
   }
 
   .gamemode-title {
     font-size: 1.2rem;
   }
+
+  .join-section{
+   width: 30%;
+   font-size: 50%;
+  }
+
+  .lobby-modal{
+    font-size: 1vw;
+    gap: 0;
+  }
+  
 }
 
-@media (max-width: 650px) {
-  .gamemodes {
-    gap: 16px;
-    padding: 16px;
-  }
-
-  .gamemode-card {
-    flex: 0 1 200px;
-    padding: 22px 16px;
-    gap: 10px;
-  }
-
-  .gamemode-icon {
-    width: 65px;
-    height: 80px;
-  }
-
-  .gamemode-title {
-    font-size: 1rem;
-  }
-
-  .gamemode-desc {
-    font-size: 0.75rem;
-  }
-
-  .gamemode-badge {
-    padding: 6px 18px;
-    font-size: 0.75rem;
-  }
-}

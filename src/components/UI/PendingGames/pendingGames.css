@@ -215,3 +215,21 @@
   color: #4fe940;
 }
 
+
+@media (max-width: 1000px) {
+
+  .capsule{
+    height: 3vw !important;
+  }
+
+  .circle {
+    width: 5vw !important;
+    height: 5vw !important;
+  }
+
+  .circle.invite-slot {
+    width: 5vw !important;
+    height: 5vw !important;
+  }
+  
+}
