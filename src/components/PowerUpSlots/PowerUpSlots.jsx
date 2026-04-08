@@ -2,19 +2,29 @@ import { useState } from "react";
 
 function PowerUpSlots({ inventory, onActivate }) {
   const [selectedSlot, setSelectedSlot] = useState(null);
+  const displaySlots = [...inventory];
+  // Rellenamos con null para mostrar siempre 3 slots
+  while (displaySlots.length < 3) displaySlots.push(null);
+
   return (
     <div className="powerup-inventory">
       <div className="slots-grid">
-        {inventory.map((item, index) => {
+        {displaySlots.map((item, index) => {
           return (
             <div
               key={index}
-              className={selectedSlot?.index === index ? "slot-selected" : "slot"}
+              className={
+                selectedSlot?.index === index ? "slot-selected" : "slot"
+              }
               onClick={() => {
-                item ? setSelectedSlot({ ...item, index }) : null;
+                if (item) setSelectedSlot({ ...item, index });
               }}
             >
-              {item ? item.name : "+"}
+              {item ? (
+                <img src={item.icon} alt={item.name} className="slot-icon" />
+              ) : (
+                <div className="empty-slot">+</div>
+              )}
             </div>
           );
         })}

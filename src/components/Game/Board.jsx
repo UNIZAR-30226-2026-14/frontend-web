@@ -83,6 +83,44 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
   const [processing, setProcessing] = useState(false); // Para que se pueda o no usar el botón de robar y tal
   const [ordenTurno, setOrdenTurno] = useState(null);
 
+  const { matchPoints, setMatchPoints } = useState(0);
+
+  // Función para conseguir puntos para comprar power-ups
+  const sumarPuntosPorJugada = (fichasColocadas) => {
+    const puntosGanados = fichasColocadas.length * 10;
+    setMatchPoints((prev) => prev + puntosGanados);
+  };
+
+  const ejecutarPowerup = (powerup) => {
+    switch (powerup.id) {
+      case "toque de midas":
+        setHandPositions((prev) => {
+          const next = { ...prev };
+          const slotsConFichas = Object.keys(next).filter(
+            (key) => next[key] !== "",
+          );
+          const seleccionadas = slotsConFichas
+            .sort(() => 0.5 - Math.random())
+            .slice(0, 3);
+
+          seleccionadas.forEach((slot) => {
+            next[slot] = { ...next[slot], habilidad: "dorada" };
+          });
+
+          return next;
+        });
+        break;
+
+      case 1:
+
+      default:
+        break;
+    }
+
+    // Quitar del inventario una vez usado
+    setInventory((prev) => prev.filter((item) => item.id !== powerup.id));
+  };
+
   const delay = (ms) => new Promise((res) => setTimeout(res, ms)); // pa pruebas
 
   const [handPositions, setHandPositions] = useState(() => {

@@ -1,66 +1,72 @@
-import { sileo, Toaster } from "sileo";
-import "./shop.css";
+import "./powerUpsShop.css";
+import { POWER_UPS } from "../../data/itemData";
 
-function PowerUpsShop() {
-  // Maneja la accion de comprar o equipar un fondo
-  const handleAction = (bg) => {
-    if (ownedBgs.includes(bg.id)) {
-      setCurrentBackground(bg.value);
+function PowerUpsShop({
+  matchPoints,
+  setMatchPoints,
+  inventory,
+  setInventory,
+  onClose,
+}) {
+  const handleBuyPowerUp = (item) => {
+    // Verificar si hay espacio en el inventario
+    if (inventory.length >= 3) {
+      sileo.error({
+        title: "Inventario lleno",
+        description: "Solo puedes tener 3 power-ups al mismo tiempo.",
+      });
+      return;
+    }
+
+    // Comprobar si tienes suficientes puntos
+    if (matchPoints >= item.price) {
+      setMatchPoints((prev) => prev - item.price);
+
+      // Añadimos el objeto al inventario
+      const newItem = { ...item, id: Date.now() }; // ID único para cada instancia
+      setInventory([...inventory, newItem]);
+
+      sileo.success({
+        title: "Power-up comprado",
+        description: `Has adquirido ${item.name}`,
+      });
     } else {
-      if (coins >= bg.price) {
-        setCoins(coins - bg.price);
-        addXp(50);
-        const updatedOwned = [...ownedBgs, bg.id];
-        setOwnedBgs(updatedOwned);
-        localStorage.setItem("rummi-bgs", JSON.stringify(updatedOwned))
-        setCurrentBackground(bg.value);
-        sileo.success({
-          title: "¡Compra realizada!",
-          description: `Has desbloqueado ${bg.name}`
-        })
-      } else {
-        sileo.error({
-          title: "Fondos insuficientes",
-          description: (
-            <span className="insufficent-founds">
-              No tienes suficientes monedas para comprar este fondo. ¡Sigue
-              jugando para ganar más!
-            </span>
-          ),
-        });
-      }
+      sileo.error({
+        title: "Puntos insuficientes",
+        description: `Necesitas ${item.price -matchPoints} puntos más para comprar ${item.name}.`,
+      });
     }
   };
 
   return (
     <div className="shop-popup">
       <h2 className="shop-title">Tienda de Power-ups</h2>
+      <div className="coins-display">💰 {coins}</div>
+
       <button className="close-button" onClick={onClose}>
         X
       </button>
-      {/* Sección de tableros */}
+
       <div className="shop-sections">
         <div className="power-ups-list">
-          {BACKGROUNDS.map((bg) => (
-            <div
-              key={bg.id}
-              className={`background-card ${currentBackground === bg.value ? "active" : ""}`}
-            >
-              <div className="color-preview" style={{ background: bg.value }} />
-              <span className="background-name">{bg.name}</span>
-              <button onClick={() => handleAction(bg)}>
-                {ownedBgs.includes(bg.id)
-                  ? currentBackground === bg.value
-                    ? "Equipado"
-                    : "Equipar"
-                  : `${bg.price}`}
+          {POWER_UPS.map((item) => (
+            <div key={item.id} className="item-card">
+              <div className="item-icon">{item.icon}</div>
+              <div className="item-info">
+                <span className="item-name">{item.name}</span>
+                <span className="item-desc">{item.description}</span>
+              </div>
+              <button
+                className="buy-button"
+                onClick={() => handleBuyPowerUp(item)}
+              >
+                {item.price} 💰
               </button>
             </div>
           ))}
         </div>
       </div>
+      <Toaster />
     </div>
   );
 }
-
-export default PowerUpsShop;
