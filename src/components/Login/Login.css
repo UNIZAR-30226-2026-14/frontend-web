@@ -31,7 +31,7 @@
   padding: 10px;
   cursor: pointer;
   transition: transform 0.2s ease;
-  width: 80px;
+  width: 100px;
 }
 
 .submit-button:hover {
@@ -65,4 +65,36 @@ input {
     opacity: 1;
     transform: translateY(0px);
   }
+}
+
+@media (max-width: 1000px) {
+  .logo {
+    width: 15%;
+    width: 15%;
+    padding: 0;
+  }
+
+  .login-title{
+    font-size: 2vw;
+    padding: 0;
+  }
+  .login-form{
+    font-size: 1vw;
+    width: 15%;
+    width: 30%; 
+    gap: 1.5vw;
+    padding: 0;
+  }
+  .toggle-mode{
+    font-size: 1.25vw;
+  }
+
+  .submit-button {
+    padding: 3%;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    width: 100px;
+  }
+ 
+
 }
