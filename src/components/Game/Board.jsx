@@ -68,7 +68,7 @@ const enviarConjuntos = (boardPositions) => {
         negativa: "N",
       };
       const color = coloresMap[tile.color] || "K";
-      const numStr = tile.number.padStart(2, "0");
+      const numStr = String(tile.number).padStart(2, "0");
       const habilidad = habilidadesMap[tile.habilidad] || "";
       return `${color}${numStr}${habilidad}`;
     });
@@ -83,7 +83,8 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
   const [processing, setProcessing] = useState(false); // Para que se pueda o no usar el botón de robar y tal
   const [ordenTurno, setOrdenTurno] = useState(null);
 
-  const { matchPoints, setMatchPoints } = useState(0);
+  const [matchPoints, setMatchPoints] = useState(0);
+  const [activeEvent, setActiveEvent] = useState(null);
 
   // Función para conseguir puntos para comprar power-ups
   const sumarPuntosPorJugada = (fichasColocadas) => {
@@ -120,6 +121,28 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
     // Quitar del inventario una vez usado
     setInventory((prev) => prev.filter((item) => item.id !== powerup.id));
   };
+
+  const mostrarEvento = (evento) => {
+    setActiveEvent(evento);
+    setTimeout(() => setActiveEvent(null), 5000);
+  };
+
+  useEffect(() => {
+    if (miTurno && !processing) {
+      // Verificar si hay un evento de inicio de turno
+      switch (activeEvent?.id) {
+        case "AUTO_DRAW":
+          drawTile();
+          break;
+
+        case "MANDATORY_SHOP":
+          setShowShop(true);
+
+        default:
+          break;
+      }
+    }
+  }, [miTurno]); // Se dispara cada vez que te toca
 
   const delay = (ms) => new Promise((res) => setTimeout(res, ms)); // pa pruebas
 

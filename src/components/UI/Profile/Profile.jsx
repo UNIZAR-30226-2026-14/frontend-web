@@ -16,12 +16,28 @@ function Profile({
   const [isEditing, setIsEditing] = useState(false);
   const [isHoveringRemove, setIsHoveringRemove] = useState(false);
   const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
+  
   const canEditAvatar = Boolean(setUserAvatar) && avatarList.length > 0;
   const isFriendProfile = !canEditAvatar;
 
   const porcentajeVictorias =
     stats.finished > 0 ? Math.round((stats.wins / stats.finished) * 100) : 0;
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return
+
+    const reader = new FileReader();
+
+    reader.onload = event => {
+      const imageUrl = event.target.result
+      setUserAvatar(imageUrl);
+      setIsEditing(false);
+    }
+
+    reader.readAsDataURL(file);
+  }
+  
   return (
     <div className="profile-stats">
       <button className="close-button" onClick={onClose}>
@@ -164,6 +180,17 @@ function Profile({
                 }}
               />
             ))}
+
+            <label className="avatar-item upload-box">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                hidden
+              />
+              <span className="upload-icon">+</span>
+              <p>Subir</p>
+            </label>
           </div>
         </div>
       ) : null}

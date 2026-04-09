@@ -18,10 +18,7 @@ function Home({ onStart, user, onLogout, addXp }) {
   const [selectedFriendProfile, setSelectedFriendProfile] = useState(null);
 
   // Avatar
-  const [userAvatar, setUserAvatar] = useState(() => {
-    const saved = localStorage.getItem("rummi-avatar");
-    return saved ? saved : alex;
-  });
+  const [userAvatar, setUserAvatar] = useState(user?.urlimagenPerfil);
 
   // Monedas
   const [coins, setCoins] = useState(user?.monedas);
