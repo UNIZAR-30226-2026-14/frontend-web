@@ -19,7 +19,7 @@ function TopMenu({
           <svg className="profile-avatar" viewBox="-50 -50 100 100">
             <defs>
               <pattern
-                id={`pattern-${user.id}`}
+                id={`userProfilePattern`}
                 x="0"
                 y="0"
                 width="1"

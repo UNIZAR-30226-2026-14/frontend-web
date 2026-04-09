@@ -1,43 +1,6 @@
 import { sileo, Toaster } from "sileo";
 import "./shop.css";
-
-// Datos de test (simulan la respuesta del Backend)
-const BACKGROUNDS = [
-  {
-    id: "classic",
-    name: "Verde Clásico",
-    price: 0,
-    value: "#2e7d32",
-    owned: true,
-  },
-  {
-    id: "midnight",
-    name: "Azul Nocturno",
-    price: 500,
-    value: "#1a237e",
-    owned: false,
-  },
-  {
-    id: "lava",
-    name: "Rojo Candente",
-    price: 1000,
-    value: "#d32f2f",
-    owned: false,
-  },
-  {
-    id: "gold",
-    name: 'Oro, "Pa que aiga lujo"',
-    price: 5000,
-    value: "gold",
-    owned: false,
-  },
-];
-
-const TILE_SKINS = [
-  { id: "default", name: "Original", price: 0, value: "skin-default" },
-  { id: "neon", name: "Cibernético", price: 800, value: "skin-neon" },
-  { id: "marble", name: "Mármol Real", price: 2000, value: "skin-marble" },
-];
+import { BACKGROUNDS, TILE_SKINS } from "../../../data/itemData";
 
 function Shop({
   onClose,
