@@ -85,6 +85,11 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
 
   const [matchPoints, setMatchPoints] = useState(0);
   const [activeEvent, setActiveEvent] = useState(null);
+  const [deckSize, setDeckSize] = useState(0);
+
+  const [slotsNecesarios, setSlotsNecesarios] = useState(20);
+
+  const [currentSort, setCurrentSort] = useState(null);
 
   // Función para conseguir puntos para comprar power-ups
   const sumarPuntosPorJugada = (fichasColocadas) => {
@@ -195,18 +200,36 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
   }, [boardPositions]); // Se ejecuta cada vez que el tablero cambie
 
   const actualizarManoVisual = (fichas) => {
-    if (!fichas || fichas.length === 0) return;
+    if (!fichas) return;
+
+    let fichasParaPintar = [...fichas];
+
+    if (currentSort === "num") {
+      fichasParaPintar.sort(sortNum)
+    } else if (currentSort === "color") {
+      fichasParaPintar.sort(sortColor)
+    }
 
     setHandPositions((prev) => {
+      const n = fichas.length;
+
+      if (n <= 20) {
+        setSlotsNecesarios(20);
+      } else {
+        setSlotsNecesarios(n);
+      }
+
       const newPositions = { ...prev };
-      fichas.forEach((tile, index) => {
+      for (let i = 0; i < slotsNecesarios; i++) {
+        newPositions[`hand-slot-${i}`] = fichasParaPintar[i] || "";
+      }
+      /*fichas.forEach((tile, index) => {
         if (newPositions[`hand-slot-${index}`] === "") {
           newPositions[`hand-slot-${index}`] = tile;
         }
-      });
+      });*/
       return newPositions;
     });
-    setPlayerHand(fichas);
   };
 
   const actualizarTableroVisual = (tableroString) => {
@@ -239,6 +262,15 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
 
         const partida = await resP.json();
         const participacion = await resU.json();
+
+        if (partida.bolsa) {
+          const numeroFichas = partida.bolsa
+            .split(",")
+            .filter((f) => f !== "").length;
+          setDeckSize(numeroFichas);
+        } else {
+          setDeckSize(0);
+        }
 
         const turnoDeLaPartida = Number(partida.turno);
         const miOrdenAsignado = Number(participacion.ordenTurno);
@@ -297,24 +329,26 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
     Object.values(boardPositions).find((t) => t?.id === activeId);
 
   const sortByNumber = () => {
+    setCurrentSort("num");
     const sorted = [
       ...Object.values(handPositions).filter((t) => t !== ""),
     ].sort(sortNum);
 
     const newPositions = {};
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < slotsNecesarios; i++) {
       newPositions[`hand-slot-${i}`] = sorted[i] || "";
     }
     setHandPositions(newPositions);
   };
 
   const sortByColor = () => {
+    setCurrentSort("color");
     const sorted = [
       ...Object.values(handPositions).filter((t) => t !== ""),
     ].sort(sortColor);
 
     const newPositions = {};
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < slotsNecesarios; i++) {
       newPositions[`hand-slot-${i}`] = sorted[i] || "";
     }
     setHandPositions(newPositions);
@@ -484,7 +518,7 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
           title="Robar ficha"
         >
           <div className="deck-stack">
-            <div className="deck-count">{bag.length}</div>
+            <div className="deck-count">{deckSize}</div>
           </div>
         </button>
 
@@ -507,13 +541,16 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
         </div>
 
         {/* SOPORTE DEL JUGADOR */}
-        <div className="player-rack">
+        <div className="player-rack" style={{ "--slots": slotsNecesarios }}>
           {/* El SVG de madera */}
-          <svg width="600" height="150" className="rack-svg">
+          <svg
+            width={Math.floor(slotsNecesarios / 2) * 50 + 30}
+            className="rack-svg"
+          >
             <rect
               x="30"
               y="20"
-              width="540"
+              width={Math.floor(slotsNecesarios / 2) * 50}
               height="60"
               fill="#5d2e0a"
               stroke="#3e1f07"
@@ -523,7 +560,7 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
             <rect
               x="30"
               y="70"
-              width="540"
+              width={Math.floor(slotsNecesarios / 2) * 50}
               height="60"
               fill="#8B4513"
               stroke="#5d2e0a"

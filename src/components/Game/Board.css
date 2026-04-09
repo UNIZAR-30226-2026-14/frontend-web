@@ -52,8 +52,6 @@
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 1000px;
-  height: 150px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -90,14 +88,15 @@
 }
 
 .player-Hand {
-  position: absolute; /* Para posicionarlo sobre el SVG */
+  position: relative; /* Para posicionarlo sobre el SVG */
   top: 0px;
-  left: 240px;
   display: grid;
-  grid-template-columns: repeat(10, 50px); /* 10 fichas por fila */
+  grid-template-columns: repeat(calc(var(--slots)/2), 50px); /* 10 fichas por fila */
   grid-template-rows: repeat(2, 70px);     /* 2 filas */
   gap: 2px;
   font-family: 'Arial', sans-serif;
+  margin: 0 auto;
+  width: fit-content;
 }
 
 .deck-container {
