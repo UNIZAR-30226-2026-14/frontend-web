@@ -88,6 +88,7 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
   const [deckSize, setDeckSize] = useState(0);
 
   const [slotsNecesarios, setSlotsNecesarios] = useState(20);
+  const [slotsTablero, setSlotsTablero] = useState(70);
 
   const [currentSort, setCurrentSort] = useState(null);
 
@@ -233,6 +234,12 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
   };
 
   const actualizarTableroVisual = (tableroString) => {
+    const n = tableroString.length;
+    if (n <= 70) { //ya cambiamos el numero luego si eso
+        setSlotsTablero(70);
+      } else {
+        setSlotsTablero(n);
+      }
     const fichas = parsearFichas(tableroString);
     const newBoard = {};
     // Inicializamos vacío
@@ -497,7 +504,7 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
                     key={slotId}
                     id={slotId}
                     // Pasamos la variable CSS directamente al style
-                    style={{ "--tile-index": groupCounter }}
+                    
                     className={isJoined ? "tile-joined" : ""}
                   >
                     {boardPositions[slotId] && (

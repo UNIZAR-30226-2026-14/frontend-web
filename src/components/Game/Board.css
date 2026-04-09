@@ -224,7 +224,7 @@
     position: absolute; /* Para posicionarlo sobre el SVG */
 
     left: 5%;
-    grid-template-columns: repeat(10, 2.6vw); /* 10 fichas por fila */
+    grid-template-columns: repeat(calc(var(--slots)/2), 2.6vw); /* 10 fichas por fila */
     grid-template-rows: repeat(2, 4vw);     /* 2 filas */
     gap: 1vw;
     transform: translateX(50%);
