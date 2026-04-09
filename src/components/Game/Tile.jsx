@@ -34,7 +34,7 @@ const Tile = ({ number, color, placed, habilidad }) => {
       className={`tile ${placed ? "tile-placed" : ""} ${habilidad ? `tile-${habilidad}` : ""}`}
       style={{ color: isRainbow ? "transparent" : color }}
     >
-      <span className="tile-number">{comodin(number, color)}</span>
+      <span>{comodin(number, color)}</span>
       {sign(number, color)}
       {isNegative && <div className="negative-sign">-</div>}
     </div>

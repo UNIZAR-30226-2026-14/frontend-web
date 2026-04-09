@@ -19,6 +19,27 @@
   transition: transform 0.2s ease;
 }
 
+.tile-number {
+  font-family: "Arial", sans-serif;
+  width: 45px;
+  height: 65px;
+  background-color: #fdfcf0;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  font-size: 30px;
+  line-height: 1.4;
+  margin: 0;
+  font-weight: bold;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  border: 1px solid #d1d1d1;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.2s ease;
+}
+
 /* Dorado */
 .tile.tile-gold {
   border: 2px solid #d4af37;
