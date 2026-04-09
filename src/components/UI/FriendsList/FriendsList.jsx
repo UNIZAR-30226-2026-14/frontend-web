@@ -1,5 +1,6 @@
 import "./friendsList.css";
 import { useState, useEffect } from "react";
+import { gameService } from "../../../services/gameService";
 
 // Simula la Base de Datos de todos los usuarios del juego
 const GLOBAL_USERS_DB = [
@@ -52,6 +53,7 @@ function FriendsList({ onClose, onOpenProfile, userId }) {
   useEffect(() => {
     const fetchFriends = async () => {
       try {
+        const amigos = await gameService.getFriends(userId)
         const res = await fetch(
           `http://localhost:8080/api/amigos?idJugador=${userId}`,
           {

@@ -6,6 +6,7 @@ import Profile from "../UI/Profile/Profile.jsx";
 import Settings from "../UI/Settings/Settings.jsx";
 import TopMenu from "../UI/TopMenu/TopMenu.jsx";
 import PendingGames from "../UI/PendingGames/PendingGames.jsx";
+import { gameService } from "../../services/gameService.js";
 
 import alex from "../../assets/avatars/alex.png";
 import { AVATAR_LIST } from "../../data/itemData.jsx";
@@ -114,72 +115,35 @@ function Home({ onStart, user, onLogout, addXp }) {
     }
 
     try {
-      const urlPartidas = "http://localhost:8080/api/partidas";
-
-      const resPartida = await fetch(urlPartidas, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          turno: 0,
-          fecha: new Date().toISOString().split("T")[0],
-          corriendo: false,
-          mercado: "",
-          bolsa: "",
-          conjuntoMesa: "",
-        }),
-      });
-
-      if (!resPartida.ok) throw new Error("Error al crear la sala");
-      const nuevaPartida = await resPartida.json();
+      // Crear partida
+      const nuevaPartida = await gameService.createGame();
       const idNuevaPartida = nuevaPartida.idPartida;
 
-      const resParticipacion = await fetch(
-        "http://localhost:8080/api/participaciones",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            idJugador: user.id,
-            idPartida: idNuevaPartida,
-            fichasActuales: 14,
-            habilidadesActuales: "",
-          }),
-        },
-      );
+      // Unirse automáticamente como host
+      const unido = await gameService.joinGame(user.id, idNuevaPartida);
 
-      if (resParticipacion.ok) {
-        console.log("Partida creada y unido con éxito:", idNuevaPartida);
-        const codigo = `RUM-${idNuevaPartida}`;
-        setRoomCode(codigo);
+      if (unido) {
+        setRoomCode(`RUM-${idNuevaPartida}`);
         setShowLobby(true);
       }
     } catch (error) {
-      console.error("Error en el flujo de creación:", error);
+      console.error(error.message);
       alert("Hubo un problema al conectar con el servidor de juegos.");
     }
   };
 
   const handleStartLobbyGame = async () => {
     const idPartida = roomCode.replace("RUM-", "");
+    
     try {
-      const resIniciar = await fetch(
-        `http://localhost:8080/api/partidas/${idPartida}/iniciar`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("rummi-token")}`,
-          },
-        },
-      );
+      const iniciada = await gameService.startGame(idPartida);
 
-      if (resIniciar.ok) {
+      if (iniciada) {
         setShowLobby(false);
         onStart(idPartida);
-        console.log(
-          "Iniciando con Token:",
-          localStorage.getItem("rummi-token")?.substring(0, 10) + "...",
-        );
+        console.log(`Partida ${idPartida} iniciada con éxito.`);
+      } else {
+        alert("No se pudo iniciar la partida.")
       }
     } catch (error) {
       alert("Error al iniciar la partida.");
@@ -190,47 +154,34 @@ function Home({ onStart, user, onLogout, addXp }) {
     try {
       const idLimpio = joinCode.toUpperCase().replace("RUM-", "").trim();
       const idPartidaNumerico = parseInt(idLimpio);
+
       if (isNaN(idPartidaNumerico)) {
         alert("Formato de código inválido. Debe ser RUM-número");
         return;
       }
 
-      const resParticipacion = await fetch(
-        "http://localhost:8080/api/participaciones",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            idJugador: user.id,
-            idPartida: idPartidaNumerico,
-            fichasActuales: 14,
-            habilidadesActuales: "",
-          }),
-        },
-      );
+      const unido = await gameService.joinGame(user.id, idPartidaNumerico);
 
-      if (resParticipacion.ok) {
+      if (unido) {
         setActivePopup("loading");
-        console.log("Unido con éxito. Esperando al anfitrión...");
         setIsWaitingForStart(true);
         setRoomCode(`RUM-${idPartidaNumerico}`);
       } else {
-        alert("No se pudo encontrar la partida o ya está llena.");
+        alert("La sala no existe o está llena.");
       }
     } catch (error) {
-      console.error("Error al unirse:", error);
       alert("Error de conexión al intentar unirse.");
     }
   };
 
   useEffect(() => {
     let interval;
+
     if (isWaitingForStart) {
       interval = setInterval(async () => {
         const id = roomCode.replace("RUM-", "");
         try {
-          const res = await fetch(`http://localhost:8080/api/partidas/${id}`);
-          const partida = await res.json();
+          const partida = await gameService.getGameStatus(id);
 
           if (partida.estado === "RUNNING") {
             clearInterval(interval);
@@ -242,8 +193,9 @@ function Home({ onStart, user, onLogout, addXp }) {
         }
       }, 2000);
     }
+
     return () => clearInterval(interval);
-  }, [isWaitingForStart, roomCode]);
+  }, [isWaitingForStart, roomCode, onStart]);
 
   return (
     <div className="home-screen">
