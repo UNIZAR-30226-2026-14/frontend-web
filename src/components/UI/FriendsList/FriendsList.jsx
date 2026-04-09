@@ -37,12 +37,10 @@ function FriendsList({ onClose, onOpenProfile, userId }) {
   // Estado para controlar el boton de retar
   const [challengeId, setChallengeId] = useState(null);
   const [search, setSearch] = useState("");
-  const [friends, setFriends] = useState([
-    () => {
-      const saved = localStorage.getItem("rummi-friends");
-      return saved ? JSON.parse(saved) : MOCK_FRIENDS;
-    },
-  ]);
+  const [friends, setFriends] = useState(() => {
+    const saved = localStorage.getItem("rummi-friends");
+    return saved ? JSON.parse(saved) : MOCK_FRIENDS;
+  });
 
   const [newFriendId, setNewFriendId] = useState("");
   const [isAdding, setIsAdding] = useState(false);
@@ -137,24 +135,24 @@ function FriendsList({ onClose, onOpenProfile, userId }) {
       });
 
       if (res.ok) {
-        const nuevaAmistad = res.json();
+        const nuevaAmistad = await res.json();
         setIsAdding(false);
         setNewFriendId("");
-        alert("¡Amigo añadido!");
+        alert("Solicitud enviada!");
       } else {
-        setError("No se pudo añadir al usuario.");
+        const errorData = await res.json();
+        if (errorData.errors) {
+          const mensajes = errorData.errors.map(
+            (err) => `${err.field}: ${err.defaultMessage}`,
+          );
+          setError(`Error en campos: ${mensajes.join(", ")}`);
+        } else {
+          setError(errorData.message || "Error al enviar la solicitud");
+        }
+        setError("No se pudo enviar la solicitud al usuario.");
       }
     } catch (error) {
-      const errorData = await res.json();
-      console.error("Detalles del error 400:", errorData);
-      
-      // Si usas validaciones de Spring (@Valid), los errores vienen en un array llamado 'errors'
-      if (errorData.errors) {
-        const mensajes = errorData.errors.map(err => `${err.field}: ${err.defaultMessage}`);
-        setError(`Error en campos: ${mensajes.join(", ")}`);
-      } else {
-        setError(errorData.message || "Error 400: Datos inválidos");
-      }
+      setError("Error de conexión con el servidor");
     }
     /*const foundUser = GLOBAL_USERS_DB.find(
       (user) => user.id === newFriendId.trim(),

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "./login.css";
 import logo from "../../assets/logo.svg";
+import { sileo } from "sileo";
 
 const Login = ({ onLogin }) => {
   const [isLogin, setIsLogin] = useState(true);
@@ -10,7 +11,7 @@ const Login = ({ onLogin }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (username.trim() === "" || password.trim() === "") {
       setError(true);
       return;
@@ -28,10 +29,17 @@ const Login = ({ onLogin }) => {
         });
 
         if (response.ok) {
-          alert("¡Cuenta creada con éxito! Ahora puedes iniciar sesión.");
+          sileo.success({
+            title: "¡Cuenta creada con éxito!",
+          });
+          setUsername("");
+          setPassword("");
           setIsLogin(true);
         } else {
-          alert("Error al registrar: El usuario ya existe.");
+          sileo.error({
+            title: "Error al registrar.",
+            description: "El nombre de usuario ya existe. Prueba otro.",
+          });
         }
       } else {
         const res = await fetch("http://localhost:8080/api/auth/login", {
@@ -48,12 +56,15 @@ const Login = ({ onLogin }) => {
           localStorage.setItem("rummi-token", data.token);
           onLogin(data.jugador);
         } else {
-          alert("Usuario o contraseña incorrectos.");
+          sileo.error({
+            title: "Error al iniciar sesión.",
+            description:
+              "El nombre de usuario o la contraseña son incorrectos. Prueba de nuevo.",
+          });
         }
       }
     } catch (error) {
       console.error("Fallo de conexión:", error);
-      alert("No se pudo conectar con el servidor.");
     }
   };
 

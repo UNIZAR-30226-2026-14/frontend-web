@@ -1,5 +1,6 @@
 import "./powerUpsShop.css";
 import { POWER_UPS } from "../../data/itemData";
+import { sileo, Toaster } from "sileo";
 
 function PowerUpsShop({
   matchPoints,
@@ -33,7 +34,7 @@ function PowerUpsShop({
     } else {
       sileo.error({
         title: "Puntos insuficientes",
-        description: `Necesitas ${item.price -matchPoints} puntos más para comprar ${item.name}.`,
+        description: `Necesitas ${item.price - matchPoints} puntos más para comprar ${item.name}.`,
       });
     }
   };
@@ -41,7 +42,7 @@ function PowerUpsShop({
   return (
     <div className="shop-popup">
       <h2 className="shop-title">Tienda de Power-ups</h2>
-      <div className="coins-display">💰 {coins}</div>
+      <div className="match-points-display">{matchPoints} pts</div>
 
       <button className="close-button" onClick={onClose}>
         X
@@ -70,3 +71,5 @@ function PowerUpsShop({
     </div>
   );
 }
+
+export default PowerUpsShop;

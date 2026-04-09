@@ -8,8 +8,8 @@ import TopMenu from "../UI/TopMenu/TopMenu.jsx";
 import PendingGames from "../UI/PendingGames/PendingGames.jsx";
 
 import alex from "../../assets/avatars/alex.png";
-import { AVATAR_LIST } from "../../data/itemData.js";
-import { PENDING_GAMES } from "../../data/itemData.js";
+import { AVATAR_LIST } from "../../data/itemData.jsx";
+import { PENDING_GAMES } from "../../data/itemData.jsx";
 
 function Home({ onStart, user, onLogout, addXp }) {
   const [activePopup, setActivePopup] = useState(null);

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ItemIcon from "../UI/ItemIcon.jsx";
 
 function PowerUpSlots({ inventory, onActivate }) {
   const [selectedSlot, setSelectedSlot] = useState(null);
@@ -12,7 +13,7 @@ function PowerUpSlots({ inventory, onActivate }) {
         {displaySlots.map((item, index) => {
           return (
             <div
-              key={index}
+              key={item.id}
               className={
                 selectedSlot?.index === index ? "slot-selected" : "slot"
               }
@@ -21,7 +22,7 @@ function PowerUpSlots({ inventory, onActivate }) {
               }}
             >
               {item ? (
-                <img src={item.icon} alt={item.name} className="slot-icon" />
+                <ItemIcon id={item.id} color={item.color} size={item.size}/>
               ) : (
                 <div className="empty-slot">+</div>
               )}

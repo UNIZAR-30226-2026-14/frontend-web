@@ -1,6 +1,6 @@
 import "./pendingGames.css";
-import { PENDING_GAMES } from "../../../data/itemData.js";
-import { PARTY_PREVIEW_SLOTS } from "../../../data/itemData.js";
+import { PENDING_GAMES } from "../../../data/itemData.jsx";
+import { PARTY_PREVIEW_SLOTS } from "../../../data/itemData.jsx";
 
 function PendingGames({
   userAvatar,
