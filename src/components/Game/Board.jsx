@@ -504,7 +504,7 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
                     key={slotId}
                     id={slotId}
                     // Pasamos la variable CSS directamente al style
-                    
+                    style={{ "--tile-index": groupCounter }}
                     className={isJoined ? "tile-joined" : ""}
                   >
                     {boardPositions[slotId] && (
