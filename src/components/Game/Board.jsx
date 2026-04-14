@@ -74,7 +74,7 @@ const enviarConjuntos = (boardPositions) => {
     });
 };
 
-function Board({ idPartida, userId, currentBackground, onWin }) {
+function Board({ idPartida, userId, userName, currentBackground, onWin }) {
   // Obtenemos el estado del juego y las funciones para manipularlo
   const { bag, playerHand, gameBoard, setGameBoard, setPlayerHand } = useGame();
   const [activeId, setActiveId] = useState(null); // Para rastrear qué ficha se arrastra
@@ -94,7 +94,7 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
 
    //para guardar el estado de tablero y mano na mas empezar turno por si cancelas
   const [startTurnHand, setStartTurnHand] = useState(null);
-  const [startTurnBoard, setStartTurnBoard] = useState(null);
+  
 
   const [inventory, setInventory] = useState([]);
 
@@ -179,6 +179,14 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
   });
 
   const [boardPositions, setBoardPositions] = useState(() => {
+    // Inicializamos 40 huecos vacíos
+    const initial = {};
+    for (let i = 0; i < 70; i++) initial[`board-slot-${i}`] = "";
+    return initial;
+  });
+
+  // PA QUE AL RESETEAR EL BOARD SE VACIE, ESTO ES TEMPORAL
+  const [startTurnBoard, setStartTurnBoard] = useState(() => {
     // Inicializamos 40 huecos vacíos
     const initial = {};
     for (let i = 0; i < 70; i++) initial[`board-slot-${i}`] = "";
@@ -310,14 +318,15 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
         if (ordenTurno === null) {
           setOrdenTurno(miOrdenAsignado);
           actualizarManoVisual(parsearFichas(participacion.manoActual));
-          setStartTurnHand(handPositions);
         }
+        setStartTurnHand(handPositions);
 
         // Lógica de cambio de turno
         const esMiTurno = turnoDeLaPartida === miOrdenAsignado;
 
         if (esMiTurno !== miTurno) {
           setMiTurno(esMiTurno);
+          setStartTurnHand(handPositions);
 
           // Si acabamos de recibir el turno, actualizamos el tablero
           //if (esMiTurno && partida.tableroActual) {
@@ -388,11 +397,12 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
 
   const undoMove = () => {
     setHandPositions(startTurnHand);
-    //setBoardPositions(startTurnHand);
+    setBoardPositions(startTurnBoard);
   }
 
   const drawTile = async () => {
     if (!miTurno) return;
+    //setStartTurnHand(handPositions);
 
     try {
       setProcessing(true);
@@ -420,9 +430,7 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
 
         if (resParti.ok) {
           const participacion = await resParti.json();
-
           actualizarManoVisual(parsearFichas(participacion.manoActual));
-          setStartTurnHand(handPositions);
           setMiTurno(false);
         }
         //const fichasNuevas = parsearFichas(data.manoActual);
@@ -570,7 +578,7 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
           </button>
 
           <button onClick={undoMove} title="Ordenar numéricamente">
-            MOTOMAMI
+            DESHACER
           </button>
 
           <button
