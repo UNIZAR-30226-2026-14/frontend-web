@@ -233,10 +233,18 @@
 
 .avatar-item {
   width: 100%;
+  justify-content: center;
+  align-items: center;
   aspect-ratio: 1 / 1;
   border-radius: 50%;
   border: 3px solid transparent;
   transition: transform 0.18s ease, border-color 0.18s ease;
+}
+
+.upload-box {
+  background-color: rgba(197, 188, 188, 0.5);
+  justify-content: center;
+  align-items: center;
 }
 
 .avatar-item:hover {

@@ -189,7 +189,6 @@ function Profile({
                 hidden
               />
               <span className="upload-icon">+</span>
-              <p>Subir</p>
             </label>
           </div>
         </div>

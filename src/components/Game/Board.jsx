@@ -1,4 +1,4 @@
-import { useEffect, useState, act } from "react";
+import { useEffect, useState } from "react";
 import Tile from "./Tile.jsx";
 import Hand from "./Hand.jsx";
 import DraggableTile from "./draggableTile.jsx";
@@ -92,6 +92,8 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
 
   const [currentSort, setCurrentSort] = useState(null);
 
+  const [inventory, setInventory] = useState([]);
+
   // Función para conseguir puntos para comprar power-ups
   const sumarPuntosPorJugada = (fichasColocadas) => {
     const puntosGanados = fichasColocadas.length * 10;
@@ -141,9 +143,22 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
           drawTile();
           break;
 
-        case "MANDATORY_SHOP":
-          setShowShop(true);
+        case "NO_SPECIFIC_COLOR":
+          // Cosas
+          break;
 
+        case "50%_DISCOUNT":
+          // Cosas
+          break;
+
+        case "HALF_PLAYTIME":
+          // Cosas
+          break;
+
+        case "DOUBLE_PLAYTIME":
+          // Cosas
+          break;
+        
         default:
           break;
       }
@@ -545,6 +560,8 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
           >
             FIN
           </button>
+
+          {/* Boton para deshacer jugadas */}
         </div>
 
         {/* SOPORTE DEL JUGADOR */}
@@ -577,7 +594,6 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
           </svg>
 
           {/* FICHAS DINÁMICAS (Las que el jugador tiene en la mano) */}
-
           <div className="player-Hand">
             {Object.keys(handPositions).map((slotId) => (
               <Hand key={slotId} id={slotId}>
