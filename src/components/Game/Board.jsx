@@ -92,6 +92,10 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
 
   const [currentSort, setCurrentSort] = useState(null);
 
+   //para guardar el estado de tablero y mano na mas empezar turno por si cancelas
+  const [startTurnHand, setStartTurnHand] = useState(null);
+  const [startTurnBoard, setStartTurnBoard] = useState(null);
+
   const [inventory, setInventory] = useState([]);
 
   // Función para conseguir puntos para comprar power-ups
@@ -181,6 +185,8 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
     return initial;
   });
 
+ 
+
   useEffect(() => {
     const newJoined = [];
 
@@ -214,6 +220,8 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
 
     setJoinedSlots(newJoined);
   }, [boardPositions]); // Se ejecuta cada vez que el tablero cambie
+   // ESTO LUEGO TENDRÍA QUE IR EN OTRO LAO PERO COMO FALTA POR IMPLEMENTAR EL ACTUALIZAR BOARD
+  //setStartTurnBoard(boardPositions);
 
   const actualizarManoVisual = (fichas) => {
     if (!fichas) return;
@@ -264,6 +272,7 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
       newBoard[`board-slot-${index}`] = { ...ficha, placed: true };
     });
     setBoardPositions(newBoard);
+    setStartTurnBoard(boardPositions);
   };
 
   // Detectamos si es nuestro turno
@@ -301,6 +310,7 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
         if (ordenTurno === null) {
           setOrdenTurno(miOrdenAsignado);
           actualizarManoVisual(parsearFichas(participacion.manoActual));
+          setStartTurnHand(handPositions);
         }
 
         // Lógica de cambio de turno
@@ -376,6 +386,11 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
     setHandPositions(newPositions);
   };
 
+  const undoMove = () => {
+    setHandPositions(startTurnHand);
+    //setBoardPositions(startTurnHand);
+  }
+
   const drawTile = async () => {
     if (!miTurno) return;
 
@@ -407,6 +422,7 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
           const participacion = await resParti.json();
 
           actualizarManoVisual(parsearFichas(participacion.manoActual));
+          setStartTurnHand(handPositions);
           setMiTurno(false);
         }
         //const fichasNuevas = parsearFichas(data.manoActual);
@@ -551,6 +567,10 @@ function Board({ idPartida, userId, currentBackground, onWin }) {
           </button>
           <button onClick={sortByNumber} title="Ordenar numéricamente">
             789
+          </button>
+
+          <button onClick={undoMove} title="Ordenar numéricamente">
+            MOTOMAMI
           </button>
 
           <button
