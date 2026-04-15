@@ -12,70 +12,10 @@ import { handleDragLogic } from "./dragHandlers.js";
 
 import PlayerRack from "./PlayerRack/PlayerRack.jsx";
 import BoardGrid from "./BoardGrid/BoardGrid.jsx";
+import GameControls from "./GameControls/GameControls.jsx";
+import Deck from "./Deck/Deck.jsx";
 
-const parsearFichas = (stringFichas) => {
-  if (!stringFichas) return [];
-
-  const coloresMap = {
-    R: "red",
-    B: "blue",
-    O: "orange",
-    K: "black",
-  };
-
-  return stringFichas.split(",").map((f, index) => {
-    if (f === "J*") {
-      return {
-        id: `J-${index}`,
-        color: "black",
-        number: "J",
-        placed: false,
-        habilidad: "joker",
-      };
-    }
-
-    const color = f[0];
-    const numero = parseInt(f.substring(1, 3));
-    const habilidad = f[3];
-
-    const habilidadesMap = {
-      D: "dorada",
-      A: "arcoiris",
-      N: "negativa",
-    };
-
-    return {
-      id: `${color}-${numero}-${index}`,
-      color: coloresMap[color] || "black",
-      number: numero,
-      placed: false,
-      habilidad: habilidadesMap[habilidad] || null,
-    };
-  });
-};
-
-const enviarConjuntos = (boardPositions) => {
-  return Object.values(boardPositions)
-    .filter((tile) => tile !== "")
-    .map((tile) => {
-      if (tile.number === "J" || tile.habilidad === "joker") return "J*";
-      const coloresMap = {
-        red: "R",
-        blue: "B",
-        orange: "O",
-        black: "K",
-      };
-      const habilidadesMap = {
-        dorada: "D",
-        arcoiris: "A",
-        negativa: "N",
-      };
-      const color = coloresMap[tile.color] || "K";
-      const numStr = String(tile.number).padStart(2, "0");
-      const habilidad = habilidadesMap[tile.habilidad] || "";
-      return `${color}${numStr}${habilidad}`;
-    });
-};
+import { parsearFichas, enviarConjuntos, getConnectedGroup } from "../../services/gameUtils.js";
 
 function Board({ idPartida, userId, userName, currentBackground, onWin }) {
   // Obtenemos el estado del juego y las funciones para manipularlo
@@ -510,39 +450,21 @@ function Board({ idPartida, userId, userName, currentBackground, onWin }) {
 
         <BoardGrid boardPositions={boardPositions} joinedSlots={joinedSlots} />
 
-        {/* Baraja con las fichas restantes */}
-        <button
-          className="deck-container"
-          disabled={processing}
-          onClick={drawTileButton}
-          title="Robar ficha"
-        >
-          <div className="deck-stack">
-            <div className="deck-count">{deckSize}</div>
-          </div>
-        </button>
+        <Deck
+          deckSize={deckSize}
+          onDraw={drawTileButton}
+          processing={processing}
+          miTurno={miTurno}
+        />
 
-        {/* Botones para ordenar las fichas */}
-        <div className="order-container">
-          <button onClick={sortByColor} title="Ordenar por palo">
-            ♤♤♤
-          </button>
-          <button onClick={sortByNumber} title="Ordenar numéricamente">
-            789
-          </button>
-
-          <button onClick={undoMove} title="Deshacer jugadas del turno actual">
-            DESHACER
-          </button>
-
-          <button
-            disabled={processing}
-            onClick={cambiarTurno}
-            title="Fin turno"
-          >
-            FIN
-          </button>
-        </div>
+        <GameControls
+          onSortColor={sortByColor}
+          onSortNum={sortByNumber}
+          onUndo={undoMove}
+          onFinish={cambiarTurno}
+          processing={processing}
+          miTurno={miTurno}
+        />
 
         {/* SOPORTE DEL JUGADOR */}
         <PlayerRack

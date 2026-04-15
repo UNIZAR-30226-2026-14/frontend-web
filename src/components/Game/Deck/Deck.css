@@ -1,0 +1,70 @@
+.deck-container {
+  background: none;
+  position: fixed;
+  color: inherit;
+  border: none;
+  padding: 0;
+  font: inherit;
+  outline: inherit;
+  bottom: 30px;
+  right: 20px;
+  left: auto;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  user-select: none;
+  z-index: 100;
+}
+
+.deck-stack {
+  width: 50px;
+  height: 70px;
+  background-color: #fdfcf0;
+  border-radius: 6px;
+  border: 1px solid #d1d1d1;
+
+  box-shadow:
+    2px 2px 0px #ccc,
+    4px 4px 0px #bbb,
+    6px 6px 0px #aaa,
+    8px 8px 15px rgba(0, 0, 0, 0.4);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.deck-stack::after {
+  content: "R";
+  font-weight: bold;
+  color: #c0392b;
+  font-size: 24px;
+}
+
+/* Efecto al pasar el ratón */
+.deck-container:hover {
+  transform: scale(1.05) translateY(-5px);
+}
+
+/* Efecto al hacer click */
+.deck-container:active {
+  transform: scale(0.95);
+}
+
+/* Contador de fichas restantes */
+.deck-count {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  background-color: orange;
+  color: white;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  font-size: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  border: 2px solid white;
+}
