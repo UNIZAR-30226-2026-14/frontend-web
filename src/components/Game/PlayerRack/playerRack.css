@@ -1,0 +1,51 @@
+.player-rack {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.rack-svg {
+  position: absolute;
+  z-index: 1;
+}
+
+.player-Hand {
+  position: relative; /* Para posicionarlo sobre el SVG */
+  top: 0px;
+  display: grid;
+  grid-template-columns: repeat(
+    calc(var(--slots) / 2),
+    50px
+  ); /* 10 fichas por fila */
+  grid-template-rows: repeat(2, 70px); /* 2 filas */
+  gap: 2px;
+  font-family: "Arial", sans-serif;
+  margin: 0 auto;
+  width: fit-content;
+}
+
+@media (max-width: 1000px) {
+  .rack-svg {
+    height: 20vw;
+    width: 30vw;
+    margin-top: 10vw;
+    transform: translateX(-0%);
+  }
+
+  .player-Hand {
+    position: absolute; /* Para posicionarlo sobre el SVG */
+    left: 5%;
+    grid-template-columns: repeat(
+      calc(var(--slots) / 2),
+      2.6vw
+    ); /* 10 fichas por fila */
+    grid-template-rows: repeat(2, 4vw); /* 2 filas */
+    gap: 1vw;
+    transform: translateX(50%);
+  }
+}

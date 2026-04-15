@@ -4,7 +4,7 @@
   background-color: #1a5e20;
   position: relative;
   overflow: hidden;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
 /* Cabecera de la página */
@@ -20,47 +20,6 @@
   left: 0;
   z-index: 100;
   background-color: rgba(0, 0, 0, 0.3);
-}
-
-/* Área central de juego */
-.board-area {
-  position: fixed;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  transform: translateX(-50%);
-  width: 1000px;
-  left: 50%;
-  padding: 100px;
-  gap: 40px;
-}
-
-.board-grid {
-  position: absolute; 
-  top: 90px;
-  display: grid;
-  grid-template-columns: repeat(14, 45px); 
-  grid-template-rows: repeat(5, 60px);
-  gap: 10px;
-  padding: 12px;
-}
-
-/* Soporte inferior */
-.player-rack {
-  position: fixed;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.rack-svg {
-  position: absolute;
-  z-index: 1;
 }
 
 .hand-container {
@@ -82,21 +41,9 @@
      Si el gap es 10px y queremos que se solapen 2px (total 12px de movimiento):
   */
   transform: translateX(calc(var(--tile-index) * -10px));
-  
+
   /* Aseguramos que la ficha de la derecha esté siempre encima de la anterior */
   z-index: calc(10 + var(--tile-index));
-}
-
-.player-Hand {
-  position: relative; /* Para posicionarlo sobre el SVG */
-  top: 0px;
-  display: grid;
-  grid-template-columns: repeat(calc(var(--slots)/2), 50px); /* 10 fichas por fila */
-  grid-template-rows: repeat(2, 70px);     /* 2 filas */
-  gap: 2px;
-  font-family: 'Arial', sans-serif;
-  margin: 0 auto;
-  width: fit-content;
 }
 
 .deck-container {
@@ -104,9 +51,9 @@
   position: fixed;
   color: inherit;
   border: none;
-	padding: 0;
-	font: inherit;
-	outline: inherit;
+  padding: 0;
+  font: inherit;
+  outline: inherit;
   bottom: 30px;
   right: 20px;
   left: auto;
@@ -122,14 +69,14 @@
   background-color: #fdfcf0;
   border-radius: 6px;
   border: 1px solid #d1d1d1;
-  
+
   /* Múltiples sombras para que parezca una pila de fichas */
-  box-shadow: 
+  box-shadow:
     2px 2px 0px #ccc,
     4px 4px 0px #bbb,
     6px 6px 0px #aaa,
-    8px 8px 15px rgba(0,0,0,0.4);
-    
+    8px 8px 15px rgba(0, 0, 0, 0.4);
+
   display: flex;
   justify-content: center;
   align-items: center;
@@ -189,7 +136,7 @@
   border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
-  box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
   transition: all 0.2s ease;
   display: flex;
   justify-content: center;
@@ -207,37 +154,5 @@
 
 .order-container button:active {
   transform: scale(0.95);
-  box-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-}
-
-
-@media (max-width: 1000px) {
-
-  .rack-svg{
-    height: 20vw;
-    width: 30vw; 
-    margin-top: 10vw;
-    transform: translateX(-0%);
-  }
-  
-  .player-Hand {
-    position: absolute; /* Para posicionarlo sobre el SVG */
-    left: 5%;
-    grid-template-columns: repeat(calc(var(--slots)/2), 2.6vw); /* 10 fichas por fila */
-    grid-template-rows: repeat(2, 4vw);     /* 2 filas */
-    gap: 1vw;
-    transform: translateX(50%);
-  }
-
-  .board-area{
-    height: 35vw;
-    width: 65vw; 
-    
-  }
-
-  .board-grid{
-    gap: 0vw;
-    padding: 0vw;
-
-  }
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }

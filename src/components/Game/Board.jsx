@@ -10,6 +10,9 @@ import { areCompatible } from "../../hooks/deckFactory.js";
 import { sortColor, sortNum } from "./botones_f.js";
 import { handleDragLogic } from "./dragHandlers.js";
 
+import PlayerRack from "./PlayerRack/PlayerRack.jsx";
+import BoardGrid from "./BoardGrid/BoardGrid.jsx";
+
 const parsearFichas = (stringFichas) => {
   if (!stringFichas) return [];
 
@@ -92,9 +95,8 @@ function Board({ idPartida, userId, userName, currentBackground, onWin }) {
 
   const [currentSort, setCurrentSort] = useState(null);
 
-   //para guardar el estado de tablero y mano na mas empezar turno por si cancelas
+  //para guardar el estado de tablero y mano na mas empezar turno por si cancelas
   const [startTurnHand, setStartTurnHand] = useState(null);
-  
 
   const [inventory, setInventory] = useState([]);
 
@@ -162,7 +164,7 @@ function Board({ idPartida, userId, userName, currentBackground, onWin }) {
         case "DOUBLE_PLAYTIME":
           // Cosas
           break;
-        
+
         default:
           break;
       }
@@ -192,8 +194,6 @@ function Board({ idPartida, userId, userName, currentBackground, onWin }) {
     for (let i = 0; i < 70; i++) initial[`board-slot-${i}`] = "";
     return initial;
   });
-
- 
 
   useEffect(() => {
     const newJoined = [];
@@ -228,7 +228,7 @@ function Board({ idPartida, userId, userName, currentBackground, onWin }) {
 
     setJoinedSlots(newJoined);
   }, [boardPositions]); // Se ejecuta cada vez que el tablero cambie
-   // ESTO LUEGO TENDRÍA QUE IR EN OTRO LAO PERO COMO FALTA POR IMPLEMENTAR EL ACTUALIZAR BOARD
+  // ESTO LUEGO TENDRÍA QUE IR EN OTRO LAO PERO COMO FALTA POR IMPLEMENTAR EL ACTUALIZAR BOARD
   //setStartTurnBoard(boardPositions);
 
   const actualizarManoVisual = (fichas) => {
@@ -237,9 +237,9 @@ function Board({ idPartida, userId, userName, currentBackground, onWin }) {
     let fichasParaPintar = [...fichas];
 
     if (currentSort === "num") {
-      fichasParaPintar.sort(sortNum)
+      fichasParaPintar.sort(sortNum);
     } else if (currentSort === "color") {
-      fichasParaPintar.sort(sortColor)
+      fichasParaPintar.sort(sortColor);
     }
 
     setHandPositions((prev) => {
@@ -266,11 +266,12 @@ function Board({ idPartida, userId, userName, currentBackground, onWin }) {
 
   const actualizarTableroVisual = (tableroString) => {
     const n = tableroString.length;
-    if (n <= 70) { //ya cambiamos el numero luego si eso
-        setSlotsTablero(70);
-      } else {
-        setSlotsTablero(n);
-      }
+    if (n <= 70) {
+      //ya cambiamos el numero luego si eso
+      setSlotsTablero(70);
+    } else {
+      setSlotsTablero(n);
+    }
     const fichas = parsearFichas(tableroString);
     const newBoard = {};
     // Inicializamos vacío
@@ -398,7 +399,7 @@ function Board({ idPartida, userId, userName, currentBackground, onWin }) {
   const undoMove = () => {
     setHandPositions(startTurnHand);
     setBoardPositions(startTurnBoard);
-  }
+  };
 
   const drawTile = async () => {
     if (!miTurno) return;
@@ -475,7 +476,7 @@ function Board({ idPartida, userId, userName, currentBackground, onWin }) {
 
     if (res.ok) {
       setMiTurno(false);
-      console.log("Siguiente urno. Esperando al oponente...");
+      console.log("Siguiente turno. Esperando al oponente...");
     }
 
     //marcar todas las fichas de tablero como placed ESTO IRÁ AL ACTUALIZAR TABLERO
@@ -495,12 +496,6 @@ function Board({ idPartida, userId, userName, currentBackground, onWin }) {
       }
       return nextState;
     });
-
-    //console.log("Fin de turno");
-    //await delay(3000);
-    //setMiTurno(true);
-    //setProcessing(false);
-    //console.log("Empieza turno");
   };
 
   const drawTileButton = () => {
@@ -513,48 +508,7 @@ function Board({ idPartida, userId, userName, currentBackground, onWin }) {
         {/* HEADER: Información del mazo y botón de robar */}
         <div className="header">RUMMIPLUS TABLE</div>
 
-        {/* ÁREA DEL TABLERO */}
-        <main className="board-area">
-          {/* El SVG de fondo */}
-          <svg width="760" height="350" className="board-svg">
-            <rect width="800" height="800" fill="#073600" />
-          </svg>
-
-          {/* FICHAS DINÁMICAS (Las que el jugador tiene en la mano) */}
-          <div className="board-grid">
-            {(() => {
-              const slots = Object.keys(boardPositions);
-              let groupCounter = 0; // Contador para el índice dentro del grupo
-
-              return slots.map((slotId, index) => {
-                const isJoined = joinedSlots.includes(slotId);
-
-                // Lógica de conteo:
-                // Si la ficha está unida, aumentamos el contador.
-                // Si no está unida o es inicio de fila, reseteamos a 0.
-                if (!isJoined || index % 14 === 0) {
-                  groupCounter = 0;
-                } else {
-                  groupCounter++;
-                }
-
-                return (
-                  <Hand
-                    key={slotId}
-                    id={slotId}
-                    // Pasamos la variable CSS directamente al style
-                    style={{ "--tile-index": groupCounter }}
-                    className={isJoined ? "tile-joined" : ""}
-                  >
-                    {boardPositions[slotId] && (
-                      <DraggableTile tile={boardPositions[slotId]} />
-                    )}
-                  </Hand>
-                );
-              });
-            })()}
-          </div>
-        </main>
+        <BoardGrid boardPositions={boardPositions} joinedSlots={joinedSlots} />
 
         {/* Baraja con las fichas restantes */}
         <button
@@ -577,61 +531,24 @@ function Board({ idPartida, userId, userName, currentBackground, onWin }) {
             789
           </button>
 
-          <button onClick={undoMove} title="Ordenar numéricamente">
+          <button onClick={undoMove} title="Deshacer jugadas del turno actual">
             DESHACER
           </button>
 
           <button
             disabled={processing}
             onClick={cambiarTurno}
-            title="fin turno"
+            title="Fin turno"
           >
             FIN
           </button>
-
-          {/* Boton para deshacer jugadas */}
         </div>
 
         {/* SOPORTE DEL JUGADOR */}
-        <div className="player-rack" style={{ "--slots": slotsNecesarios }}>
-          {/* El SVG de madera */}
-          <svg
-            width={Math.floor(slotsNecesarios / 2) * 50 + 30}
-            className="rack-svg"
-          >
-            <rect
-              x="30"
-              y="20"
-              width={Math.floor(slotsNecesarios / 2) * 50}
-              height="60"
-              fill="#5d2e0a"
-              stroke="#3e1f07"
-              strokeWidth="2"
-              rx="5"
-            />
-            <rect
-              x="30"
-              y="70"
-              width={Math.floor(slotsNecesarios / 2) * 50}
-              height="60"
-              fill="#8B4513"
-              stroke="#5d2e0a"
-              strokeWidth="2"
-              rx="5"
-            />
-          </svg>
-
-          {/* FICHAS DINÁMICAS (Las que el jugador tiene en la mano) */}
-          <div className="player-Hand">
-            {Object.keys(handPositions).map((slotId) => (
-              <Hand key={slotId} id={slotId}>
-                {handPositions[slotId] && (
-                  <DraggableTile tile={handPositions[slotId]} />
-                )}
-              </Hand>
-            ))}
-          </div>
-        </div>
+        <PlayerRack
+          handPositions={handPositions}
+          slotsNecesarios={slotsNecesarios}
+        />
       </div>
 
       {/* ESTO ES LO QUE PERMITE EL ARRASTRE LIBRE */}
