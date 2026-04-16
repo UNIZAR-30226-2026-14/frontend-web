@@ -70,4 +70,42 @@ export const gameService = {
     if (!res.ok) throw new Error("Error al cargar amigos.");
     return await res.json();
   },
+
+  // Robar ficha
+  drawTile: async (userId, gameId) => {
+    const res = await fetch(`${API_BASE_URL}/partidas/${gameId}/robar`, {
+      method: "POST",
+      headers: getHeaders(),
+      body: JSON.stringify({
+        idJugador: userId,
+      }),
+    });
+    if (!res.ok) throw new Error("Error al robar ficha.");
+    return await res.json();
+  },
+
+  // Pasar turno
+  passTurn: async (userId, gameId) => {
+    const res = await fetch(`${API_BASE_URL}/partidas/${gameId}/pasar`, {
+      method: "POST",
+      headers: getHeaders(),
+      body: JSON.stringify({
+        idJugador: userId,
+      }),
+    });
+    if (!res.ok) throw new Error("Error al pasar turno.");
+    return await res.json();
+  },
+
+  // Obtener participación
+  getParticipation: async (userId, gameId) => {
+    const res = await fetch(
+      `${API_BASE_URL}/participaciones/${userId}/${gameId}`,
+      {
+        headers: getHeaders(),
+      },
+    );
+    if (!res.ok) throw new Error("Error al obtener la participación del juagdor.");
+    return await res.json();
+  },
 };

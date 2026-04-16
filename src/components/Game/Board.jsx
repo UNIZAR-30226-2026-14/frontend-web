@@ -15,9 +15,17 @@ import BoardGrid from "./BoardGrid/BoardGrid.jsx";
 import GameControls from "./GameControls/GameControls.jsx";
 import Deck from "./Deck/Deck.jsx";
 
-import { parsearFichas, enviarConjuntos, getConnectedGroup } from "../../services/gameUtils.js";
+import { parsearFichas, enviarConjuntos } from "../../services/gameUtils.js";
+import { gameService } from "../../services/gameService.js";
 
-function Board({ idPartida, userId, userName, currentBackground, onWin }) {
+function Board({
+  idPartida,
+  userId,
+  userName,
+  currentBackground,
+  onWin,
+  isArcade,
+}) {
   // Obtenemos el estado del juego y las funciones para manipularlo
   const { bag, playerHand, gameBoard, setGameBoard, setPlayerHand } = useGame();
   const [activeId, setActiveId] = useState(null); // Para rastrear qué ficha se arrastra
@@ -347,45 +355,22 @@ function Board({ idPartida, userId, userName, currentBackground, onWin }) {
 
     try {
       setProcessing(true);
-      const token = localStorage.getItem("rummi-token");
-      const res = await fetch(
-        `http://localhost:8080/api/partidas/${idPartida}/robar`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            idJugador: userId,
-          }),
-        },
-      );
+      await gameService.drawTile(userId, idPartida);
+      const participacion = await gameService.getParticipation(userId, idPartida);
+      actualizarManoVisual(parsearFichas(participacion.manoActual));
+      setMiTurno(false);
 
-      if (res.ok) {
-        const data = await res.json();
+      //const fichasNuevas = parsearFichas(data.manoActual);
+      //actualizarManoVisual(fichasNuevas);
 
-        const resParti = await fetch(
-          `http://localhost:8080/api/participaciones/${userId}/${idPartida}`,
-        );
+      //setHandPositions(newPositions);
+      //setPlayerHand(Object.values(newPositions));
 
-        if (resParti.ok) {
-          const participacion = await resParti.json();
-          actualizarManoVisual(parsearFichas(participacion.manoActual));
-          setMiTurno(false);
-        }
-        //const fichasNuevas = parsearFichas(data.manoActual);
-        //actualizarManoVisual(fichasNuevas);
+      //const orden = participacion.ordenTurno;
+      //orden === 0 ? setMiTurno(true) : setMiTurno(false);
+      //setMiTurno(false);
 
-        //setHandPositions(newPositions);
-        //setPlayerHand(Object.values(newPositions));
-
-        //const orden = participacion.ordenTurno;
-        //orden === 0 ? setMiTurno(true) : setMiTurno(false);
-        //setMiTurno(false);
-
-        //llamar a fichasActuales para el numero
-      }
+      //llamar a fichasActuales para el numero
     } catch (error) {
       console.error("Error al robar:", error);
     } finally {
@@ -397,27 +382,7 @@ function Board({ idPartida, userId, userName, currentBackground, onWin }) {
     // esto temporal pa ponerle algo
     setMiTurno(false);
     setProcessing(true);
-
-    const token = localStorage.getItem("rummi-token");
-
-    const res = await fetch(
-      `http://localhost:8080/api/partidas/${idPartida}/pasar`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          idJugador: userId,
-        }),
-      },
-    );
-
-    if (res.ok) {
-      setMiTurno(false);
-      console.log("Siguiente turno. Esperando al oponente...");
-    }
+    await gameService.passTurn(userId, idPartida);
 
     //marcar todas las fichas de tablero como placed ESTO IRÁ AL ACTUALIZAR TABLERO
     setBoardPositions((prev) => {
