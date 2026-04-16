@@ -1,7 +1,10 @@
 import { useState } from "react";
+import { sileo } from "sileo";
+
 import "./login.css";
 import logo from "../../assets/logo.svg";
-import { sileo } from "sileo";
+
+import { authService, gameService } from "../../services/gameService";
 
 const Login = ({ onLogin }) => {
   const [isLogin, setIsLogin] = useState(true);
@@ -19,16 +22,9 @@ const Login = ({ onLogin }) => {
 
     try {
       if (!isLogin) {
-        const response = await fetch("http://localhost:8080/api/jugadores", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            nombre: username,
-            contrasena: password,
-          }),
-        });
+        const success = await authService.register(username, password)
 
-        if (response.ok) {
+        if (success) {
           sileo.success({
             title: "¡Cuenta creada con éxito!",
           });
@@ -42,29 +38,12 @@ const Login = ({ onLogin }) => {
           });
         }
       } else {
-        const res = await fetch("http://localhost:8080/api/auth/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            nombre: username,
-            contrasena: password,
-          }),
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          localStorage.setItem("rummi-token", data.token);
-          onLogin(data.jugador);
-        } else {
-          sileo.error({
-            title: "Error al iniciar sesión.",
-            description:
-              "El nombre de usuario o la contraseña son incorrectos. Prueba de nuevo.",
-          });
-        }
+        const data = await authService.login(username, password)
+        localStorage.setItem("rummi-token", data.token);
+        onLogin(data.jugador);
       }
     } catch (error) {
-      console.error("Fallo de conexión:", error);
+      sileo.error({title: "Error", description: error.message})
     }
   };
 

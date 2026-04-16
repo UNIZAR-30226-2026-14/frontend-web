@@ -1,91 +1,40 @@
 import "./friendsList.css";
 import { useState, useEffect } from "react";
-import { gameService } from "../../../services/gameService";
-
-// Simula la Base de Datos de todos los usuarios del juego
-const GLOBAL_USERS_DB = [
-  {
-    id: "1",
-    name: "Lucas G.",
-    status: "online",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Lucas",
-  },
-  {
-    id: "2",
-    name: "Santi_77",
-    status: "offline",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Santi",
-  },
-];
-
-// Amigos ya agregados
-const MOCK_FRIENDS = [
-  {
-    id: "3",
-    name: "Maria_Rumi",
-    status: "online",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Maria",
-  },
-  {
-    id: "4",
-    name: "JugadorPro",
-    status: "online",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Pro",
-  },
-];
+import { friendService } from "../../../services/gameService";
+import { sileo } from "sileo";
 
 function FriendsList({ onClose, onOpenProfile, userId }) {
-  // Estado para controlar el boton de retar
   const [challengeId, setChallengeId] = useState(null);
   const [search, setSearch] = useState("");
-  const [friends, setFriends] = useState(() => {
-    const saved = localStorage.getItem("rummi-friends");
-    return saved ? JSON.parse(saved) : MOCK_FRIENDS;
-  });
-
+  const [friends, setFriends] = useState([]);
+  const [requests, setRequests] = useState([]);
   const [newFriendId, setNewFriendId] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const [error, setError] = useState("");
 
-  const token = localStorage.getItem("rummi-token");
+  // Cargar amigos y solicitudes
+  const loadFriendData = async () => {
+    try {
+      const [listaAmigos, listaSolicitudes] = await Promise.all([
+        friend
+      ])
+    } catch (error) {
+      
+    }
+  }
 
-  // Cargar amigos
   useEffect(() => {
-    const fetchFriends = async () => {
+    const loadData = async () => {
       try {
-        const amigos = await gameService.getFriends(userId)
-        const res = await fetch(
-          `http://localhost:8080/api/amigos?idJugador=${userId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
-
-        if (res.ok) {
-          const amigos = await res.json();
-          const listaAmigos = amigos
-            .filter((rel) => rel.estado === "ACEPTADA")
-            .map((rel) => {
-              // Si soy jugador1, mi amigo es jugador2. Si no, al revés.
-              const amigoId =
-                rel.jugador1 === userId ? rel.jugador2 : rel.jugador1;
-
-              return {
-                id: amigoId,
-                name: `Usuario ${amigoId}`,
-                avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${amigoId}`,
-                status: "online",
-              };
-            });
-          setFriends(listaAmigos);
-        }
+        const lista = await friendService.getFriends(userId);
+        setFriends(lista);
       } catch (err) {
         console.error("Error cargando amigos:", err);
       }
     };
 
-    if (userId) fetchFriends();
-  }, [userId, token]);
+    if (userId) loadData();
+  }, [userId]);
 
   // Simula el proceso de retar a un amigo (aquí irá la lógica de enviar la solicitud al Backend)
   const handleChallenge = (id) => {
@@ -118,63 +67,22 @@ function FriendsList({ onClose, onOpenProfile, userId }) {
   const handleAddFriend = async (e) => {
     e.preventDefault();
     setError("");
-
     if (!newFriendId.trim()) return;
 
     try {
-      const res = await fetch(`http://localhost:8080/api/amigos`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          jugador1Id: userId,
-          jugador2Id: parseInt(newFriendId),
-          estado: "PENDIENTE",
-          fecha: new Date().toISOString().split("T")[0],
-        }),
-      });
-
+      const res = await friendService.sendRequest(userId, newFriendId);
       if (res.ok) {
-        const nuevaAmistad = await res.json();
         setIsAdding(false);
         setNewFriendId("");
-        alert("Solicitud enviada!");
+        sileo.success({
+          title: "¡Solicitud enviada con éxito!",
+        });
       } else {
-        const errorData = await res.json();
-        if (errorData.errors) {
-          const mensajes = errorData.errors.map(
-            (err) => `${err.field}: ${err.defaultMessage}`,
-          );
-          setError(`Error en campos: ${mensajes.join(", ")}`);
-        } else {
-          setError(errorData.message || "Error al enviar la solicitud");
-        }
-        setError("No se pudo enviar la solicitud al usuario.");
+        setError("No se pudo enviar la solicitud.");
       }
     } catch (error) {
       setError("Error de conexión con el servidor");
     }
-    /*const foundUser = GLOBAL_USERS_DB.find(
-      (user) => user.id === newFriendId.trim(),
-    );
-
-    if (!foundUser) {
-      setError("Usuario no encontrado.");
-      return;
-    }
-
-    const isAlreadyFriend = friends.some((f) => f.id === foundUser.id);
-
-    if (isAlreadyFriend) {
-      setError("Este usuario ya está en tu lista de amigos.");
-      return;
-    }
-
-    setFriends([foundUser, ...friends]);
-    setNewFriendId("");
-    setIsAdding(false);*/
   };
 
   const filteredFriends = friends
