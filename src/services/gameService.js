@@ -90,9 +90,9 @@ export const friendService = {
   },
 
   // Aceptar o rechazar solicitud
-  answerRequest: async (userId, amigoId, accept) => {
-    const res = await fetch(`${API_BASE_URL}/amigos/${userId}/${amigoId}/estado`, {
-      method: "PUT", 
+  answerRequest: async (jugador1Id, jugador2Id, accept) => {
+    const res = await fetch(`${API_BASE_URL}/amigos/${jugador1Id}/${jugador2Id}/estado`, {
+      method: "PATCH", 
       headers: getHeaders(),
       body: JSON.stringify({ estado: accept ? "ACEPTADA" : "RECHAZADA" }),
     });

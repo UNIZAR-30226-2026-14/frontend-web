@@ -2,6 +2,7 @@ import "./friendsList.css";
 import { useState, useEffect } from "react";
 import { friendService } from "../../../services/gameService";
 import { sileo } from "sileo";
+import { loadDiffConfig } from "vitest/internal/browser";
 
 function FriendsList({ onClose, onOpenProfile, userId }) {
   const [challengeId, setChallengeId] = useState(null);
@@ -16,36 +17,41 @@ function FriendsList({ onClose, onOpenProfile, userId }) {
   const loadFriendData = async () => {
     try {
       const [listaAmigos, listaSolicitudes] = await Promise.all([
-        friend
-      ])
-    } catch (error) {
-      
+        friendService.getFriends(userId),
+        friendService.getPendingRequests(userId),
+      ]);
+      setFriends(listaAmigos);
+      setRequests(listaSolicitudes);
+    } catch (err) {
+      console.error("Error cargando los amigos y las solicitudes: ", err);
     }
-  }
+  };
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const lista = await friendService.getFriends(userId);
-        setFriends(lista);
-      } catch (err) {
-        console.error("Error cargando amigos:", err);
-      }
-    };
-
-    if (userId) loadData();
+    if (userId) loadFriendData();
   }, [userId]);
+
+  const handleAnswerRequest = async (amigoId) => {
+    try {
+      const ok = await friendService.answerRequest(amigoId, userId, true);
+      if (ok) {
+        sileo.success({ title: "¡Solicitud de amistad aceptada!" });
+        loadFriendData(); // Refrescamos las listas
+      }
+    } catch (error) {
+      sileo.error({ title: "Error al aceptar la solicitud" });
+    }
+  };
 
   // Simula el proceso de retar a un amigo (aquí irá la lógica de enviar la solicitud al Backend)
   const handleChallenge = (id) => {
     setChallengeId(id);
-
     setTimeout(() => {
       setChallengeId(null);
     }, 2000);
   };
 
-  // Escape
+  // Cierre con escape
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape") {
@@ -77,6 +83,7 @@ function FriendsList({ onClose, onOpenProfile, userId }) {
         sileo.success({
           title: "¡Solicitud enviada con éxito!",
         });
+        loadFriendData();
       } else {
         setError("No se pudo enviar la solicitud.");
       }
@@ -106,23 +113,38 @@ function FriendsList({ onClose, onOpenProfile, userId }) {
               <form onSubmit={handleAddFriend}>
                 <input
                   type="text"
-                  placeholder="Introduzca el id de tu amigo..."
+                  placeholder="Id del usuario..."
                   className="search-input"
                   value={newFriendId}
                   onChange={(e) => setNewFriendId(e.target.value)}
                 />
-                <button onClick={handleAddFriend}>Añadir Amigo</button>
+                <button type="submit">Enviar solicitud</button>
               </form>
             </div>
-            {error && (
-              <p className="error-text" style={{ color: "red" }}>
-                {error}
-              </p>
-            )}
-            <button onClick={() => setIsAdding(false)}>Cancelar</button>
+            {error && <p className="error-text">{error}</p>}
+            <button onClick={() => setIsAdding(false)}>Atrás</button>
           </div>
         ) : (
           <>
+            {/* Solicitudes pendientes */}
+            {requests.length > 0 && (
+              <div className="requests-section">
+                <p className="section-title">Solicitudes pendientes</p>
+                {requests.map((req) => (
+                  <div key={`req-${req.jugador1}`} className="request-card">
+                    <span>Usuario {req.jugador1}</span>
+                    <button
+                      className="accept-mini-btn"
+                      onClick={() => handleAnswerRequest(req.jugador1)}
+                    >
+                      Aceptar
+                    </button>
+                  </div>
+                ))}
+                <hr />
+              </div>
+            )}
+
             <div className="searchbar">
               <input
                 type="text"
@@ -133,20 +155,17 @@ function FriendsList({ onClose, onOpenProfile, userId }) {
               />
             </div>
 
-            {}
-
             <div className="friends-list">
               {filteredFriends.length > 0 ? (
                 filteredFriends.map((friend) => (
                   <div key={`friend-${friend.id}`} className="friend-card">
-                    <button
+                    <div
                       className="friend-profile-hit"
                       onClick={() => onOpenProfile?.(friend)}
-                      type="button"
                     >
                       <img
                         src={friend.avatar}
-                        alt={friend.name}
+                        alt=""
                         className="friend-avatar"
                       />
                       <div className="friend-info">
@@ -155,11 +174,11 @@ function FriendsList({ onClose, onOpenProfile, userId }) {
                           className={`status-indicator ${friend.status}`}
                         ></span>
                       </div>
-                    </button>
+                    </div>
                     {friend.status === "online" && (
                       <button
                         className="challenge-button"
-                        onClick={() => handleChallenge(friend.id, friend.name)}
+                        onClick={() => handleChallenge(friend.id)}
                         disabled={challengeId === friend.id}
                       >
                         {challengeId === friend.id ? "..." : "Retar"}
