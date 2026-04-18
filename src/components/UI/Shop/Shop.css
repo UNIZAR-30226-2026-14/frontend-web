@@ -15,7 +15,7 @@
 
 .shop-bg {
   position: absolute;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0.75);
   top: 100px;
   width: 100vw;
   height: calc(100vh - 100px);
@@ -35,6 +35,9 @@
   font-size: 30px;
   margin-bottom: 20px;
   text-align: center;
+  color: #ffd700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
 .shop-sections {
@@ -44,45 +47,88 @@
   align-items: center;
 }
 
-.bg-title {
+.bg-title,
+.tile-title,
+.coins-title {
   font-size: 30px;
-  color: #ccc;
+  color: #eee;
   margin: 20px 0;
 }
 
-.backgrounds-list {
+.backgrounds-list,
+.skins-list {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, minmax(160px, 1fr));
   gap: 15px;
   padding: 40px;
-}
-
-.color-preview {
-  height: 60px;
-  border-radius: 5px;
 }
 
 .insufficent-founds {
   color: black;
 }
 
-.background-card {
-  background: rgba(255, 255, 255, 0.1);
+.background-card,
+.skin-card {
+  background: #252525;
   padding: 15px;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 10px;
   border: 2px solid transparent;
-  transition: transform 0.2s ease-in-out;
-  transform: translateZ(0);
+  transition: all 0.2s ease;
 }
 
-.background-card.active {
-  border-color: #00ff1a;
+.background-card.active,
+.skin-card.active {
+  border-color: greenyellow;
   background: rgba(255, 215, 0, 0.05);
 }
 
-.background-card:hover {
+.background-card:hover,
+.skin-card:hover {
+  background: #303030;
   transform: translateY(-5px);
+}
+
+.color-preview {
+  width: 100%;
+  height: 80px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.skin-preview {
+  width: 60px;
+  height: 80px;
+  background: #fff;
+  color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  border-radius: 5px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.background-card button,
+.skin-card button {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  background: #444;
+  color: white;
+  transition: 0.2s;
+}
+
+.background-card button:disabled,
+.skin-card button:disabled {
+  background: #00ff1a33;
+  color: #00ff1a;
+  cursor: default;
 }

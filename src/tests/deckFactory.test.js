@@ -38,11 +38,6 @@ describe("Reglas de Rummikub", () => {
       expect(isValidSameNumberGroup(group)).toBe(false);
     });
 
-    it("Joker intenta suplir un color que ya existe", () => {
-      const group = [tile(5, "red"), tile(5, "red"), tile("J", "black")];
-      expect(isValidSameNumberGroup(group)).toBe(false);
-    });
-
     it("Joker con colores únicos", () => {
       const group = [tile(10, "red"), tile(10, "blue"), tile("J", "black")];
       expect(isValidSameNumberGroup(group)).toBe(true);

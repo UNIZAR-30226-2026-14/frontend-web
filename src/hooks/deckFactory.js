@@ -24,8 +24,8 @@ export const createDeck = () => {
   });
 
   // Añadir los 2 comodines
-  deck.push({ id: "joker-1", color: "black", number: "J", placed: false});
-  deck.push({ id: "joker-2", color: "red", number: "J", placed: false});
+  deck.push({ id: "joker-1", color: "black", number: "J", placed: false });
+  deck.push({ id: "joker-2", color: "red", number: "J", placed: false });
 
   return shuffle(deck);
 };
@@ -53,11 +53,12 @@ export const isValidSameNumberGroup = (tiles) => {
     const sameNumber = tiles.every(
       (ficha) => ficha.number === "J" || ficha.number === firstTile.number,
     );
-    const colors = tiles.map((t) => t.color);
-    const uniqueColors = new Set(colors);
-    const countJ = tiles.filter(t => t.number === 'J').length;
 
-    return sameNumber && (uniqueColors.size+countJ) === tiles.length;
+    const realTiles = tiles.filter((t) => t.number !== "J");
+    const uniqueColors = new Set(realTiles.map((t) => t.color));
+    const jokersCount = tiles.length - realTiles.length;
+
+    return sameNumber && uniqueColors.size + jokersCount === tiles.length;
   } else {
     return false;
   }
@@ -106,7 +107,6 @@ export const isMoveValid = (tiles) => {
   return isValidSameNumberGroup(tiles) || isValidLadderGroup(tiles);
 };
 
-
 // funciones para ver si se unen las fichas (literalmente lo mismo de arriba pero sin que sean 3)
 export const isValidSameNumber = (tiles) => {
   if (tiles.length > 1) {
@@ -116,14 +116,13 @@ export const isValidSameNumber = (tiles) => {
     );
     const colors = tiles.map((t) => t.color);
     const uniqueColors = new Set(colors);
-    const countJ = tiles.filter(t => t.number === 'J').length;
+    const countJ = tiles.filter((t) => t.number === "J").length;
 
-    return sameNumber && (uniqueColors.size+countJ) === tiles.length;
+    return sameNumber && uniqueColors.size + countJ === tiles.length;
   } else {
     return false;
   }
 };
-
 
 export const isValidLadder = (tiles) => {
   if (tiles.length > 1) {
@@ -153,7 +152,6 @@ export const isValidLadder = (tiles) => {
     return false;
   }
 };
-
 
 export const areCompatible = (tiles) => {
   return isValidSameNumber(tiles) || isValidLadder(tiles);

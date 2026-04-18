@@ -16,38 +16,35 @@ function Shop({
   ownedSkins,
   setOwnedSkins,
 }) {
-  const handlePurchase = (item, type) => {
-    const isOwned =
-      type === "bg"
-        ? ownedBgs?.includes(item.id)
-        : ownedSkins?.includes(item.id);
+  const handlePurchase = async (item, type) => {
+    const isbg = type === "bg";
+    const ownedList = isBg ? ownedBgs : ownedSkins;
+    const setOwnedList = isBg ? setOwnedBgs : setOwnedSkins;
+    const setCurrent = isBg ? setCurrentBackground : setCurrentSkin;
 
-    if (isOwned) {
-      type === "bg"
-        ? setCurrentBackground(item.value)
-        : setCurrentSkin(item.value);
+    if (ownedList?.includes(item.id)) {
+      setCurrent(item.value);
     } else {
       if (coins >= item.price) {
-        setCoins((prev) => prev - item.price);
-        addXp(50);
+        try {
+          // Llamada a la API para comprar una skin
 
-        let updatedOwned;
-        if (type === "bg") {
-          updatedOwned = [...ownedBgs, item.id];
-          setOwnedBgs(updatedOwned);
+          const newCoins = coins - item.price;
+          setCoins(newCoins);
+          addXp(50);
+
+          const updatedOwned = [...(ownedList || []), item.id];
+          setOwnedList(updatedOwned);
           localStorage.setItem("rummi-bgs", JSON.stringify(updatedOwned));
-          setCurrentBackground(item.value);
-        } else {
-          updatedOwned = [...ownedSkins, item.id];
-          setOwnedSkins(updatedOwned);
-          localStorage.setItem("rummi-skins", JSON.stringify(updatedOwned));
-          setCurrentSkin(item.value);
-        }
+          setCurrent(item.value);
 
-        sileo.success({
-          title: "¡Compra realizada!",
-          description: `Has desbloqueado ${item.name}`,
-        });
+          sileo.success({
+            title: "¡Compra realizada!",
+            description: `Has desbloqueado ${item.name}`,
+          });
+        } catch (error) {
+          sileo.error({ title: "Error en la transacción" });
+        }
       } else {
         sileo.error({
           title: "Fondos insuficientes",
