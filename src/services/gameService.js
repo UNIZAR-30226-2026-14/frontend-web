@@ -40,12 +40,9 @@ export const authService = {
 export const friendService = {
   // Obtener los amigos
   getFriends: async (userId) => {
-    const res = await fetch(
-      `${API_BASE_URL}/amigos?idJugador=${userId}`,
-      {
-        headers: getHeaders(),
-      },
-    );
+    const res = await fetch(`${API_BASE_URL}/amigos?jugadorId=${userId}`, {
+      headers: getHeaders(),
+    });
     if (!res.ok) throw new Error("Error al cargar amigos");
 
     const amigos = await res.json();
@@ -79,25 +76,45 @@ export const friendService = {
 
   // Obtener solicitudes de amistad
   getPendingRequests: async (userId) => {
-    const res = await fetch(`${API_BASE_URL}/amigos?idJugador=${userId}`, {
+    const res = await fetch(`${API_BASE_URL}/amigos?jugadorId=${userId}`, {
       headers: getHeaders(),
     });
-    if (!res.ok) throw new Error("Error al cargar solicitudes");
-    
+    if (!res.ok) throw new Error("Error al cargar solicitudes pendientes.");
+
     const data = await res.json();
-    // Solicitudes donde soy el receptor (jugador2) y está PENDIENTE
-    return data.filter(rel => rel.jugador2 === userId && rel.estado === "PENDIENTE");
+    // Solicitudes donde soy el receptor y está PENDIENTE
+    return data.filter(
+      (rel) => rel.jugador2 === userId && rel.estado === "PENDIENTE",
+    );
+  },
+
+  // Obtener solicitudes enviadas pendientes
+  getSentRequests: async (userId) => {
+    const res = await fetch(`${API_BASE_URL}/amigos?jugadorId=${userId}`, {
+      headers: getHeaders(),
+    });
+    if (!res.ok)
+      throw new Error("Error al cargar solicitudes enviadas pendientes.");
+
+    const data = await res.json();
+    // Solicitudes donde soy el emisor y está PENDIENTE
+    return data.filter(
+      (rel) => rel.jugador1 === userId && rel.estado === "PENDIENTE",
+    );
   },
 
   // Aceptar o rechazar solicitud
   answerRequest: async (jugador1Id, jugador2Id, accept) => {
-    const res = await fetch(`${API_BASE_URL}/amigos/${jugador1Id}/${jugador2Id}/estado`, {
-      method: "PATCH", 
-      headers: getHeaders(),
-      body: JSON.stringify({ estado: accept ? "ACEPTADA" : "RECHAZADA" }),
-    });
+    const res = await fetch(
+      `${API_BASE_URL}/amigos/${jugador1Id}/${jugador2Id}/estado`,
+      {
+        method: "PATCH",
+        headers: getHeaders(),
+        body: JSON.stringify({ estado: accept ? "ACEPTADA" : "RECHAZADA" }),
+      },
+    );
     return res.ok;
-  }
+  },
 };
 
 export const gameService = {
@@ -156,7 +173,7 @@ export const gameService = {
 
   // Obtener lista de amigos
   getFriends: async (userId) => {
-    const res = await fetch(`${API_BASE_URL}/amigos?idJugador=${userId}`, {
+    const res = await fetch(`${API_BASE_URL}/amigos?jugadorId=${userId}`, {
       headers: getHeaders(),
     });
     if (!res.ok) throw new Error("Error al cargar amigos.");
