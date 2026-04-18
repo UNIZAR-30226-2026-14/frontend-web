@@ -9,6 +9,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { areCompatible } from "../../hooks/deckFactory.js";
 import { sortColor, sortNum } from "./botones_f.js";
 import { handleDragLogic } from "./dragHandlers.js";
+import alex from "../../assets/avatars/alex.png";
 
 import PlayerRack from "./PlayerRack/PlayerRack.jsx";
 import BoardGrid from "./BoardGrid/BoardGrid.jsx";
@@ -20,8 +21,7 @@ import { gameService } from "../../services/gameService.js";
 
 function Board({
   idPartida,
-  userId,
-  userName,
+  user,
   currentBackground,
   onWin,
   isArcade,
@@ -234,7 +234,7 @@ function Board({
 
   // Detectamos si es nuestro turno
   useEffect(() => {
-    if (!idPartida || !userId) return;
+    if (!idPartida || !user.id) return;
 
     const sincronizar = async () => {
       try {
@@ -242,7 +242,7 @@ function Board({
         const [resP, resU] = await Promise.all([
           fetch(`http://localhost:8080/api/partidas/${idPartida}`),
           fetch(
-            `http://localhost:8080/api/participaciones/${userId}/${idPartida}`,
+            `http://localhost:8080/api/participaciones/${user.id}/${idPartida}`,
           ),
         ]);
 
@@ -290,7 +290,7 @@ function Board({
     sincronizar();
     const interval = setInterval(sincronizar, 3000);
     return () => clearInterval(interval);
-  }, [idPartida, userId, ordenTurno, miTurno]);
+  }, [idPartida, user.id, ordenTurno, miTurno]);
 
   function handleDragStart(event) {
     setActiveId(event.active.id); // Guardamos el ID al empezar
@@ -355,8 +355,8 @@ function Board({
 
     try {
       setProcessing(true);
-      await gameService.drawTile(userId, idPartida);
-      const participacion = await gameService.getParticipation(userId, idPartida);
+      await gameService.drawTile(user.id, idPartida);
+      const participacion = await gameService.getParticipation(user.id, idPartida);
       actualizarManoVisual(parsearFichas(participacion.manoActual));
       setMiTurno(false);
 
@@ -382,7 +382,7 @@ function Board({
     // esto temporal pa ponerle algo
     setMiTurno(false);
     setProcessing(true);
-    await gameService.passTurn(userId, idPartida);
+    await gameService.passTurn(user.id, idPartida);
 
     //marcar todas las fichas de tablero como placed ESTO IRÁ AL ACTUALIZAR TABLERO
     setBoardPositions((prev) => {
@@ -421,22 +421,63 @@ function Board({
           processing={processing}
           miTurno={miTurno}
         />
+        <div className="UNDO">
+          <button onClick={undoMove} title="Deshacer movimientos del turno">
+            🗘
+          </button>
+        </div>
+
+        <div className="FINISH">
+        <button
+          className="finish-button"
+          disabled={processing || !miTurno}
+          onClick={cambiarTurno}
+          title="Finalizar turno"
+        >
+          {processing ? "..." : "FIN"}
+        </button></div>
+
+
 
         <GameControls
           onSortColor={sortByColor}
           onSortNum={sortByNumber}
-          onUndo={undoMove}
-          onFinish={cambiarTurno}
           processing={processing}
           miTurno={miTurno}
         />
+
+
+      
+
+        <div className="Users">
+          <div>
+            <img src={user?.urlimagenPerfil || alex} />
+            <div>otro</div>
+          </div>
+          <div>
+            <img src={user?.urlimagenPerfil || alex} />
+            <div>otro</div>
+          </div>
+          <div>
+            <img src={user?.urlimagenPerfil || alex} />
+            <div>otro</div>
+          </div>
+          <div className="ME">
+            <img src={user?.urlimagenPerfil || alex} />
+            <div>{user.nombre}</div>
+          </div>
+        </div>
+
 
         {/* SOPORTE DEL JUGADOR */}
         <PlayerRack
           handPositions={handPositions}
           slotsNecesarios={slotsNecesarios}
         />
+        
       </div>
+
+      
 
       {/* ESTO ES LO QUE PERMITE EL ARRASTRE LIBRE */}
       <DragOverlay zIndex={1000}>

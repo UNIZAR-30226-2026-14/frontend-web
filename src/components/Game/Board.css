@@ -5,6 +5,7 @@
   position: relative;
   overflow: hidden;
   font-family: "Arial", sans-serif;
+  user-select: none;
 }
 
 /* Cabecera de la página */
@@ -44,4 +45,73 @@
 
   /* Aseguramos que la ficha de la derecha esté siempre encima de la anterior */
   z-index: calc(10 + var(--tile-index));
+}
+
+.Users {
+  font-size: 1.3rem;
+  text-align: left;
+  margin-top: 20vw;
+  margin-left: 1vw;
+  line-height: 20px;
+}
+
+.ME {
+  font-size: 2.3rem !important;
+}
+
+img {
+  width: 5%;
+  height: 5%;
+}
+
+/* This targets any <img> tag inside an element with class "ME" */
+.ME img {
+  width: 7%;
+  height: 7%; /* Changed to auto to maintain aspect ratio */
+}
+
+.UNDO{
+  margin-top: 43vw;
+  margin-left: 17vw;
+  position: absolute;
+}
+
+.UNDO button{
+  font-size: 3.5rem;
+  color: red;
+  line-height: 0.2px;
+}
+
+.FINISH{
+  margin-top: 44vw;
+  margin-left: 90vw;
+  position: absolute;
+}
+
+button {
+  width: 50px;
+  height: 60px;
+  background-color: #fdfcf0;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: black;
+  user-select: none;
+}
+
+/* Efecto hover para que se note que son botones */
+button:hover {
+  background-color: #ffffff;
+  transform: scale(1.05);
+  border-color: #e67e22;
+}
+
+button:active {
+  transform: scale(0.95);
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }

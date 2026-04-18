@@ -3,9 +3,7 @@ import "./GameControls.css";
 
 const GameControls = ({ 
   onSortColor, 
-  onSortNum, 
-  onUndo, 
-  onFinish, 
+  onSortNum,  
   processing,
   miTurno 
 }) => {
@@ -16,19 +14,6 @@ const GameControls = ({
       </button>
       <button onClick={onSortNum} title="Ordenar numéricamente">
         789
-      </button>
-
-      <button onClick={onUndo} title="Deshacer movimientos del turno">
-        DESHACER
-      </button>
-
-      <button
-        className="finish-button"
-        disabled={processing || !miTurno}
-        onClick={onFinish}
-        title="Finalizar turno"
-      >
-        {processing ? "..." : "FIN"}
       </button>
     </div>
   );

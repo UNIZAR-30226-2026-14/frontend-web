@@ -180,7 +180,7 @@ function App() {
       {screen === "game" && (
         <Board
           idPartida={activeGameId}
-          userId={user.id}
+          user={user}
           currentBackground={currentBackground}
           onWin={(puntosGanados) => {
             addXp(puntosGanados);
