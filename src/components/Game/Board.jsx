@@ -9,7 +9,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { areCompatible } from "../../hooks/deckFactory.js";
 import { sortColor, sortNum } from "./botones_f.js";
 import { handleDragLogic } from "./dragHandlers.js";
-import alex from "../../assets/avatars/alex.png";
+import alex from "../../assets/avatars/Dani.png";
 
 import PlayerRack from "./PlayerRack/PlayerRack.jsx";
 import BoardGrid from "./BoardGrid/BoardGrid.jsx";
@@ -20,8 +20,11 @@ import { parsearFichas, enviarConjuntos } from "../../services/gameUtils.js";
 import { gameService } from "../../services/gameService.js";
 
 function Board({
-  idPartida,
-  user,
+  idPartida, objetos,
+  user, userPic,
+  user2,user2Pic,
+  user3,user3Pic,
+  user4,user4Pic,
   currentBackground,
   onWin,
   isArcade,
@@ -47,6 +50,8 @@ function Board({
   const [startTurnHand, setStartTurnHand] = useState(null);
 
   const [inventory, setInventory] = useState([]);
+
+  const [points, setPoints] = useState(0);
 
   // Función para conseguir puntos para comprar power-ups
   const sumarPuntosPorJugada = (fichasColocadas) => {
@@ -437,6 +442,10 @@ function Board({
           {processing ? "..." : "FIN"}
         </button></div>
 
+        <div className="puntos">
+          <div>Puntos: {points}</div>
+        </div>
+
 
 
         <GameControls
@@ -451,19 +460,19 @@ function Board({
 
         <div className="Users">
           <div>
-            <img src={user?.urlimagenPerfil || alex} />
-            <div>otro</div>
+            <img src={user4?.urlimagenPerfil || alex} />
+            <div>{user4?.nombre || "otro"}</div>
           </div>
           <div>
-            <img src={user?.urlimagenPerfil || alex} />
-            <div>otro</div>
+            <img src={user3?.urlimagenPerfil || alex} />
+            <div>{user3?.nombre || "otro"}</div>
           </div>
           <div>
-            <img src={user?.urlimagenPerfil || alex} />
-            <div>otro</div>
+            <img src={user2?.urlimagenPerfil || alex} />
+            <div>{user2?.nombre || "otro"}</div>
           </div>
           <div className="ME">
-            <img src={user?.urlimagenPerfil || alex} />
+            <img src={userPic || alex} />
             <div>{user.nombre}</div>
           </div>
         </div>

@@ -181,6 +181,7 @@ function App() {
         <Board
           idPartida={activeGameId}
           user={user}
+          userPic={userAvatar}
           currentBackground={currentBackground}
           onWin={(puntosGanados) => {
             addXp(puntosGanados);
