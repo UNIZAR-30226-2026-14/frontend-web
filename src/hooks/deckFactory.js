@@ -48,7 +48,7 @@ const shuffle = ([...arr]) => {
  * @returns {boolean} - True si es un grupo váildo, false en caso contrario.
  */
 export const isValidSameNumberGroup = (tiles) => {
-  if (tiles.length >= 3) {
+  if (tiles.length === 3 || tiles.length === 4) {
     const firstTile = tiles.find((t) => t.number !== "J");
     const sameNumber = tiles.every(
       (ficha) => ficha.number === "J" || ficha.number === firstTile.number,

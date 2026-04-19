@@ -17,7 +17,7 @@ function Shop({
   setOwnedSkins,
 }) {
   const handlePurchase = async (item, type) => {
-    const isbg = type === "bg";
+    const isBg = type === "bg";
     const ownedList = isBg ? ownedBgs : ownedSkins;
     const setOwnedList = isBg ? setOwnedBgs : setOwnedSkins;
     const setCurrent = isBg ? setCurrentBackground : setCurrentSkin;
