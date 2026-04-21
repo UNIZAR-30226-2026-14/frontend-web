@@ -20,11 +20,16 @@ import { parsearFichas, enviarConjuntos } from "../../services/gameUtils.js";
 import { gameService } from "../../services/gameService.js";
 
 function Board({
-  idPartida, objetos,
-  user, userPic,
-  user2,user2Pic,
-  user3,user3Pic,
-  user4,user4Pic,
+  idPartida,
+  objetos,
+  user,
+  userPic,
+  user2,
+  user2Pic,
+  user3,
+  user3Pic,
+  user4,
+  user4Pic,
   currentBackground,
   onWin,
   isArcade,
@@ -208,12 +213,30 @@ function Board({
       for (let i = 0; i < slotsNecesarios; i++) {
         newPositions[`hand-slot-${i}`] = fichasParaPintar[i] || "";
       }
-      /*fichas.forEach((tile, index) => {
-        if (newPositions[`hand-slot-${index}`] === "") {
-          newPositions[`hand-slot-${index}`] = tile;
-        }
-      });*/
       return newPositions;
+    });
+  };
+
+  const añadirFichaALaMano = (nuevaFicha) => {
+    if (!nuevaFicha) return;
+
+    setHandPositions((prev) => {
+      const next = { ...prev };
+
+      // Buscamos el primer slot vacío
+      const slots = Object.keys(next);
+      const primerHuecoLibre = slots.find((key) => next[key] === "");
+
+      if (primerHuecoLibre) {
+        next[primerHuecoLibre] = nuevaFicha;
+      } else {
+        // Si no hay hueco, creamos un nuevo slot
+        const nuevoIndice = slots.length;
+        setSlotsNecesarios(nuevoIndice + 1); // Expandimos el rack
+        next[`hand-slot-${nuevoIndice}`] = nuevaFicha;
+      }
+
+      return next;
     });
   };
 
@@ -355,14 +378,21 @@ function Board({
   };
 
   const drawTile = async () => {
-    if (!miTurno) return;
+    if (!miTurno || processing) return;
     //setStartTurnHand(handPositions);
 
     try {
       setProcessing(true);
-      await gameService.drawTile(user.id, idPartida);
-      const participacion = await gameService.getParticipation(user.id, idPartida);
-      actualizarManoVisual(parsearFichas(participacion.manoActual));
+      const data = await gameService.drawTile(user.id, idPartida);
+
+      const fichaNueva = parsearFichas(data.fichaRobada);
+
+      console.log("fichaNueva: ", fichaNueva)
+
+      if (fichaNueva) {
+        añadirFichaALaMano(fichaNueva[0]);
+      }
+
       setMiTurno(false);
 
       //const fichasNuevas = parsearFichas(data.manoActual);
@@ -382,6 +412,15 @@ function Board({
       setProcessing(false);
     }
   };
+
+  useEffect(() => {
+    console.log("--- CAMBIO EN MANO DETECTADO ---");
+    console.log(
+      "Fichas actuales en mano:",
+      Object.values(handPositions).filter((f) => f !== "").length,
+    );
+    console.log("Contenido de handPositions:", handPositions);
+  }, [handPositions]);
 
   const cambiarTurno = async () => {
     // esto temporal pa ponerle algo
@@ -433,20 +472,19 @@ function Board({
         </div>
 
         <div className="FINISH">
-        <button
-          className="finish-button"
-          disabled={processing || !miTurno}
-          onClick={cambiarTurno}
-          title="Finalizar turno"
-        >
-          {processing ? "..." : "FIN"}
-        </button></div>
+          <button
+            className="finish-button"
+            disabled={processing || !miTurno}
+            onClick={cambiarTurno}
+            title="Finalizar turno"
+          >
+            {processing ? "..." : "FIN"}
+          </button>
+        </div>
 
         <div className="puntos">
           <div>Puntos: {points}</div>
         </div>
-
-
 
         <GameControls
           onSortColor={sortByColor}
@@ -454,9 +492,6 @@ function Board({
           processing={processing}
           miTurno={miTurno}
         />
-
-
-      
 
         <div className="Users">
           <div>
@@ -477,16 +512,12 @@ function Board({
           </div>
         </div>
 
-
         {/* SOPORTE DEL JUGADOR */}
         <PlayerRack
           handPositions={handPositions}
           slotsNecesarios={slotsNecesarios}
         />
-        
       </div>
-
-      
 
       {/* ESTO ES LO QUE PERMITE EL ARRASTRE LIBRE */}
       <DragOverlay zIndex={1000}>
