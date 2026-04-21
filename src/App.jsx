@@ -6,39 +6,14 @@ import Loading from "./components/Loading/Loading";
 import Login from "./components/Login/Login";
 import alex from "./assets/avatars/alex.png";
 import Realistic from "react-canvas-confetti/dist/presets/realistic";
+import { authService } from "./services/gameService";
 
 function App() {
-  // Monedas
-  const [coins, setCoins] = useState(() => {
-    const saved = localStorage.getItem("rummi-coins");
-    return saved ? parseInt(saved) : 1000;
-  });
-
-  // Nivel
-  const [level, setLevel] = useState(() => {
-    const saved = localStorage.getItem("rummi-lvl");
-    return saved ? parseInt(saved) : 1;
-  });
-
-  // Experiencia del nivel actual
-  const [xp, setXp] = useState(() => {
-    const saved = localStorage.getItem("rummi-xp");
-    return saved ? parseInt(saved) : 0;
-  });
-
-  // Nombre de usuario
-  const [user, setUser] = useState(() => {
-    /*const saved = localStorage.getItem("rummi-user-object");
-    try {
-      return saved ? JSON.parse(saved) : null;
-    } catch (e) {
-      return null;
-    }*/
-    return null;
-  });
-
-  // Pantalla actual
-  const [screen, setScreen] = useState(user ? "home" : "login");
+  const [user, setUser] = useState(null);
+  const [coins, setCoins] = useState(0);
+  const [level, setLevel] = useState(1);
+  const [xp, setXp] = useState(0);
+  const [screen, setScreen] = useState("login");
 
   // Fondo del tablero actual
   const [currentBackground, setCurrentBackground] = useState(() => {
@@ -102,28 +77,33 @@ function App() {
     setLevel(newLevel);
   };
 
-  const handleLogin = (user) => {
-    setUser(user);
-    localStorage.setItem("rummi-user-object", JSON.stringify(user));
+  useEffect(() => {
+    const checkSession = async () => {
+      const token = localStorage.getItem("rummi-token");
+      if (token) {
+        try {
+          const user = await authService.getMe();
+          setUser(user);
+        } catch (err) {
+          console.error("Token inválido");
+          setUser(null);
+        }
+      }
+    };
+    checkSession();
+  }, []);
+
+  const handleLogin = (jugador) => {
+    setUser(jugador);
+    setCoins(jugador.monedas)
     setScreen("home");
   };
 
-  const handleLogout = () => {
-    localStorage.clear();
-    setUser("");
+  const handleLogout = async () => {
+    await authService.logout();
+    setUser(null);
     setScreen("login");
   };
-
-  /**
-   * Sincroniza automáticamente cualquier cambio en el estado con el LocalStorage
-   */
-  useEffect(() => {
-    localStorage.setItem("rummi-bg", currentBackground);
-    localStorage.setItem("rummi-skin", currentSkin);
-    localStorage.setItem("rummi-avatar", userAvatar);
-    localStorage.setItem("rummi-lvl", level);
-    localStorage.setItem("rummi-xp", xp);
-  }, [currentBackground, currentSkin, userAvatar, level, xp]);
 
   return (
     <>

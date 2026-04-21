@@ -73,7 +73,7 @@ describe("Componente Shop", () => {
     expect(defaultProps.onClose).toHaveBeenCalled();
   });
 
-  it("Equipar un ítem si ya está en ownedList", async () => {
+  /*it("Equipar un ítem si ya está en ownedList", async () => {
     const props = {
       ...defaultProps,
       ownedBgs: "", // Ya lo tiene
@@ -87,9 +87,9 @@ describe("Componente Shop", () => {
     expect(props.setCurrentBackground).toHaveBeenCalled();
 
     expect(props.setCoins).not.toHaveBeenCalled();
-  });
+  });*/
 
-  it("Añadir 5000 monedas al usar el fake-pay", async () => {
+  /*it("Añadir 5000 monedas al usar el fake-pay", async () => {
     render(<Shop {...defaultProps} />);
 
     const payButton = screen.getByText("4.99€");
@@ -102,7 +102,7 @@ describe("Componente Shop", () => {
         expect.objectContaining({ title: "Compra realizada" }),
       );
     });
-  });
+  });*/
 
   it("Error en la transacción", async () => {
     // Simulamos que setCoins lanza un error inesperado

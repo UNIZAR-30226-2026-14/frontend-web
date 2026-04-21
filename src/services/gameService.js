@@ -35,6 +35,30 @@ export const authService = {
     });
     return res.ok;
   },
+
+  getMe: async () => {
+    const res = await fetch(`${API_BASE_URL}/auth/me`, {
+      headers: getHeaders(),
+    });
+
+    if (!res.ok) {
+      localStorage.removeItem("rummi-token");
+      throw new Error("Sesión no válida o expirada");
+    }
+    return await res.json();
+  },
+
+  // Cerrar sesión
+  logout: async () => {
+    try {
+      await fetch(`${API_BASE_URL}/auth/logout`, {
+        method: "POST",
+        headers: getHeaders(),
+      });
+    } finally {
+      localStorage.removeItem("rummi-token");
+    }
+  },
 };
 
 export const friendService = {
@@ -171,15 +195,6 @@ export const gameService = {
     return res.ok;
   },
 
-  // Obtener lista de amigos
-  getFriends: async (userId) => {
-    const res = await fetch(`${API_BASE_URL}/amigos?jugadorId=${userId}`, {
-      headers: getHeaders(),
-    });
-    if (!res.ok) throw new Error("Error al cargar amigos.");
-    return await res.json();
-  },
-
   // Robar ficha
   drawTile: async (userId, gameId) => {
     const res = await fetch(`${API_BASE_URL}/partidas/${gameId}/robar`, {
@@ -210,12 +225,44 @@ export const gameService = {
   getParticipation: async (userId, gameId) => {
     const res = await fetch(
       `${API_BASE_URL}/participaciones/${userId}/${gameId}`,
-      {
-        headers: getHeaders(),
-      },
+      { headers: getHeaders() },
     );
     if (!res.ok)
       throw new Error("Error al obtener la participación del juagdor.");
     return await res.json();
+  },
+
+  // Participaciones de la partida
+  getParticipationByGame: async (gameId) => {
+    const res = await fetch(
+      `${API_BASE_URL}/participaciones?partidaId=${gameId}`,
+      { headers: getHeaders() },
+    );
+    if (!res.ok) throw new Error("Error al obtener participantes");
+    return await res.json();
+  },
+  
+  // Jugar
+  playAdvanced: async (gameId, moveData) => {
+    const res = await fetch(
+      `${API_BASE_URL}/partidas/${gameId}/jugar-advanced`,
+      {
+        method: "POST",
+        headers: getHeaders(),
+        body: JSON.stringify(moveData),
+      },
+    );
+    if (!res.ok) throw new Error("Movimiento inválido");
+    return await res.json();
+  },
+
+  // Abandonar la partida
+  leaveGame: async (gameId, userId) => {
+    const res = await fetch(`${API_BASE_URL}/partidas/${gameId}/salir`, {
+      method: "POST",
+      headers: getHeaders(),
+      body: JSON.stringify({ idJugador: userId }),
+    });
+    return res.ok;
   },
 };
