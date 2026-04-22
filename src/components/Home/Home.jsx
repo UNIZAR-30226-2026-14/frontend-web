@@ -78,7 +78,7 @@ function Home({ onStart, user, onLogout, addXp }) {
   };
 
   const openFriendProfile = async (friendId) => {
-    const idNumber = Number(friendId) || 0;
+    //const idNumber = Number(friendId) || 0;
     //const wins = 10 + idNumber * 3;
     //const losses = 4 + idNumber;
     //const draws = 2 + (idNumber % 4);
@@ -87,12 +87,17 @@ function Home({ onStart, user, onLogout, addXp }) {
 
     const profile = await friendService.getFriendsProfile(user.id, friendId);
 
+    if (!profile) {
+      alert("No se pudo cargar el perfil del amigo");
+      return;
+    }
+
     setSelectedFriendProfile({
       userId: profile.id,
-      user: profile.nombre,
-      avatar: profile.urlimagenPerfil,
+      user: profile,
+      avatar: profile.urlImgPerfil || alex,
       coins: profile.monedas || 0,
-      level: 3 + idNumber,
+      level: 1,
       stats: {
         wins: profile.partidasGanadas || 0,
         losses: profile.partidasPerdidas || 0,
@@ -226,12 +231,11 @@ function Home({ onStart, user, onLogout, addXp }) {
             setSelectedFriendProfile(null);
             setActivePopup(null);
           }}
-          currentAvatar={selectedFriendProfile?.avatar || userAvatar}
+          currentAvatar={selectedFriendProfile?.urlImgPerfil || userAvatar}
           setUserAvatar={selectedFriendProfile ? null : setUserAvatar}
           avatarList={selectedFriendProfile ? [] : AVATAR_LIST}
           userId={selectedFriendProfile?.userId || user.id}
-          //user={selectedFriendProfile?.user || user}
-          user={selectedFriendProfile ? selectedFriendProfile.user : user.nombre}
+          user={selectedFriendProfile ? selectedFriendProfile.user : user}
           coins={selectedFriendProfile?.coins ?? coins}
           level={selectedFriendProfile?.level ?? level}
           stats={

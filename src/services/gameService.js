@@ -148,7 +148,8 @@ export const friendService = {
       );
       if (!res.ok) throw new Error("Error al conectar con el servidor");
       const amigos = await res.json();
-      return amigos.find((amigo) => amigo.id === friendId);
+      const profile = amigos.find((amigo) => amigo.id === friendId);
+      return profile;
     } catch (error) {
       console.error("Error obteniendo el perfil del amigo:", error);
       return null;

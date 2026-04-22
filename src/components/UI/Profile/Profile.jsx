@@ -1,5 +1,7 @@
 import { useState } from "react";
 import "./profile.css";
+import { AVATAR_LIST } from "../../../data/itemData";
+import alex from "../../../assets/avatars/alex.png";
 
 function Profile({
   onClose,
@@ -16,7 +18,7 @@ function Profile({
   const [isEditing, setIsEditing] = useState(false);
   const [isHoveringRemove, setIsHoveringRemove] = useState(false);
   const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
-  
+
   const canEditAvatar = Boolean(setUserAvatar) && avatarList.length > 0;
   const isFriendProfile = !canEditAvatar;
 
@@ -25,19 +27,22 @@ function Profile({
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (!file) return
+    if (!file) return;
 
     const reader = new FileReader();
 
-    reader.onload = event => {
-      const imageUrl = event.target.result
+    reader.onload = (event) => {
+      const imageUrl = event.target.result;
       setUserAvatar(imageUrl);
       setIsEditing(false);
-    }
+    };
 
     reader.readAsDataURL(file);
-  }
-  
+  };
+
+  const avatarSeleccionado =
+    AVATAR_LIST.find((a) => a.id === currentAvatar) || alex;
+
   return (
     <div className="profile-stats">
       <button className="close-button" onClick={onClose}>
