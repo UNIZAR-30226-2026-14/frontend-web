@@ -56,8 +56,11 @@ export const authService = {
         method: "POST",
         headers: getHeaders(),
       });
+    } catch (error) {
+      console.error("Error al cerrar sesión.", error);
     } finally {
       localStorage.removeItem("rummi-token");
+      localStorage.removeItem("rummi-expire");
     }
   },
 };
