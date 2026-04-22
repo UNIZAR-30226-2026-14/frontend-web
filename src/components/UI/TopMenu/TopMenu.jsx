@@ -1,5 +1,6 @@
 import "./TopMenu.css";
 import settings_icon from "../../../assets/settings-icon.svg";
+import { getAvatarDisplay } from "../../../data/itemData";
 
 function TopMenu({
   userAvatar,
@@ -31,7 +32,7 @@ function TopMenu({
                   y="0"
                   width="100"
                   height="100"
-                  href={userAvatar}
+                  href={getAvatarDisplay(userAvatar)}
                   preserveAspectRatio="xMidYMid slice"
                 />
               </pattern>

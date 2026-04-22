@@ -1,7 +1,9 @@
 import { useState } from "react";
 import "./profile.css";
-import { AVATAR_LIST } from "../../../data/itemData";
+import { getAvatarDisplay } from "../../../data/itemData";
 import alex from "../../../assets/avatars/alex.png";
+import { profileService } from "../../../services/gameService";
+import { sileo } from "sileo";
 
 function Profile({
   onClose,
@@ -40,8 +42,21 @@ function Profile({
     reader.readAsDataURL(file);
   };
 
-  const avatarSeleccionado =
-    AVATAR_LIST.find((a) => a.id === currentAvatar) || alex;
+  const handleChangeAvatar = async (avatarId) => {
+    const succes = await profileService.updateProfile(userId, {
+      urlImgPerfil: avatarId,
+    });
+
+    if (succes) {
+      setUserAvatar(avatarId);
+      setIsEditing(false);
+    } else {
+      sileo.error({
+        title: "Error de conexión.",
+        description: "No se pudo actualizar el avatar en el servidor.",
+      });
+    }
+  };
 
   return (
     <div className="profile-stats">
@@ -71,7 +86,7 @@ function Profile({
 
           <div className="avatar-container">
             <img
-              src={currentAvatar}
+              src={getAvatarDisplay(currentAvatar)}
               alt="Avatar de perfil"
               className="main-avatar"
             />
@@ -175,14 +190,11 @@ function Profile({
                 src={avatar.url}
                 alt={avatar.name}
                 className={
-                  currentAvatar === avatar.url
+                  currentAvatar === avatar.name
                     ? "avatar-item active"
                     : "avatar-item"
                 }
-                onClick={() => {
-                  setUserAvatar(avatar.url);
-                  setIsEditing(false);
-                }}
+                onClick={() => handleChangeAvatar(avatar.id)}
               />
             ))}
 

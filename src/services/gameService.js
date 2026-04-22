@@ -36,6 +36,7 @@ export const authService = {
     return res.ok;
   },
 
+  // Para no tener que volver a iniciar sesion (aun no funciona)
   getMe: async () => {
     const res = await fetch(`${API_BASE_URL}/auth/me`, {
       headers: getHeaders(),
@@ -295,5 +296,23 @@ export const gameService = {
       body: JSON.stringify({ idJugador: userId }),
     });
     return res.ok;
+  },
+};
+
+export const profileService = {
+  // Cambiar el nombre o avatar
+  updateProfile: async (userId, data) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/jugadores/${userId}/perfil`, {
+        method: "PATCH",
+        headers: getHeaders(),
+        body: JSON.stringify(data),
+      });
+
+      return res.ok;
+    } catch (error) {
+      console.error("Error al actualizar el perfil:", error);
+      return false;
+    }
   },
 };

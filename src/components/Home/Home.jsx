@@ -19,7 +19,9 @@ function Home({ onStart, user, onLogout, addXp }) {
   const [selectedFriendProfile, setSelectedFriendProfile] = useState(null);
 
   // Avatar
-  const [userAvatar, setUserAvatar] = useState(user?.urlimagenPerfil || alex);
+  const [userAvatar, setUserAvatar] = useState(() => {
+    return user?.urlimagenPerfil || alex;
+  });
 
   // Monedas
   const [coins, setCoins] = useState(user?.monedas);
@@ -78,13 +80,6 @@ function Home({ onStart, user, onLogout, addXp }) {
   };
 
   const openFriendProfile = async (friendId) => {
-    //const idNumber = Number(friendId) || 0;
-    //const wins = 10 + idNumber * 3;
-    //const losses = 4 + idNumber;
-    //const draws = 2 + (idNumber % 4);
-    //const pending = idNumber % 3;
-    //const finished = wins + losses + draws;
-
     const profile = await friendService.getFriendsProfile(user.id, friendId);
 
     if (!profile) {
@@ -210,6 +205,14 @@ function Home({ onStart, user, onLogout, addXp }) {
     return () => clearInterval(interval);
   }, [isWaitingForStart, roomCode, onStart]);
 
+  useEffect(() => {
+    if (user && user.urlImgPerfil) {
+      setUserAvatar(user.urlImgPerfil);
+    }
+  }, [user]);
+
+  console.log("Datos del usuario al cargar Home:", user);
+
   return (
     <div className="home-screen">
       {/* Barra superior */}
@@ -231,7 +234,7 @@ function Home({ onStart, user, onLogout, addXp }) {
             setSelectedFriendProfile(null);
             setActivePopup(null);
           }}
-          currentAvatar={selectedFriendProfile?.urlImgPerfil || userAvatar}
+          currentAvatar={selectedFriendProfile?.avatar || userAvatar}
           setUserAvatar={selectedFriendProfile ? null : setUserAvatar}
           avatarList={selectedFriendProfile ? [] : AVATAR_LIST}
           userId={selectedFriendProfile?.userId || user.id}

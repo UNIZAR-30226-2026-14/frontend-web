@@ -112,6 +112,11 @@ export const AVATAR_LIST = [
   { id: 6, url: miguel, name: "Miguel" },
 ];
 
+export const getAvatarDisplay = (avatarId) => {
+  const found = AVATAR_LIST.find((a) => String(a.id) === String(avatarId));
+  return found ? found.url : alex;
+};
+
 export const PENDING_GAMES = [
   {
     id: "game1",
