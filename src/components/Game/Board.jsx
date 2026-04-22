@@ -68,7 +68,7 @@ function Board({
     setMatchPoints((prev) => prev + puntosGanados);
   };
 
-  const ejecutarPowerup = (powerup) => {
+  const ejecutarPowerup = (powerup) => { //esto mejor será ponerlo aparte
     switch (powerup.id) {
       case "toque de midas":
         setHandPositions((prev) => {
@@ -143,15 +143,15 @@ function Board({
   });
 
   const [boardPositions, setBoardPositions] = useState(() => {
-    // Inicializamos 40 huecos vacíos
+    // Inicializamos 70 huecos vacíos
     const initial = {};
     for (let i = 0; i < 70; i++) initial[`board-slot-${i}`] = "";
     return initial;
   });
 
-  // PA QUE AL RESETEAR EL BOARD SE VACIE, ESTO ES TEMPORAL
+  // PA QUE AL RESETEAR EL BOARD SE VACIE
   const [startTurnBoard, setStartTurnBoard] = useState(() => {
-    // Inicializamos 40 huecos vacíos
+    // Inicializamos 70 huecos vacíos
     const initial = {};
     for (let i = 0; i < 70; i++) initial[`board-slot-${i}`] = "";
     return initial;
@@ -191,7 +191,6 @@ function Board({
     setJoinedSlots(newJoined);
   }, [boardPositions]); // Se ejecuta cada vez que el tablero cambie
   // ESTO LUEGO TENDRÍA QUE IR EN OTRO LAO PERO COMO FALTA POR IMPLEMENTAR EL ACTUALIZAR BOARD
-  //setStartTurnBoard(boardPositions);
 
   const actualizarManoVisual = (fichas) => {
     if (!fichas) return;
@@ -310,9 +309,9 @@ function Board({
           setStartTurnHand(handPositions);
 
           // Si acabamos de recibir el turno, actualizamos el tablero
-          //if (esMiTurno && partida.tableroActual) {
-          //  actualizarTableroVisual(partida.tableroActual);
-          //}
+          if (esMiTurno && partida.tableroActual) {
+            actualizarTableroVisual(partida.tableroActual);
+          }
         }
       } catch (error) {
         console.error("Error en sincronización:", error);
@@ -382,9 +381,6 @@ function Board({
   };
 
   const drawTile = async () => {
-    if (!miTurno || processing) return;
-    //setStartTurnHand(handPositions);
-
     try {
       setProcessing(true);
       const data = await gameService.drawTile(user.id, idPartida);
@@ -395,18 +391,6 @@ function Board({
       }
 
       setMiTurno(false);
-
-      //const fichasNuevas = parsearFichas(data.manoActual);
-      //actualizarManoVisual(fichasNuevas);
-
-      //setHandPositions(newPositions);
-      //setPlayerHand(Object.values(newPositions));
-
-      //const orden = participacion.ordenTurno;
-      //orden === 0 ? setMiTurno(true) : setMiTurno(false);
-      //setMiTurno(false);
-
-      //llamar a fichasActuales para el numero
     } catch (error) {
       console.error("Error al robar:", error);
     } finally {
@@ -416,17 +400,19 @@ function Board({
 
   const cambiarTurno = async () => {
     console.log("¡Botón pulsado!");
-    if (!miTurno || processing) return;
-    console.log("Mi turno");
     try {
-      setProcessing(false);
+      setProcessing(true);
       const conjuntos = obtenerConjuntosDelTablero(boardPositions);
       console.log("3");
       if (conjuntos.length === 0) {
         console.log("4");
-        setProcessing(true);
+        setBoardPositions(startTurnBoard);
+        setHandPositions(startTurnHand);
+        setProcessing(false);
         return;
       }
+
+      console.log(conjuntos);
 
       console.log("Lo que le voy a enviar a la IA:", JSON.stringify(newBoard));
 
@@ -495,7 +481,7 @@ function Board({
         <Deck
           deckSize={deckSize}
           onDraw={drawTileButton}
-          processing={processing}
+          processing={processing || !miTurno}
           miTurno={miTurno}
         />
         <div className="UNDO">
@@ -511,7 +497,7 @@ function Board({
             onClick={cambiarTurno}
             title="Finalizar turno"
           >
-            {processing ? "..." : "FIN"}
+            {(processing || !miTurno) ? "..." : "FIN"}
           </button>
         </div>
 
@@ -522,8 +508,6 @@ function Board({
         <GameControls
           onSortColor={sortByColor}
           onSortNum={sortByNumber}
-          processing={processing}
-          miTurno={miTurno}
         />
 
         <div className="Users">
