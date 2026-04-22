@@ -60,3 +60,30 @@ export const enviarConjuntos = (boardPositions) => {
       return `${color}${numStr}${habilidad}`;
     });
 };
+
+export const obtenerConjuntosDelTablero = () => {
+  const conjuntos = [];
+  for (let row = 0; row < 5; row++) {
+    let conjuntoActual = [];
+    for (let col = 0; col < 14; col++) {
+      const index = row * 14 + col;
+      const tile = boardPositions[`board-slot-${index}`];
+
+      if (tile && tile !== "") {
+        const colorKey = tile.color.charAt(0).toUpperCase();
+        conjuntoActual.push(`${colorKey}-${tile.number}`);
+      } else {
+        if (conjuntoActual.length > 0) {
+          conjuntos.push([...conjuntoActual]);
+          conjuntoActual = [];
+        }
+      }
+    }
+    
+    // Si la fila termina y hay un grupo, lo cerramos
+    if (conjuntoActual.length > 0) {
+      conjuntos.push(conjuntoActual);
+    }
+  }
+  return conjuntos;
+};

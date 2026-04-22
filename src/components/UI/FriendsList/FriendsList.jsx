@@ -177,7 +177,7 @@ function FriendsList({ onClose, onOpenProfile, userId }) {
                       <div key={`friend-${friend.id}`} className="friend-card">
                         <div
                           className="friend-profile-hit"
-                          onClick={() => onOpenProfile?.(friend)}
+                          onClick={() => onOpenProfile?.(friend.id)}
                         >
                           <img
                             src={friend.avatar}

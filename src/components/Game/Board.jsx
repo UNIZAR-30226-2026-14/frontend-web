@@ -16,7 +16,11 @@ import BoardGrid from "./BoardGrid/BoardGrid.jsx";
 import GameControls from "./GameControls/GameControls.jsx";
 import Deck from "./Deck/Deck.jsx";
 
-import { parsearFichas, enviarConjuntos } from "../../services/gameUtils.js";
+import {
+  parsearFichas,
+  enviarConjuntos,
+  obtenerConjuntosDelTablero,
+} from "../../services/gameUtils.js";
 import { gameService } from "../../services/gameService.js";
 
 function Board({
@@ -384,10 +388,7 @@ function Board({
     try {
       setProcessing(true);
       const data = await gameService.drawTile(user.id, idPartida);
-
       const fichaNueva = parsearFichas(data.fichaRobada);
-
-      console.log("fichaNueva: ", fichaNueva)
 
       if (fichaNueva) {
         añadirFichaALaMano(fichaNueva[0]);
@@ -413,38 +414,70 @@ function Board({
     }
   };
 
-  useEffect(() => {
-    console.log("--- CAMBIO EN MANO DETECTADO ---");
-    console.log(
-      "Fichas actuales en mano:",
-      Object.values(handPositions).filter((f) => f !== "").length,
-    );
-    console.log("Contenido de handPositions:", handPositions);
-  }, [handPositions]);
-
   const cambiarTurno = async () => {
-    // esto temporal pa ponerle algo
-    setMiTurno(false);
-    setProcessing(true);
-    await gameService.passTurn(user.id, idPartida);
-
-    //marcar todas las fichas de tablero como placed ESTO IRÁ AL ACTUALIZAR TABLERO
-    setBoardPositions((prev) => {
-      const nextState = {};
-      for (const id in prev) {
-        const currentTile = prev[id];
-        if (currentTile && typeof currentTile === "object") {
-          // Creamos una copia profunda de la ficha con el nuevo atributo
-          nextState[id] = {
-            ...currentTile,
-            placed: true,
-          };
-        } else {
-          nextState[id] = currentTile;
-        }
+    console.log("¡Botón pulsado!");
+    if (!miTurno || processing) return;
+    console.log("Mi turno");
+    try {
+      setProcessing(false);
+      const conjuntos = obtenerConjuntosDelTablero(boardPositions);
+      console.log("3");
+      if (conjuntos.length === 0) {
+        console.log("4");
+        setProcessing(true);
+        return;
       }
-      return nextState;
-    });
+
+      console.log("Lo que le voy a enviar a la IA:", JSON.stringify(newBoard));
+
+      await gameService.playAdvanced(
+        user.id,
+        idPartida,
+        "replace_board",
+        conjuntos,
+      );
+      setMiTurno(false);
+
+      setBoardPositions((prev) => {
+        const nextState = {};
+        for (const id in prev) {
+          const currentTile = prev[id];
+          if (currentTile && typeof currentTile === "object") {
+            nextState[id] = { ...currentTile, placed: true };
+          } else {
+            nextState[id] = currentTile;
+          }
+        }
+        return nextState;
+      });
+
+      /*
+      // esto temporal pa ponerle algo
+      setMiTurno(false);
+      setProcessing(true);
+      await gameService.passTurn(user.id, idPartida);
+
+      //marcar todas las fichas de tablero como placed ESTO IRÁ AL ACTUALIZAR TABLERO
+      setBoardPositions((prev) => {
+        const nextState = {};
+        for (const id in prev) {
+          const currentTile = prev[id];
+          if (currentTile && typeof currentTile === "object") {
+            // Creamos una copia profunda de la ficha con el nuevo atributo
+            nextState[id] = {
+              ...currentTile,
+              placed: true,
+            };
+          } else {
+            nextState[id] = currentTile;
+          }
+        }
+        return nextState;
+      });*/
+    } catch (error) {
+    } finally {
+      setProcessing(false);
+    }
   };
 
   const drawTileButton = () => {

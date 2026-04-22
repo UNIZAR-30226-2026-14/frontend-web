@@ -139,6 +139,21 @@ export const friendService = {
     );
     return res.ok;
   },
+
+  // Perfil de los amigos
+  getFriendsProfile: async (userId, friendId) => {
+    try {
+      const res = await fetch(
+        `${API_BASE_URL}/jugadores/${userId}/amigos/perfiles?estado=ACEPTADA`,
+      );
+      if (!res.ok) throw new Error("Error al conectar con el servidor");
+      const amigos = await res.json();
+      return amigos.find((amigo) => amigo.id === friendId);
+    } catch (error) {
+      console.error("Error obteniendo el perfil del amigo:", error);
+      return null;
+    }
+  },
 };
 
 export const gameService = {
@@ -241,18 +256,33 @@ export const gameService = {
     if (!res.ok) throw new Error("Error al obtener participantes");
     return await res.json();
   },
-  
+
   // Jugar
-  playAdvanced: async (gameId, moveData) => {
+  playAdvanced: async (userId, gameId, moveType, board) => {
+    const body = {
+      idJugador: userId,
+      moveType: moveType,
+    };
+
+    if (moveType === "replace_board") {
+      body.newBoard = board;
+    } else if (moveType === "extend_meld") {
+      // body.extendedIndex = ...
+      // body.extensionTiles = ...
+    }
     const res = await fetch(
-      `${API_BASE_URL}/partidas/${gameId}/jugar-advanced`,
+      `${API_BASE_URL}/partidas/${gameId}/jugar-avanzado`,
       {
         method: "POST",
         headers: getHeaders(),
-        body: JSON.stringify(moveData),
+        body: JSON.stringify(body),
       },
     );
-    if (!res.ok) throw new Error("Movimiento inválido");
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(res.message || "Movimiento rechazado por el árbitro");
+    }
+
     return await res.json();
   },
 

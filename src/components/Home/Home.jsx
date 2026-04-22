@@ -6,7 +6,7 @@ import Profile from "../UI/Profile/Profile.jsx";
 import Settings from "../UI/Settings/Settings.jsx";
 import TopMenu from "../UI/TopMenu/TopMenu.jsx";
 import PendingGames from "../UI/PendingGames/PendingGames.jsx";
-import { gameService } from "../../services/gameService.js";
+import { gameService, friendService } from "../../services/gameService.js";
 
 import alex from "../../assets/avatars/alex.png";
 import { AVATAR_LIST } from "../../data/itemData.jsx";
@@ -77,21 +77,29 @@ function Home({ onStart, user, onLogout, addXp }) {
     setActivePopup("profile");
   };
 
-  const openFriendProfile = (friend) => {
-    const idNumber = Number(friend.id) || 0;
-    const wins = 10 + idNumber * 3;
-    const losses = 4 + idNumber;
-    const draws = 2 + (idNumber % 4);
-    const pending = idNumber % 3;
-    const finished = wins + losses + draws;
+  const openFriendProfile = async (friendId) => {
+    const idNumber = Number(friendId) || 0;
+    //const wins = 10 + idNumber * 3;
+    //const losses = 4 + idNumber;
+    //const draws = 2 + (idNumber % 4);
+    //const pending = idNumber % 3;
+    //const finished = wins + losses + draws;
+
+    const profile = await friendService.getFriendsProfile(user.id, friendId);
 
     setSelectedFriendProfile({
-      userId: friend.id,
-      user: friend.name,
-      avatar: friend.avatar,
-      coins: 200 + idNumber * 120,
+      userId: profile.id,
+      user: profile.nombre,
+      avatar: profile.urlimagenPerfil,
+      coins: profile.monedas || 0,
       level: 3 + idNumber,
-      stats: { wins, losses, draws, pending, finished },
+      stats: {
+        wins: profile.partidasGanadas || 0,
+        losses: profile.partidasPerdidas || 0,
+        draws: profile.partidasEmpatadas || 0,
+        pending: profile.partidasPendientes || 0,
+        finished: profile.partidasFinalizadas || 0,
+      },
     });
     setActivePopup("profile");
   };
@@ -134,7 +142,7 @@ function Home({ onStart, user, onLogout, addXp }) {
 
   const handleStartLobbyGame = async () => {
     const idPartida = roomCode.replace("RUM-", "");
-    
+
     try {
       const iniciada = await gameService.startGame(idPartida);
 
@@ -143,7 +151,7 @@ function Home({ onStart, user, onLogout, addXp }) {
         onStart(idPartida);
         console.log(`Partida ${idPartida} iniciada con éxito.`);
       } else {
-        alert("No se pudo iniciar la partida.")
+        alert("No se pudo iniciar la partida.");
       }
     } catch (error) {
       alert("Error al iniciar la partida.");
@@ -222,7 +230,8 @@ function Home({ onStart, user, onLogout, addXp }) {
           setUserAvatar={selectedFriendProfile ? null : setUserAvatar}
           avatarList={selectedFriendProfile ? [] : AVATAR_LIST}
           userId={selectedFriendProfile?.userId || user.id}
-          user={selectedFriendProfile?.user || user}
+          //user={selectedFriendProfile?.user || user}
+          user={selectedFriendProfile ? selectedFriendProfile.user : user.nombre}
           coins={selectedFriendProfile?.coins ?? coins}
           level={selectedFriendProfile?.level ?? level}
           stats={
