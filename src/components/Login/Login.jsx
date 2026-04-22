@@ -40,6 +40,7 @@ const Login = ({ onLogin }) => {
       } else {
         const data = await authService.login(username, password)
         localStorage.setItem("rummi-token", data.token);
+        localStorage.setItem("rummi-expire", data.expiraEn);
         onLogin(data.jugador);
       }
     } catch (error) {

@@ -84,9 +84,12 @@ function App() {
         try {
           const user = await authService.getMe();
           setUser(user);
+          setScreen("home");
         } catch (err) {
-          console.error("Token inválido");
+          console.error("Token inválido o expirado");
+          localStorage.removeItem("rummi-token");
           setUser(null);
+          setScreen("login");
         }
       }
     };
@@ -95,7 +98,7 @@ function App() {
 
   const handleLogin = (jugador) => {
     setUser(jugador);
-    setCoins(jugador.monedas)
+    setCoins(jugador.monedas);
     setScreen("home");
   };
 
