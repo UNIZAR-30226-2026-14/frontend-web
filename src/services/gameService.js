@@ -177,7 +177,7 @@ export const gameService = {
       }),
     });
 
-    if (!res) throw new Error("Error al crear la partida.");
+    if (!res.ok) throw new Error("Error al crear la partida.");
     return await res.json();
   },
 
@@ -252,7 +252,24 @@ export const gameService = {
     return await res.json();
   },
 
-  // Participaciones de la partida
+  // Obtener todas las partidas
+  getAllGames: async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/partidas`, {
+        headers: getHeaders(),
+      });
+      if (!res.ok) {
+        throw new Error("Error al obtener la lista de partidas");
+      }
+
+      return await res.json();
+    } catch (error) {
+      console.error("Error en getAllGames:", error);
+      return [];
+    }
+  },
+
+  // Obtener participaciones de una partida
   getParticipationByGame: async (gameId) => {
     const res = await fetch(
       `${API_BASE_URL}/participaciones?partidaId=${gameId}`,

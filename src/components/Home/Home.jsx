@@ -57,10 +57,13 @@ function Home({ onStart, user, onLogout, addXp }) {
     return saved ? JSON.parse(saved) : ["classic"];
   });
 
-  const [showLobby, setShowLobby] = useState(false);
   const [roomCode, setRoomCode] = useState("");
   const [joinCode, setJoinCode] = useState("");
   const [isWaitingForStart, setIsWaitingForStart] = useState(false);
+
+  const [showPlayOptions, setShowPlayOptions] = useState(false);
+  const [isHost, setIsHost] = useState(false);
+  const [showCodeModal, setShowCodeModal] = useState(false);
 
   // Experiencia para subir al siguiente nivel
   const xpToNextLevel = (level - 1) ** 2 * 50 + 100;
@@ -116,27 +119,50 @@ function Home({ onStart, user, onLogout, addXp }) {
     setActivePopup("friends");
   };
 
-  const handleCreateGame = async () => {
-    if (selectedGame) {
-      onStart(selectedGame.id);
-      return;
-    }
-
+  const handleCreatePrivateGame = async () => {
     try {
-      // Crear partida
       const nuevaPartida = await gameService.createGame();
       const idNuevaPartida = nuevaPartida.idPartida;
-
-      // Unirse automáticamente como host
       const unido = await gameService.joinGame(user.id, idNuevaPartida);
 
       if (unido) {
         setRoomCode(`RUM-${idNuevaPartida}`);
-        setShowLobby(true);
+        setIsHost(true);
+        setShowCodeModal(true);
       }
     } catch (error) {
       console.error(error.message);
-      alert("Hubo un problema al conectar con el servidor de juegos.");
+      alert("Error al crear partida privada. Inténtalo de nuevo.");
+    }
+  };
+
+  const handleQuickMatch = async () => {
+    try {
+      const partidas = await gameService.getAllGames();
+      const partidaDisponible = partidas.find(
+        (p) => p.estado === "WAITING" || !p.corriendo,
+      );
+      let idDisponible;
+
+      if (partidaDisponible) {
+        idDisponible = partidaDisponible.idPartida;
+      } else {
+        const nuevaPartida = await gameService.createGame();
+        idDisponible = nuevaPartida.idPartida;
+      }
+
+      const unido = await gameService.joinGame(user.id, idDisponible);
+
+      if (unido) {
+        setRoomCode(`RUM-${idPartida}`);
+        setIsHost(false);
+        setIsWaitingForStart(true);
+        onStart(idDisponible);
+      }
+    } catch (error) {
+      console.error("Error en matchmaking:", error);
+      alert("No se pudo encontrar partida.");
+      setActivePopup(null);
     }
   };
 
@@ -147,9 +173,7 @@ function Home({ onStart, user, onLogout, addXp }) {
       const iniciada = await gameService.startGame(idPartida);
 
       if (iniciada) {
-        setShowLobby(false);
         onStart(idPartida);
-        console.log(`Partida ${idPartida} iniciada con éxito.`);
       } else {
         alert("No se pudo iniciar la partida.");
       }
@@ -160,7 +184,7 @@ function Home({ onStart, user, onLogout, addXp }) {
 
   const handleJoinByCode = async () => {
     try {
-      const idLimpio = joinCode.toUpperCase().replace("RUM-", "").trim();
+      const idLimpio = joinCode.replace("RUM-", "").trim();
       const idPartidaNumerico = parseInt(idLimpio);
 
       if (isNaN(idPartidaNumerico)) {
@@ -171,9 +195,10 @@ function Home({ onStart, user, onLogout, addXp }) {
       const unido = await gameService.joinGame(user.id, idPartidaNumerico);
 
       if (unido) {
-        setActivePopup("loading");
-        setIsWaitingForStart(true);
         setRoomCode(`RUM-${idPartidaNumerico}`);
+        setIsHost(false);
+        setIsWaitingForStart(true);
+        onStart(idPartidaNumerico);
       } else {
         alert("La sala no existe o está llena.");
       }
@@ -211,7 +236,20 @@ function Home({ onStart, user, onLogout, addXp }) {
     }
   }, [user]);
 
-  console.log("Datos del usuario al cargar Home:", user);
+  useEffect(() => {
+    let interval;
+    if (isWaitingForStart && !isHost) {
+      interval = setInterval(async () => {
+        const id = roomCode.replace("RUM-", "");
+        const partida = await gameService.getGameStatus(id);
+        if (partida.estado === "RUNNING") {
+          clearInterval(interval);
+          onStart(id); // Esto confirma el cambio a Board en App.jsx
+        }
+      }, 2000);
+    }
+    return () => clearInterval(interval);
+  }, [isWaitingForStart, isHost, roomCode]);
 
   return (
     <div className="home-screen">
@@ -292,36 +330,57 @@ function Home({ onStart, user, onLogout, addXp }) {
         onInvite={() => setActivePopup("friends")}
       />
 
-      <div className="join-section">
-        <input
-          type="text"
-          placeholder="Código de amigo (RUM-123)"
-          value={joinCode}
-          onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-        />
-        <button onClick={handleJoinByCode}>UNIRSE A SALA</button>
-      </div>
-
-      {showLobby && (
+      {showCodeModal && (
         <div className="lobby-overlay">
           <div className="lobby-modal">
-            <h2>SALA DE ESPERA</h2>
-            <p>Comparte este código con tu amigo:</p>
-            <div className="room-code-display">{roomCode}</div>
-            <p className="hint">
-              Espera a que tu amigo se una antes de empezar.
-            </p>
+            <h2>CÓDIGO: {roomCode}</h2>
+            <button onClick={handleStartLobbyGame}>INICIAR PARTIDA</button>
+            <button onClick={() => setShowCodeModal(false)}>CANCELAR</button>
+          </div>
+        </div>
+      )}
 
-            <div className="lobby-actions">
-              <button className="start-btn" onClick={handleStartLobbyGame}>
-                EMPEZAR PARTIDA
-              </button>
-              <button
-                className="cancel-btn"
-                onClick={() => setShowLobby(false)}
-              >
-                CANCELAR
-              </button>
+      {showPlayOptions && (
+        <div className="lobby-overlay">
+          <div className="lobby-modal selection-modal">
+            <button
+              className="close-button"
+              onClick={() => setShowPlayOptions(false)}
+            >
+              X
+            </button>
+
+            <h2 className="selection-title">MODO CLÁSICO</h2>
+
+            <div className="selection-options-container">
+              {/* Buscar partida (Matchmaking) */}
+              <div className="selection-card" onClick={handleQuickMatch}>
+                <div className="selection-icon">🌍</div>
+                <h3>Partida Pública</h3>
+                <p>Buscar una mesa libre para jugar ahora</p>
+              </div>
+
+              {/* Crear partida privada */}
+              <div className="selection-card" onClick={handleCreatePrivateGame}>
+                <div className="selection-icon">🔑</div>
+                <h3>Crear Partida Privada</h3>
+                <p>Genera un código para invitar a un amigo</p>
+              </div>
+
+              {/* Unirse a partida privada*/}
+              <div className="selection-card join-card">
+                <div className="selection-icon">⌨</div>
+                <h3>Unirse con Código</h3>
+                <div className="join-input-wrapper">
+                  <input
+                    type="text"
+                    placeholder="RUM-000"
+                    value={joinCode}
+                    onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+                  />
+                  <button onClick={handleJoinByCode}>ENTRAR</button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -331,7 +390,7 @@ function Home({ onStart, user, onLogout, addXp }) {
       <div className="gamemodes">
         <div
           className={`gamemode-card classic ${selectedGame ? "" : ""} ${selectedGame && selectedGame.mode !== "classic" ? "disabled" : ""}`}
-          onClick={handleCreateGame}
+          onClick={() => setShowPlayOptions(true)}
         >
           <div className="gamemode-glow" />
           <div className="gamemode-icon">

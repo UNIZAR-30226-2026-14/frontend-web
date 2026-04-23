@@ -1,14 +1,26 @@
 import { useEffect } from "react";
 import "./loading.css";
+import { gameService } from "../../services/gameService";
 
-function Loading({ onFinished, onCancel }) {
+function Loading({ gameId, onFinished, onCancel }) {
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      onFinished();
-    }, 3000);
+    if (!gameId) return;
 
-    return () => clearTimeout(timeout);
-  }, [onFinished]);
+    const interval = setInterval(async () => {
+      try {
+        const status = await gameService.getGameStatus(gameId);
+
+        if (status.estado === "RUNNING") {
+          clearInterval(interval);
+          onFinished();
+        }
+      } catch (error) {
+        console.error("Error comprobando inicio de partida:", error);
+      }
+    }, 2000); // Comprueba cada 2 segundos
+
+    return () => clearInterval(interval);
+  }, [gameId, onFinished]);
 
   return (
     <div className="loading-screen">

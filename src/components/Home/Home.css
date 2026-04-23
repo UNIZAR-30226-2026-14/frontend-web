@@ -188,14 +188,53 @@
   z-index: 100;
 }
 
-@media (max-width: 1070px) {
+.selection-options-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-top: 20px;
+}
 
+.selection-card {
+  background: #2a2a2a;
+  padding: 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.selection-card:hover {
+  background: #333;
+  border-color: #4caf50;
+  transform: translateY(-3px);
+}
+
+.join-card {
+  grid-column: span 2; /* Ocupa toda la fila de abajo */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.join-input-wrapper {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.selection-icon {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+@media (max-width: 1070px) {
   .gamemode-card {
     flex: 0 1 260px;
     padding: 28px 20px 26px;
     width: 20vw !important;
     height: 15vw !important;
-    padding: 0  !important;
+    padding: 0 !important;
   }
 
   .gamemode-icon {
@@ -208,15 +247,13 @@
     font-size: 1.2rem;
   }
 
-  .join-section{
-   width: 30%;
-   font-size: 50%;
+  .join-section {
+    width: 30%;
+    font-size: 50%;
   }
 
-  .lobby-modal{
+  .lobby-modal {
     font-size: 1vw;
     gap: 0;
   }
-  
 }
-

@@ -123,7 +123,6 @@ function App() {
       {screen === "home" && (
         <Home
           onStart={(id) => {
-            console.log("ID de partida recibido en App:", id);
             setActiveGameId(id);
             setScreen("loading");
           }}
@@ -152,6 +151,7 @@ function App() {
 
       {screen === "loading" && (
         <Loading
+        gameId={activeGameId}
           onFinished={() => setScreen("game")}
           onCancel={() => {
             setActiveGameId(null);
