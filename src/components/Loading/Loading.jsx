@@ -17,7 +17,7 @@ function Loading({ gameId, onFinished, onCancel }) {
       } catch (error) {
         console.error("Error comprobando inicio de partida:", error);
       }
-    }, 2000); // Comprueba cada 2 segundos
+    }, 2000);
 
     return () => clearInterval(interval);
   }, [gameId, onFinished]);

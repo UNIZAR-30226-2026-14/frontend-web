@@ -322,6 +322,7 @@ function Home({ onStart, user, onLogout, addXp }) {
       )}
 
       <PendingGames
+        userId={user.id}
         userAvatar={userAvatar}
         selectedGame={selectedGame}
         setSelectedGame={setSelectedGame}

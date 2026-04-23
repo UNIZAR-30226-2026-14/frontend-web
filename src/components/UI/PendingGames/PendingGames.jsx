@@ -1,8 +1,10 @@
 import "./pendingGames.css";
+import { useState, useEffect } from "react";
 import { PENDING_GAMES } from "../../../data/itemData.jsx";
 import { PARTY_PREVIEW_SLOTS } from "../../../data/itemData.jsx";
 
 function PendingGames({
+  userId,
   userAvatar,
   selectedGame,
   setSelectedGame,
@@ -10,7 +12,20 @@ function PendingGames({
   setPendingDropdownOpen,
   onInvite,
 }) {
-  if (!PENDING_GAMES || PENDING_GAMES.length === 0) return null;
+  // if (!PENDING_GAMES || PENDING_GAMES.length === 0) return null;
+  const [pendingGames, setPendingGames] = useState([]);
+
+  useEffect(() => {
+    const loadGames = async () => {
+      if (!userId) return;
+      const games = await gameService.getUserPendingGames(userId);
+      setPendingGames(games);
+    };
+
+    loadGames();
+    const interval = setInterval(loadGames, 10000);
+    return () => clearInterval(interval);
+  }, [userId]);
 
   return (
     <div className="container">

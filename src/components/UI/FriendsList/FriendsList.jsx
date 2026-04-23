@@ -213,7 +213,7 @@ function FriendsList({ onClose, onOpenProfile, userId }) {
                   {receivedRequests.length > 0 ? (
                     receivedRequests.map((req) => (
                       <div key={`req-${req.jugador1}`} className="request-card">
-                        <span>Usuario {req.jugador1}</span>
+                        <span>{req.amigoNombre}</span>
                         <div className="request-buttons">
                           <button
                             className="accept-mini-btn"

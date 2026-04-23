@@ -36,7 +36,7 @@ export const authService = {
     return res.ok;
   },
 
-  // Para no tener que volver a iniciar sesion (aun no funciona)
+  // Para no tener que volver a iniciar sesion
   getMe: async () => {
     const res = await fetch(`${API_BASE_URL}/auth/me`, {
       headers: getHeaders(),
@@ -80,7 +80,7 @@ export const friendService = {
         const amigoId = rel.jugador1 === userId ? rel.jugador2 : rel.jugador1;
         return {
           id: amigoId,
-          name: `Usuario ${amigoId}`,
+          name: rel.amigoNombre,
           avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${amigoId}`,
           status: "online",
         };
@@ -144,7 +144,7 @@ export const friendService = {
     return res.ok;
   },
 
-  // Perfil de los amigos
+  // Obtener perfil de un amigo
   getFriendsProfile: async (userId, friendId) => {
     try {
       const res = await fetch(
@@ -157,6 +157,22 @@ export const friendService = {
     } catch (error) {
       console.error("Error obteniendo el perfil del amigo:", error);
       return null;
+    }
+  },
+
+  // Obtener partidas pendientes
+  getUserPendingGames: async (userId) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/partidas?usuarioId=${userId}`, {
+        headers: getHeaders(),
+      });
+      if (!res.ok) throw new Error("Error al obtener las partidas pendientes del usuario");
+
+      const data = await res.json();
+      return data.filter((p) => p.estado !== "FINISHED");
+    } catch (error) {
+      console.error(error);
+      return [];
     }
   },
 };
