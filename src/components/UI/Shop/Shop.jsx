@@ -1,8 +1,10 @@
 import { sileo, Toaster } from "sileo";
 import "./shop.css";
 import { BACKGROUNDS, TILE_SKINS } from "../../../data/itemData";
+import { profileService } from "../../../services/gameService";
 
 function Shop({
+  userId,
   onClose,
   coins,
   setCoins,
@@ -24,38 +26,48 @@ function Shop({
 
     if (ownedList?.includes(item.id)) {
       setCurrent(item.value);
-    } else {
-      if (coins >= item.price) {
-        try {
-          // Llamada a la API para comprar una skin
+      return;
+    }
 
-          const newCoins = coins - item.price;
+    if (coins >= item.price) {
+      try {
+        const newCoins = coins - item.price;
+        const updatedOwned = [...(ownedList || []), item.id];
+
+        const purchase = {
+          monedas: newCoins,
+          [isBg ? "skinTablero" : "skinFichas"]: updatedOwned.join(","),
+        };
+
+        const success = await profileService.updateProfile(userId, purchase);
+
+        if (success) {
           setCoins(newCoins);
-          addXp(50);
-
-          const updatedOwned = [...(ownedList || []), item.id];
           setOwnedList(updatedOwned);
-          localStorage.setItem("rummi-bgs", JSON.stringify(updatedOwned));
           setCurrent(item.value);
-
+          addXp(50);
           sileo.success({
             title: "¡Compra realizada!",
             description: `Has desbloqueado ${item.name}`,
           });
-        } catch (error) {
-          sileo.error({ title: "Error en la transacción" });
+        } else {
+          throw new Error("Error en el servidor.");
         }
-      } else {
+      } catch (error) {
         sileo.error({
-          title: "Fondos insuficientes",
-          description: (
-            <span className="insufficent-founds">
-              No tienes suficientes monedas para comprar este ${type}. ¡Sigue
-              jugando para ganar más!
-            </span>
-          ),
+          title: "Error en la transacción",
+          description: "No se pudo conectar con el servidor.",
         });
       }
+    } else {
+      sileo.error({
+        title: "Fondos insuficientes",
+        description: (
+          <span className="insufficent-founds">
+            No tienes suficientes monedas para comprar este ${type}.
+          </span>
+        ),
+      });
     }
   };
 

@@ -266,6 +266,7 @@ function Home({ onStart, user, onLogout, addXp }) {
       {/* Pop-up de la tienda */}
       {activePopup === "shop" && (
         <Shop
+          userId={user.id}
           onClose={() => togglePopup("shop")}
           coins={coins}
           setCoins={setCoins}
