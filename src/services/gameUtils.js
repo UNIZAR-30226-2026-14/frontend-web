@@ -56,7 +56,7 @@ export const enviarConjuntos = (boardPositions) => {
         negativa: "N",
       };
       const color = coloresMap[tile.color] || "K";
-      const numStr = String(tile.number).padStart(2, "0");
+      const numStr = String(tile.number);
       const habilidad = habilidadesMap[tile.habilidad] || "";
       return `${color}${numStr}${habilidad}`;
     });
@@ -77,7 +77,7 @@ const aux = (tile) => {
         negativa: "N",
       };
       const color = coloresMap[tile.color] || "K";
-      const numStr = String(tile.number).padStart(2, "0");
+      const numStr = String(tile.number); 
       const habilidad = habilidadesMap[tile.habilidad] || "";
       return `${color}${numStr}${habilidad}`;
 };

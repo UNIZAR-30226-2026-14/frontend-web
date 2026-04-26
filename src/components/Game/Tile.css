@@ -93,9 +93,10 @@
   transform: scale(1.05) translateY(-5px);
 }
 
-img {
-  margin-top: 13px;
-  width: 90%;
+.tile img {
+  margin-top: 7px;
+  width: 100%;
+  height: 80%;
 }
 
 h3 {
