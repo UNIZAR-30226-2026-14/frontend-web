@@ -244,13 +244,13 @@ function Board({
   };
 
   const actualizarTableroVisual = (tableroString) => {
-    const n = tableroString.length;
+    /*const n = tableroString.length;
     if (n <= 70) {
       //ya cambiamos el numero luego si eso
       setSlotsTablero(70);
     } else {
       setSlotsTablero(n);
-    }
+    }*/
     const fichas = parsearFichas(tableroString);
     const newBoard = {};
     // Inicializamos vacío
@@ -266,6 +266,7 @@ function Board({
   // Detectamos si es nuestro turno
   useEffect(() => {
     if (!idPartida || !user.id) return;
+    
 
     const sincronizar = async () => {
       try {
@@ -293,6 +294,10 @@ function Board({
 
         const turnoDeLaPartida = Number(partida.turno);
         const miOrdenAsignado = Number(participacion.ordenTurno);
+        console.log("Mi numero es:");
+        console.log(miOrdenAsignado);
+        console.log("le toca a:");
+        console.log(turnoDeLaPartida);
 
         // Actualizar el orden si no lo teníamos
         if (ordenTurno === null) {
@@ -303,15 +308,11 @@ function Board({
 
         // Lógica de cambio de turno
         const esMiTurno = turnoDeLaPartida === miOrdenAsignado;
+        //actualizarTableroVisual(partida.tableroActual);
 
         if (esMiTurno !== miTurno) {
           setMiTurno(esMiTurno);
           setStartTurnHand(handPositions);
-
-          // Si acabamos de recibir el turno, actualizamos el tablero
-          if (esMiTurno && partida.tableroActual) {
-            actualizarTableroVisual(partida.tableroActual);
-          }
         }
       } catch (error) {
         console.error("Error en sincronización:", error);
@@ -382,6 +383,8 @@ function Board({
 
   const drawTile = async () => {
     try {
+      setBoardPositions(startTurnBoard);
+      setHandPositions(startTurnHand);
       setProcessing(true);
       const data = await gameService.drawTile(user.id, idPartida);
       const fichaNueva = parsearFichas(data.fichaRobada);
@@ -399,22 +402,20 @@ function Board({
   };
 
   const cambiarTurno = async () => {
-    console.log("¡Botón pulsado!");
     try {
+      console.log(idPartida);
       setProcessing(true);
+      
       const conjuntos = obtenerConjuntosDelTablero(boardPositions);
       console.log("3");
       if (conjuntos.length === 0) {
-        console.log("4");
         setBoardPositions(startTurnBoard);
         setHandPositions(startTurnHand);
-        setProcessing(false);
-        return;
-      }
+      } else {
 
       console.log(conjuntos);
 
-      console.log("Lo que le voy a enviar a la IA:", JSON.stringify(newBoard));
+      //console.log("Lo que le voy a enviar a la IA:", JSON.stringify(newBoard));
 
       await gameService.playAdvanced(
         user.id,
@@ -422,8 +423,6 @@ function Board({
         "replace_board",
         conjuntos,
       );
-      setMiTurno(false);
-
       setBoardPositions((prev) => {
         const nextState = {};
         for (const id in prev) {
@@ -435,7 +434,10 @@ function Board({
           }
         }
         return nextState;
-      });
+      }); }
+
+      setMiTurno(false);
+      await gameService.passTurn(user.id, idPartida);
 
       /*
       // esto temporal pa ponerle algo
@@ -461,6 +463,7 @@ function Board({
         return nextState;
       });*/
     } catch (error) {
+      console.error("Error al terminar turno:", error);
     } finally {
       setProcessing(false);
     }
@@ -485,7 +488,7 @@ function Board({
           miTurno={miTurno}
         />
         <div className="UNDO">
-          <button onClick={undoMove} title="Deshacer movimientos del turno">
+          <button onClick={undoMove}  disabled={processing || !miTurno} title="Deshacer movimientos del turno">
             🗘
           </button>
         </div>
