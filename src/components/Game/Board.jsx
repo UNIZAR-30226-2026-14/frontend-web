@@ -68,7 +68,8 @@ function Board({
     setMatchPoints((prev) => prev + puntosGanados);
   };
 
-  const ejecutarPowerup = (powerup) => { //esto mejor será ponerlo aparte
+  const ejecutarPowerup = (powerup) => {
+    //esto mejor será ponerlo aparte
     switch (powerup.id) {
       case "toque de midas":
         setHandPositions((prev) => {
@@ -266,7 +267,7 @@ function Board({
   // Detectamos si es nuestro turno
   useEffect(() => {
     if (!idPartida || !user.id) return;
-    
+    if (processing) return;
 
     const sincronizar = async () => {
       try {
@@ -294,10 +295,6 @@ function Board({
 
         const turnoDeLaPartida = Number(partida.turno);
         const miOrdenAsignado = Number(participacion.ordenTurno);
-        console.log("Mi numero es:");
-        console.log(miOrdenAsignado);
-        console.log("le toca a:");
-        console.log(turnoDeLaPartida);
 
         // Actualizar el orden si no lo teníamos
         if (ordenTurno === null) {
@@ -322,7 +319,7 @@ function Board({
     sincronizar();
     const interval = setInterval(sincronizar, 3000);
     return () => clearInterval(interval);
-  }, [idPartida, user.id, ordenTurno, miTurno]);
+  }, [idPartida, user.id, ordenTurno, miTurno, processing]);
 
   function handleDragStart(event) {
     setActiveId(event.active.id); // Guardamos el ID al empezar
@@ -403,19 +400,16 @@ function Board({
 
   const cambiarTurno = async () => {
     try {
-      console.log(idPartida);
       setProcessing(true);
-      
       const conjuntos = obtenerConjuntosDelTablero(boardPositions);
-      console.log("3");
+
       if (conjuntos.length === 0) {
-        setBoardPositions(startTurnBoard);
-        setHandPositions(startTurnHand);
-      } else {
-
-      console.log(conjuntos);
-
-      //console.log("Lo que le voy a enviar a la IA:", JSON.stringify(newBoard));
+        // Resetear si obligamos al usuario a empezar de cero
+        //setBoardPositions(startTurnBoard);
+        //setHandPositions(startTurnHand);
+        setProcessing(false);
+        return;
+      }
 
       await gameService.playAdvanced(
         user.id,
@@ -423,6 +417,7 @@ function Board({
         "replace_board",
         conjuntos,
       );
+
       setBoardPositions((prev) => {
         const nextState = {};
         for (const id in prev) {
@@ -434,34 +429,9 @@ function Board({
           }
         }
         return nextState;
-      }); }
+      });
 
       setMiTurno(false);
-      await gameService.passTurn(user.id, idPartida);
-
-      /*
-      // esto temporal pa ponerle algo
-      setMiTurno(false);
-      setProcessing(true);
-      await gameService.passTurn(user.id, idPartida);
-
-      //marcar todas las fichas de tablero como placed ESTO IRÁ AL ACTUALIZAR TABLERO
-      setBoardPositions((prev) => {
-        const nextState = {};
-        for (const id in prev) {
-          const currentTile = prev[id];
-          if (currentTile && typeof currentTile === "object") {
-            // Creamos una copia profunda de la ficha con el nuevo atributo
-            nextState[id] = {
-              ...currentTile,
-              placed: true,
-            };
-          } else {
-            nextState[id] = currentTile;
-          }
-        }
-        return nextState;
-      });*/
     } catch (error) {
       console.error("Error al terminar turno:", error);
     } finally {
@@ -470,7 +440,7 @@ function Board({
   };
 
   const drawTileButton = () => {
-    drawTile(); //cambiarTurno();
+    drawTile();
   };
 
   return (
@@ -488,7 +458,11 @@ function Board({
           miTurno={miTurno}
         />
         <div className="UNDO">
-          <button onClick={undoMove}  disabled={processing || !miTurno} title="Deshacer movimientos del turno">
+          <button
+            onClick={undoMove}
+            disabled={processing || !miTurno}
+            title="Deshacer movimientos del turno"
+          >
             🗘
           </button>
         </div>
@@ -500,7 +474,7 @@ function Board({
             onClick={cambiarTurno}
             title="Finalizar turno"
           >
-            {(processing || !miTurno) ? "..." : "FIN"}
+            {processing || !miTurno ? "..." : "FIN"}
           </button>
         </div>
 
@@ -508,10 +482,7 @@ function Board({
           <div>Puntos: {points}</div>
         </div>
 
-        <GameControls
-          onSortColor={sortByColor}
-          onSortNum={sortByNumber}
-        />
+        <GameControls onSortColor={sortByColor} onSortNum={sortByNumber} />
 
         <div className="Users">
           <div>
