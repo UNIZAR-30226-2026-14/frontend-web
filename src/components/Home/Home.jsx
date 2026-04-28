@@ -84,7 +84,6 @@ function Home({ onStart, user, onLogout, addXp }) {
 
   const openFriendProfile = async (friendId) => {
     const profile = await friendService.getFriendsProfile(user.id, friendId);
-
     if (!profile) {
       alert("No se pudo cargar el perfil del amigo");
       return;

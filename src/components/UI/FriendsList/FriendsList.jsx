@@ -218,7 +218,7 @@ function FriendsList({ onClose, onOpenProfile, userId }) {
                           <button
                             className="accept-mini-btn"
                             onClick={() =>
-                              handleAnswerRequest(req.jugador1, true)
+                              handleAnswerRequest(req.amigoId, true)
                             }
                           >
                             ✓
@@ -226,7 +226,7 @@ function FriendsList({ onClose, onOpenProfile, userId }) {
                           <button
                             className="reject-mini-btn"
                             onClick={() =>
-                              handleAnswerRequest(req.jugador1, false)
+                              handleAnswerRequest(req.amigoId, false)
                             }
                           >
                             ✕

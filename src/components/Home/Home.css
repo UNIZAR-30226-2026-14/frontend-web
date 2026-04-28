@@ -228,6 +228,57 @@
   margin-bottom: 10px;
 }
 
+/* El contenedor oscuro que bloquea el fondo */
+.lobby-overlay {
+  position: fixed; /* Fijo para que no se mueva al hacer scroll */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.85); /* Fondo oscuro semi-transparente */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999; /* Valor muy alto para estar encima de todo */
+  backdrop-filter: blur(5px); /* Efecto de desenfoque opcional */
+}
+
+/* La caja del modal blanco o gris */
+.lobby-modal {
+  background: #1a1a1a;
+  padding: 40px;
+  border-radius: 24px;
+  border: 2px solid #4caf50;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  max-width: 500px;
+  width: 90%;
+  position: relative; /* Para el botón de cerrar */
+  animation: modal-appear 0.3s ease-out;
+}
+
+/* Animación de entrada */
+@keyframes modal-appear {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Estilo para los inputs dentro del modal para que no se vean pegados */
+.join-input-wrapper input {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background: #111;
+  color: white;
+  font-size: 1.1rem;
+  width: 150px;
+}
+
 @media (max-width: 1070px) {
   .gamemode-card {
     flex: 0 1 260px;
@@ -250,10 +301,5 @@
   .join-section {
     width: 30%;
     font-size: 50%;
-  }
-
-  .lobby-modal {
-    font-size: 1vw;
-    gap: 0;
   }
 }

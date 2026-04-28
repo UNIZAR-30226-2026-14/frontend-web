@@ -77,7 +77,7 @@ export const friendService = {
     return amigos
       .filter((rel) => rel.estado === "ACEPTADA")
       .map((rel) => {
-        const amigoId = rel.jugador1 === userId ? rel.jugador2 : rel.jugador1;
+        const amigoId = rel.amigoId;
         return {
           id: amigoId,
           name: rel.amigoNombre,
@@ -112,7 +112,7 @@ export const friendService = {
     const data = await res.json();
     // Solicitudes donde soy el receptor y está PENDIENTE
     return data.filter(
-      (rel) => rel.jugador2 === userId && rel.estado === "PENDIENTE",
+      (rel) => rel.jugador2Id === userId && rel.estado === "PENDIENTE",
     );
   },
 
@@ -127,7 +127,7 @@ export const friendService = {
     const data = await res.json();
     // Solicitudes donde soy el emisor y está PENDIENTE
     return data.filter(
-      (rel) => rel.jugador1 === userId && rel.estado === "PENDIENTE",
+      (rel) => rel.jugador1Id === userId && rel.estado === "PENDIENTE",
     );
   },
 
@@ -166,7 +166,8 @@ export const friendService = {
       const res = await fetch(`${API_BASE_URL}/partidas?usuarioId=${userId}`, {
         headers: getHeaders(),
       });
-      if (!res.ok) throw new Error("Error al obtener las partidas pendientes del usuario");
+      if (!res.ok)
+        throw new Error("Error al obtener las partidas pendientes del usuario");
 
       const data = await res.json();
       return data.filter((p) => p.estado !== "FINISHED");

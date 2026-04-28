@@ -2,6 +2,7 @@ import "./pendingGames.css";
 import { useState, useEffect } from "react";
 import { PENDING_GAMES } from "../../../data/itemData.jsx";
 import { PARTY_PREVIEW_SLOTS } from "../../../data/itemData.jsx";
+import { gameService } from "../../../services/gameService.js";
 
 function PendingGames({
   userId,
@@ -13,7 +14,7 @@ function PendingGames({
   onInvite,
 }) {
   // if (!PENDING_GAMES || PENDING_GAMES.length === 0) return null;
-  const [pendingGames, setPendingGames] = useState([]);
+  /*const [pendingGames, setPendingGames] = useState([]);
 
   useEffect(() => {
     const loadGames = async () => {
@@ -132,7 +133,7 @@ function PendingGames({
           );
         })()}
     </div>
-  );
+  );*/
 }
 
 export default PendingGames;

@@ -6,6 +6,6 @@ export default defineConfig({
   plugins: [react()],
   test: {
     globals: true,
-    environment: "jsdom", // <--- Esto es lo que falta
+    environment: "jsdom",
   },
 });
