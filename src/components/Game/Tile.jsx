@@ -29,6 +29,8 @@ function comodin(number, color) {
 const Tile = ({ number, color, placed, habilidad }) => {
   const isRainbow = habilidad === "arcoiris";
   const isNegative = habilidad === "negativa";
+
+  console.log(`Pintando ficha: ${number} ${color}`);
   return (
     <div
       className={`tile ${placed ? "tile-placed" : ""} ${habilidad ? `tile-${habilidad}` : ""}`}

@@ -106,16 +106,21 @@ function Home({ onStart, user, onLogout, addXp }) {
     setActivePopup("profile");
   };
 
-  const handleRemoveFriend = (friendId) => {
-    const saved = localStorage.getItem("rummi-friends");
-    const currentFriends = saved ? JSON.parse(saved) : [];
-    const updatedFriends = currentFriends.filter(
-      (friend) => String(friend.id) !== String(friendId),
-    );
+  const handleRemoveFriend = async (friendId) => {
+    try {
+      const success = await friendService.removeFriendship(user.id, friendId);
 
-    localStorage.setItem("rummi-friends", JSON.stringify(updatedFriends));
-    setSelectedFriendProfile(null);
-    setActivePopup("friends");
+      if (success) {
+        setSelectedFriendProfile(null);
+        setActivePopup("friends");
+        //sileo.success({ title: "Amigo eliminado" });
+      } else {
+        alert("No se pudo eliminar al amigo del servidor.");
+      }
+    } catch (error) {
+      console.error("Error al eliminar amigo:", error);
+      alert("Error de conexión al intentar eliminar al amigo.");
+    }
   };
 
   const handleCreatePrivateGame = async () => {

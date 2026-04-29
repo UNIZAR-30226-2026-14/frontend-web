@@ -20,7 +20,7 @@ function DraggableTile({ tile }) {
     transform: CSS.Translate.toString(transform),
     transition,
     touchAction: "none",
-    opacity: isDragging ? 0 : 1, // La ficha original se vuelve traslúcida
+    opacity: isDragging ? 0.5 : 1, // La ficha original se vuelve traslúcida
     cursor: "grab",
     zIndex: isDragging ? 100 : 1,
   };

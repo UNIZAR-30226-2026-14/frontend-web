@@ -102,6 +102,31 @@ export const friendService = {
     return res;
   },
 
+  // Eliminar relación de amistad
+  removeFriendship: async (jugador1Id, jugador2Id) => {
+    try {
+      const res = await fetch(
+        `${API_BASE_URL}/amigos/${jugador1Id}/${jugador2Id}`,
+        {
+          method: "DELETE",
+          headers: getHeaders(),
+        },
+      );
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(
+          errorData.message || "No se pudo eliminar la relación de amistad",
+        );
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Error en removeFriendship:", error);
+      return false;
+    }
+  },
+
   // Obtener solicitudes de amistad
   getPendingRequests: async (userId) => {
     const res = await fetch(`${API_BASE_URL}/amigos?jugadorId=${userId}`, {

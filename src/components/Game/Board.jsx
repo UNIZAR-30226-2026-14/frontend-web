@@ -18,7 +18,6 @@ import Deck from "./Deck/Deck.jsx";
 
 import {
   parsearFichas,
-  enviarConjuntos,
   obtenerConjuntosDelTablero,
 } from "../../services/gameUtils.js";
 import { gameService } from "../../services/gameService.js";
@@ -244,30 +243,78 @@ function Board({
     });
   };
 
-  const actualizarTableroVisual = (tableroString) => {
-    /*const n = tableroString.length;
+  /*const actualizarTableroVisual = (tableroApi) => {
+    const n = tableroString.length;
     if (n <= 70) {
       //ya cambiamos el numero luego si eso
       setSlotsTablero(70);
     } else {
       setSlotsTablero(n);
-    }*/
-    const fichas = parsearFichas(tableroString);
-    const newBoard = {};
+    }
+    if (!tableroApi) return;
+
     // Inicializamos vacío
+    const newBoard = {};
     for (let i = 0; i < 70; i++) newBoard[`board-slot-${i}`] = "";
+
     // Rellenamos (asumiendo que el string guarda posiciones, si no, los pone en orden)
-    fichas.forEach((ficha, index) => {
-      newBoard[`board-slot-${index}`] = { ...ficha, placed: true };
+    let slotIndex = 0;
+
+    tableroApi.forEach((conjunto) => {
+      const fichasParseadas = parsearFichas(conjunto, true);
+
+      fichasParseadas.forEach((ficha) => {
+        newBoard[`board-slot-${slotIndex}`] = ficha;
+        slotIndex++;
+      });
+      slotIndex++;
     });
     setBoardPositions(newBoard);
+    setStartTurnBoard(newBoard);
+  };*/
+
+  const actualizarTableroVisual = (tableroApi) => {
+    console.log("Inicio actualizar tablero");
+    if (!tableroApi) return;
+    console.log("Tablero api no es null");
+
+    const newBoard = {};
+    for (let i = 0; i < 70; i++) newBoard[`board-slot-${i}`] = "";
+
+    
+
+    //console.log("AWOOOOOGA: ", newBoard[1]);
+
+    setBoardPositions((prev) => {
+      const newPositions = { ...prev };
+      let slotIndex = 0;
+      const conjuntos = tableroApi.split(';');
+      conjuntos.forEach((conjunto) => {
+        const fichas = parsearFichas(conjunto, true);
+        fichas.forEach((ficha) => {
+          if (slotIndex < 70) {
+            console.log("ficha: ", ficha);
+            newPositions[slotIndex] = parsearFichas(ficha, true);
+            slotIndex++;
+          }
+        });
+        slotIndex++;
+      });
+        return newPositions;
+    });
+
+    //setGameBoard(newBoard);
+    console.log("Tablero original: ", startTurnBoard);
+
+    console.log("Tablero actualizado: ", newBoard);
+    //setBoardPositions(newBoard);
+    
     setStartTurnBoard(boardPositions);
   };
 
   // Detectamos si es nuestro turno
-  useEffect(() => {
-    if (!idPartida || !user.id) return;
-    if (processing) return;
+  /*useEffect(() => {
+    if (!idPartida || !user.id || processing) return;
 
     const sincronizar = async () => {
       try {
@@ -282,6 +329,20 @@ function Board({
         if (!resP.ok || !resU.ok) return;
 
         const partida = await resP.json();
+
+        const esMiTurnoAhora = Number(partida.turno) === miOrdenAsignado;
+
+        if (!esMiTurnoAhora || (esMiTurnoAhora && !miTurno)) {
+          // Si el backend lo manda como String, lo parseamos; si es Array, directo.
+          const mesaData =
+            typeof partida.conjuntoMesa === "string"
+              ? JSON.parse(partida.conjuntoMesa)
+              : partida.conjuntoMesa;
+
+          if (mesaData) {
+            actualizarTableroVisual(mesaData);
+          }
+        }
         const participacion = await resU.json();
 
         if (partida.bolsa) {
@@ -317,6 +378,77 @@ function Board({
     };
 
     sincronizar();
+    const interval = setInterval(sincronizar, 3000);
+    return () => clearInterval(interval);
+  }, [idPartida, user.id, ordenTurno, miTurno, processing]);*/
+
+  useEffect(() => {
+    if (!idPartida || !user.id || processing) return;
+
+    const sincronizar = async () => {
+      try {
+        const resP = await fetch(
+          `http://localhost:8080/api/partidas/${idPartida}`,
+        );
+        if (!resP.ok) return;
+        const partida = await resP.json();
+
+        const turnoDeLaPartida = Number(partida.turno);
+        const esMiTurnoAhora = turnoDeLaPartida === ordenTurno;
+
+        // Actualizar bolsa
+        if (partida.bolsa) {
+          setDeckSize(partida.bolsa.split(",").filter((f) => f !== "").length);
+        }
+
+        // Si acaba de empezar mi turno, sincronizamos frontend y backend
+        if (esMiTurnoAhora && !miTurno) {
+          const resU = await fetch(
+            `http://localhost:8080/api/participaciones/${user.id}/${idPartida}`,
+          );
+          if (resU.ok) {
+            const participacion = await resU.json();
+            console.log("conjunto mesa:", partida.conjuntoMesa)
+            
+            /*const mesaData =
+              typeof partida.conjuntoMesa === "string"
+                ? JSON.parse(partida.conjuntoMesa)
+                : partida.conjuntoMesa;*/
+            const mesaData = partida.conjuntoMesa;
+
+            console.log("mesaData: ", mesaData);    
+
+            actualizarTableroVisual(mesaData);
+            //actualizarManoVisual(parsearFichas(participacion.manoActual));
+
+            // Guardar backup para el botón "Deshacer"
+            setStartTurnHand(handPositions);
+            setMiTurno(true);
+          }
+        } else if (!esMiTurnoAhora) {
+          // Si no es mi turno, solo actualizamos tablero
+          const mesaData =
+            typeof partida.tableroActual === "string"
+              ? JSON.parse(partida.tableroActual)
+              : partida.tableroActual;
+          actualizarTableroVisual(mesaData);
+          if (miTurno) setMiTurno(false);
+        }
+      } catch (error) {
+        console.error("Error en sincronización:", error);
+      }
+    };
+
+    // Carga inicial del orden de turno
+    if (ordenTurno === null) {
+      fetch(`http://localhost:8080/api/participaciones/${user.id}/${idPartida}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setOrdenTurno(Number(data.ordenTurno));
+          actualizarManoVisual(parsearFichas(data.manoActual));
+        });
+    }
+
     const interval = setInterval(sincronizar, 3000);
     return () => clearInterval(interval);
   }, [idPartida, user.id, ordenTurno, miTurno, processing]);
@@ -378,7 +510,7 @@ function Board({
     setBoardPositions(startTurnBoard);
   };
 
-  const drawTile = async () => {
+  /*const drawTile = async () => {
     try {
       setBoardPositions(startTurnBoard);
       setHandPositions(startTurnHand);
@@ -396,9 +528,27 @@ function Board({
     } finally {
       setProcessing(false);
     }
+  };*/
+
+  const drawTile = async () => {
+    try {
+      setProcessing(true);
+      const data = await gameService.drawTile(user.id, idPartida);
+      const fichasNuevas = parsearFichas(data.fichaRobada);
+
+      if (fichasNuevas.length > 0) {
+        añadirFichaALaMano(fichasNuevas[0]);
+        setDeckSize((prev) => prev - 1);
+      }
+      setMiTurno(false);
+    } catch (error) {
+      console.error("Error al robar:", error);
+    } finally {
+      setProcessing(false);
+    }
   };
 
-  const cambiarTurno = async () => {
+  /*const cambiarTurno = async () => {
     try {
       setProcessing(true);
       const conjuntos = obtenerConjuntosDelTablero(boardPositions);
@@ -434,6 +584,42 @@ function Board({
       setMiTurno(false);
     } catch (error) {
       console.error("Error al terminar turno:", error);
+    } finally {
+      setProcessing(false);
+    }
+  };*/
+
+  const cambiarTurno = async () => {
+    try {
+      setProcessing(true);
+      const conjuntos = obtenerConjuntosDelTablero(boardPositions);
+
+      if (conjuntos.length === 0) {
+        undoMove();
+        setProcessing(false);
+        return;
+      }
+
+      await gameService.playAdvanced(
+        user.id,
+        idPartida,
+        "replace_board",
+        conjuntos,
+      );
+
+     /* setBoardPositions((prev) => {
+        const nextState = {};
+        for (const id in prev) {
+          nextState[id] = prev[id] !== "" ? { ...prev[id], placed: true } : "";
+        }
+        return nextState;
+      });*/
+
+      setMiTurno(false);
+    } catch (error) {
+      console.error("Error al terminar turno:", error);
+      // Si falla, podríamos llamar a undoMove() para restaurar el tablero
+      // undoMove();
     } finally {
       setProcessing(false);
     }
