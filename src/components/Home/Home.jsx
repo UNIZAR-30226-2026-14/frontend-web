@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import "./home.css";
-import FriendsList from "../UI/FriendsList/FriendsList.jsx";
-import Shop from "../UI/Shop/Shop.jsx";
-import Profile from "../UI/Profile/Profile.jsx";
-import Settings from "../UI/Settings/Settings.jsx";
-import TopMenu from "../UI/TopMenu/TopMenu.jsx";
+import FriendsList from "../TopMenu/FriendsList/FriendsList.jsx";
+import Shop from "../TopMenu/Shop/Shop.jsx";
+import Profile from "../TopMenu/Profile/Profile.jsx";
+import TopMenu from "../TopMenu/TopMenu.jsx";
 import PendingGames from "../UI/PendingGames/PendingGames.jsx";
 import { gameService, friendService } from "../../services/gameService.js";
 
@@ -71,7 +70,7 @@ function Home({ onStart, user, onLogout, addXp }) {
   /**
    * Alterna la visibilidad de los popups. Si el popup ya está abierto,
    * lo cierra.
-   * @param {string} popupName - Nombre del popup a mostrar ("profile", "friends", "shop", "settings").
+   * @param {string} popupName - Nombre del popup a mostrar ("profile", "friends", "shop").
    */
   const togglePopup = (popupName) => {
     setActivePopup(activePopup === popupName ? null : popupName);
@@ -276,6 +275,7 @@ function Home({ onStart, user, onLogout, addXp }) {
             setSelectedFriendProfile(null);
             setActivePopup(null);
           }}
+          onLogout={onLogout}
           currentAvatar={selectedFriendProfile?.avatar || userAvatar}
           setUserAvatar={selectedFriendProfile ? null : setUserAvatar}
           avatarList={selectedFriendProfile ? [] : AVATAR_LIST}
@@ -318,11 +318,6 @@ function Home({ onStart, user, onLogout, addXp }) {
           ownedBgs={ownedBgs}
           setOwnedBgs={setOwnedBgs}
         />
-      )}
-
-      {/* Pop-up de los ajustes */}
-      {activePopup === "settings" && (
-        <Settings onClose={() => togglePopup("settings")} onLogout={onLogout} />
       )}
 
       <PendingGames

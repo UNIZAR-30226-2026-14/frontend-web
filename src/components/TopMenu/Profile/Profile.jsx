@@ -4,9 +4,11 @@ import { getAvatarDisplay } from "../../../data/itemData";
 import alex from "../../../assets/avatars/alex.png";
 import { profileService } from "../../../services/gameService";
 import { sileo } from "sileo";
+import { LogOut } from "lucide-react";
 
 function Profile({
   onClose,
+  onLogout,
   currentAvatar,
   setUserAvatar,
   avatarList,
@@ -58,6 +60,22 @@ function Profile({
     }
   };
 
+  const handleChangeUsername = async (username) => {
+    const succes = await profileService.updateProfile(userId, {
+      nombre: username,
+    });
+
+    if (succes) {
+      setIsEditing(false);
+    } else {
+      sileo.error({
+        title: "Error de conexión.",
+        description:
+          "No se pudo actualizar el nombre de usuario en el servidor.",
+      });
+    }
+  };
+
   return (
     <div className="profile-stats">
       <button className="close-button" onClick={onClose}>
@@ -68,6 +86,9 @@ function Profile({
         <div className="profile-card">
           <div className="profile-header">
             <h1>Perfil de jugador</h1>
+            <button className="logout-button" onClick={onLogout} title="Cerrar sesión">
+              <LogOut size={25} color="#ff4444" />
+            </button>
           </div>
 
           {isFriendProfile && (

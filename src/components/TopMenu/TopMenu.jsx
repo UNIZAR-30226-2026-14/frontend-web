@@ -1,6 +1,5 @@
 import "./TopMenu.css";
-import settings_icon from "../../../assets/settings-icon.svg";
-import { getAvatarDisplay } from "../../../data/itemData";
+import { getAvatarDisplay } from "../../data/itemData";
 
 function TopMenu({
   userAvatar,
@@ -86,11 +85,6 @@ function TopMenu({
               d="M 157 30 L 183 30 M 170 17 L 170 43"
             />
           </svg>
-        </div>
-
-        {/* Ajustes */}
-        <div className="settings" onClick={() => togglePopup("settings")}>
-          <img src={settings_icon} alt="settings_icon" />
         </div>
 
         {/* Amigos */}

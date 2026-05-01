@@ -11,6 +11,7 @@
   align-items: center;
   z-index: 50;
   animation: fadeIn 0.3s ease-out;
+  user-select: none;
 }
 
 @keyframes fadeIn {
@@ -49,19 +50,40 @@
   position: relative;
 }
 
+.profile-header {
+  border-bottom: 1px solid rgba(79, 233, 64, 0.35);
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .profile-header h1 {
   margin: 0;
+  flex-grow: 1;
   text-align: center;
   font-size: 2rem;
   color: #f5fff3;
   text-shadow: 0 0 12px rgba(79, 233, 64, 0.45);
   letter-spacing: 0.5px;
+  padding-left: 100px;
 }
 
-.profile-header {
-  border-bottom: 1px solid rgba(79, 233, 64, 0.35);
-  padding-bottom: 12px;
-  margin-bottom: 12px;
+.logout-button {
+  background: none !important;
+  border: none !important;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.logout-button:hover {
+  transform: scale(1.2);
 }
 
 .friend-action-row {
@@ -103,14 +125,16 @@
   background: #4fe940;
   border: 2px solid rgba(8, 45, 15, 0.95);
   border-radius: 50%;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
   cursor: pointer;
   font-size: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 12px rgba(0, 45, 5, 0.45);
+  padding: 0;
 }
 
 .edit-pencil:hover {
