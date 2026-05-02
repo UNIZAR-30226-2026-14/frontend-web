@@ -56,7 +56,7 @@ export const parsearFichas = (datosFichas, esMesa = false) => {
     // Caso especial: Joker
     if (f === "J*") {
       return {
-        id: `J-${index}`,
+        id: `J-${Math.random()}`,
         color: "black",
         number: "J",
         placed: esMesa,
@@ -64,7 +64,7 @@ export const parsearFichas = (datosFichas, esMesa = false) => {
       };
     }
 
-    const colorChar = f[0]; // La primera letra siempre es el color
+    const colorChar = f[0]; // La primera letra siempre es el color  sdcsd
 
     // Extraemos el número: buscamos todos los dígitos seguidos
     const numeroMatch = f.match(/\d+/);
@@ -76,7 +76,7 @@ export const parsearFichas = (datosFichas, esMesa = false) => {
 
     return {
       // Usamos Math.random para que el ID sea único y React repinte siempre
-      id: `${colorChar}-${numero}-${index}`,
+      id: `${colorChar}-${numero}-${Math.random()}`,
       color: coloresMap[colorChar] || "black",
       number: numero,
       placed: esMesa, // true si viene del tablero, false si es de la mano
