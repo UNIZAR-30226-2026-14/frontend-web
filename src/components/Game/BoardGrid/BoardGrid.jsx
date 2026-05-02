@@ -10,8 +10,8 @@ const BoardGrid = ({ boardPositions, joinedSlots }) => {
   return (
     <main className="board-area">
       {/* El SVG de fondo se queda aquí, es parte del tablero */}
-      <svg width="760" height="350" className="board-svg">
-        <rect width="800" height="800" fill="#073600" />
+      <svg width="1360" height="560" className="board-svg">
+        <rect width="1360" height="700" fill="#073600" />
       </svg>
 
       <div className="board-grid">
@@ -19,7 +19,7 @@ const BoardGrid = ({ boardPositions, joinedSlots }) => {
           const isJoined = joinedSlots.includes(slotId);
 
           // Lógica visual de conexión
-          if (!isJoined || index % 14 === 0) {
+          if (!isJoined || index % 25 === 0) {
             groupCounter = 0;
           } else {
             groupCounter++;

@@ -50,7 +50,7 @@ function Board({
   const [deckSize, setDeckSize] = useState(0);
 
   const [slotsNecesarios, setSlotsNecesarios] = useState(20);
-  const [slotsTablero, setSlotsTablero] = useState(70);
+  const [slotsTablero, setSlotsTablero] = useState(200);
 
   const [currentSort, setCurrentSort] = useState(null);
 
@@ -143,30 +143,30 @@ function Board({
   });
 
   const [boardPositions, setBoardPositions] = useState(() => {
-    // Inicializamos 70 huecos vacíos
+    // Inicializamos 200 huecos vacíos
     const initial = {};
-    for (let i = 0; i < 70; i++) initial[`board-slot-${i}`] = "";
+    for (let i = 0; i < 200; i++) initial[`board-slot-${i}`] = "";
     return initial;
   });
 
   // PA QUE AL RESETEAR EL BOARD SE VACIE
   const [startTurnBoard, setStartTurnBoard] = useState(() => {
-    // Inicializamos 70 huecos vacíos
+    // Inicializamos 200 huecos vacíos
     const initial = {};
-    for (let i = 0; i < 70; i++) initial[`board-slot-${i}`] = "";
+    for (let i = 0; i < 200; i++) initial[`board-slot-${i}`] = "";
     return initial;
   });
 
   useEffect(() => {
     const newJoined = [];
 
-    // Recorremos el tablero por filas (5 filas de 14)
-    for (let row = 0; row < 5; row++) {
+    // Recorremos el tablero por filas (8 filas de 25)
+    for (let row = 0; row < 8; row++) {
       let currentRowIndices = [];
       let currentRowTiles = [];
 
-      for (let col = 0; col < 14; col++) {
-        const index = row * 14 + col;
+      for (let col = 0; col < 25; col++) {
+        const index = row * 25 + col;
         const slotId = `board-slot-${index}`;
         const tile = boardPositions[slotId];
 
@@ -245,9 +245,9 @@ function Board({
 
   /*const actualizarTableroVisual = (tableroApi) => {
     const n = tableroString.length;
-    if (n <= 70) {
+    if (n <= 200) {
       //ya cambiamos el numero luego si eso
-      setSlotsTablero(70);
+      setSlotsTablero(200);
     } else {
       setSlotsTablero(n);
     }
@@ -255,7 +255,7 @@ function Board({
 
     // Inicializamos vacío
     const newBoard = {};
-    for (let i = 0; i < 70; i++) newBoard[`board-slot-${i}`] = "";
+    for (let i = 0; i < 200; i++) newBoard[`board-slot-${i}`] = "";
 
     // Rellenamos (asumiendo que el string guarda posiciones, si no, los pone en orden)
     let slotIndex = 0;
@@ -279,12 +279,8 @@ function Board({
     console.log("Tablero api no es null");
 
     const newBoard = {};
-    for (let i = 0; i < 70; i++) newBoard[`board-slot-${i}`] = "";
-
+    for (let i = 0; i < 200; i++) newBoard[`board-slot-${i}`] = "";
     
-
-    //console.log("AWOOOOOGA: ", newBoard[1]);
-
     setBoardPositions((prev) => {
       const newPositions = { ...prev };
       let slotIndex = 0;
@@ -292,14 +288,15 @@ function Board({
       conjuntos.forEach((conjunto) => {
         const fichas = parsearFichas(conjunto, true);
         fichas.forEach((ficha) => {
-          if (slotIndex < 70) {
+          if (slotIndex < 200) {
             console.log("ficha: ", ficha);
-            newPositions[slotIndex] = parsearFichas(ficha, true);
+            newPositions[slotIndex] = ficha //parsearFichas(ficha, true);
             slotIndex++;
           }
         });
         slotIndex++;
       });
+
         return newPositions;
     });
 
@@ -631,7 +628,7 @@ function Board({
 
   return (
     <DndContext onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
-      <div className="game-container">
+      <div className="game-container" style={{backgroundcolor: currentBackground}}>
         {/* HEADER: Información del mazo y botón de robar */}
         <div className="header">RUMMIPLUS TABLE</div>
 

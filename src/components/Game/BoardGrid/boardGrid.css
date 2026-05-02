@@ -6,7 +6,7 @@
   justify-content: center;
   transform: translateX(-50%);
   width: 1000px;
-  left: 50%;
+  left: 53%;
   padding: 100px;
   gap: 40px;
 }
@@ -15,8 +15,8 @@
   position: absolute;
   top: 90px;
   display: grid;
-  grid-template-columns: repeat(14, 45px);
-  grid-template-rows: repeat(5, 60px);
+  grid-template-columns: repeat(25, 45px);
+  grid-template-rows: repeat(8, 60px);
   gap: 10px;
   padding: 12px;
 }
