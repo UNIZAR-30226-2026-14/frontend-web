@@ -11,7 +11,7 @@ const BoardGrid = ({ boardPositions, joinedSlots }) => {
     <main className="board-area">
       {/* El SVG de fondo se queda aquí, es parte del tablero */}
       <svg width="1360" height="560" className="board-svg">
-        <rect width="1360" height="700" fill="#073600" />
+        <rect width="1360" height="700" fill="#154a19"/>
       </svg>
 
       <div className="board-grid">

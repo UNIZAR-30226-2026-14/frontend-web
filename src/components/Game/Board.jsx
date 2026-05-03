@@ -169,6 +169,7 @@ function Board({
         const index = row * 25 + col;
         const slotId = `board-slot-${index}`;
         const tile = boardPositions[slotId];
+        console.log("Tile: ", tile);
 
         if (tile !== "") {
           currentRowIndices.push(slotId);
@@ -187,6 +188,7 @@ function Board({
         newJoined.push(...currentRowIndices);
       }
     }
+    
 
     setJoinedSlots(newJoined);
   }, [boardPositions]); // Se ejecuta cada vez que el tablero cambie
@@ -282,22 +284,28 @@ function Board({
     for (let i = 0; i < 200; i++) newBoard[`board-slot-${i}`] = "";
     
     setBoardPositions((prev) => {
-      const newPositions = { ...prev };
+      //const newPositions = { ...prev };
       let slotIndex = 0;
       const conjuntos = tableroApi.split(';');
       conjuntos.forEach((conjunto) => {
         const fichas = parsearFichas(conjunto, true);
         fichas.forEach((ficha) => {
           if (slotIndex < 200) {
-            console.log("ficha: ", ficha);
-            newPositions[slotIndex] = ficha //parsearFichas(ficha, true);
+            //console.log("ficha: ", ficha);
+            newBoard[`board-slot-${slotIndex}`] = ficha;
             slotIndex++;
           }
         });
+         newBoard[`board-slot-${slotIndex}`] = "";
         slotIndex++;
+        if (slotIndex % 25 === 0) {
+              slotIndex++;
+        }
       });
 
-        return newPositions;
+        setGameBoard(Object.values(newBoard));
+
+        return newBoard;
     });
 
     //setGameBoard(newBoard);
@@ -424,10 +432,7 @@ function Board({
           }
         } else if (!esMiTurnoAhora) {
           // Si no es mi turno, solo actualizamos tablero
-          const mesaData =
-            typeof partida.tableroActual === "string"
-              ? JSON.parse(partida.tableroActual)
-              : partida.tableroActual;
+          const mesaData = partida.conjuntoMesa;
           actualizarTableroVisual(mesaData);
           if (miTurno) setMiTurno(false);
         }
@@ -623,6 +628,7 @@ function Board({
   };
 
   const drawTileButton = () => {
+    //undoMove();
     drawTile();
   };
 

@@ -145,12 +145,12 @@ const aux = (tile) => {
 
 export const obtenerConjuntosDelTablero = (boardPositions) => {
   const conjuntos = [];
-  for (let row = 0; row < 5; row++) {
+  for (let row = 0; row < 8; row++) {
     let conjuntoActual = [];
     let conjTiles = [];
 
-    for (let col = 0; col < 14; col++) {
-      const index = row * 14 + col;
+    for (let col = 0; col < 25; col++) {
+      const index = row * 25 + col;
       const tile = boardPositions[`board-slot-${index}`];
 
       if (tile && tile !== "") {
