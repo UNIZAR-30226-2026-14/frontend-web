@@ -3,6 +3,7 @@ export const handleDragLogic = (event, states) => {
   const { 
     handPositions, setHandPositions, 
     boardPositions, setBoardPositions, 
+    heJugado, setHeJugado,
     setPlayerHand, setGameBoard, 
     miTurno, activeTile 
   } = states;
@@ -39,6 +40,9 @@ export const handleDragLogic = (event, states) => {
         setGameBoard(Object.values(newPos).filter(t => t !== ""));
         return newPos;
       });
+
+      setHeJugado(true);
+      
     }
 
     // Movimiento interno en Tablero

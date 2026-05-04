@@ -42,6 +42,7 @@ function Board({
   const [activeId, setActiveId] = useState(null); // Para rastrear qué ficha se arrastra
   const [joinedSlots, setJoinedSlots] = useState([]);
   const [miTurno, setMiTurno] = useState(false); // pa turnos
+  const [heJugado, setHeJugado] = useState(false); // pa indicar que has puesto algo en tablero
   const [processing, setProcessing] = useState(false); // Para que se pueda o no usar el botón de robar y tal
   const [ordenTurno, setOrdenTurno] = useState(null);
 
@@ -169,7 +170,6 @@ function Board({
         const index = row * 25 + col;
         const slotId = `board-slot-${index}`;
         const tile = boardPositions[slotId];
-        console.log("Tile: ", tile);
 
         if (tile !== "") {
           currentRowIndices.push(slotId);
@@ -303,18 +303,18 @@ function Board({
         }
       });
 
-        setGameBoard(Object.values(newBoard));
+       // setGameBoard(Object.values(newBoard));
 
         return newBoard;
     });
+
+    setStartTurnBoard(newBoard);
 
     //setGameBoard(newBoard);
     console.log("Tablero original: ", startTurnBoard);
 
     console.log("Tablero actualizado: ", newBoard);
     //setBoardPositions(newBoard);
-    
-    setStartTurnBoard(boardPositions);
   };
 
   // Detectamos si es nuestro turno
@@ -413,7 +413,7 @@ function Board({
           );
           if (resU.ok) {
             const participacion = await resU.json();
-            console.log("conjunto mesa:", partida.conjuntoMesa)
+            //console.log("conjunto mesa:", partida.conjuntoMesa)
             
             /*const mesaData =
               typeof partida.conjuntoMesa === "string"
@@ -421,12 +421,13 @@ function Board({
                 : partida.conjuntoMesa;*/
             const mesaData = partida.conjuntoMesa;
 
-            console.log("mesaData: ", mesaData);    
+            //console.log("mesaData: ", mesaData);    
 
             actualizarTableroVisual(mesaData);
             //actualizarManoVisual(parsearFichas(participacion.manoActual));
 
             // Guardar backup para el botón "Deshacer"
+            
             setStartTurnHand(handPositions);
             setMiTurno(true);
           }
@@ -470,6 +471,8 @@ function Board({
       setBoardPositions,
       setPlayerHand,
       setGameBoard,
+      heJugado,
+      setHeJugado,
       miTurno,
       activeTile,
     };
@@ -618,6 +621,7 @@ function Board({
       });*/
 
       setMiTurno(false);
+      setHeJugado(false);
     } catch (error) {
       console.error("Error al terminar turno:", error);
       // Si falla, podríamos llamar a undoMove() para restaurar el tablero
@@ -628,7 +632,7 @@ function Board({
   };
 
   const drawTileButton = () => {
-    //undoMove();
+    undoMove();
     drawTile();
   };
 
@@ -659,7 +663,7 @@ function Board({
         <div className="FINISH">
           <button
             className="finish-button"
-            disabled={processing || !miTurno}
+            disabled={processing || !miTurno || !heJugado}
             onClick={cambiarTurno}
             title="Finalizar turno"
           >
