@@ -9,7 +9,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { areCompatible } from "../../hooks/deckFactory.js";
 import { sortColor, sortNum } from "./botones_f.js";
 import { handleDragLogic } from "./dragHandlers.js";
-import alex from "../../assets/avatars/Dani.png";
+import alex from "../../assets/avatars/bot.png";
 
 import PlayerRack from "./PlayerRack/PlayerRack.jsx";
 import BoardGrid from "./BoardGrid/BoardGrid.jsx";
@@ -284,37 +284,29 @@ function Board({
     for (let i = 0; i < 200; i++) newBoard[`board-slot-${i}`] = "";
     
     setBoardPositions((prev) => {
-      //const newPositions = { ...prev };
       let slotIndex = 0;
       const conjuntos = tableroApi.split(';');
       conjuntos.forEach((conjunto) => {
         const fichas = parsearFichas(conjunto, true);
+        let aux = ((slotIndex%25) + fichas.length);
+        console.log("fichas length: ", fichas.length);
+        console.log("CUanto queda:", slotIndex%25);
+        console.log("sobrante: ", aux);
+        if (aux >= 25) {
+          for (let i = 0; i < fichas.length; i++) {newBoard[`board-slot-${slotIndex}`] = "";slotIndex++};
+        }
         fichas.forEach((ficha) => {
           if (slotIndex < 200) {
-            //console.log("ficha: ", ficha);
             newBoard[`board-slot-${slotIndex}`] = ficha;
             slotIndex++;
           }
         });
          newBoard[`board-slot-${slotIndex}`] = "";
         slotIndex++;
-        if (slotIndex % 25 === 0) {
-              slotIndex++;
-        }
       });
-
-       // setGameBoard(Object.values(newBoard));
-
         return newBoard;
     });
-
     setStartTurnBoard(newBoard);
-
-    //setGameBoard(newBoard);
-    console.log("Tablero original: ", startTurnBoard);
-
-    console.log("Tablero actualizado: ", newBoard);
-    //setBoardPositions(newBoard);
   };
 
   // Detectamos si es nuestro turno
@@ -511,29 +503,10 @@ function Board({
   };
 
   const undoMove = () => {
+    setHeJugado(false);
     setHandPositions(startTurnHand);
     setBoardPositions(startTurnBoard);
   };
-
-  /*const drawTile = async () => {
-    try {
-      setBoardPositions(startTurnBoard);
-      setHandPositions(startTurnHand);
-      setProcessing(true);
-      const data = await gameService.drawTile(user.id, idPartida);
-      const fichaNueva = parsearFichas(data.fichaRobada);
-
-      if (fichaNueva) {
-        añadirFichaALaMano(fichaNueva[0]);
-      }
-
-      setMiTurno(false);
-    } catch (error) {
-      console.error("Error al robar:", error);
-    } finally {
-      setProcessing(false);
-    }
-  };*/
 
   const drawTile = async () => {
     try {
@@ -612,14 +585,6 @@ function Board({
         conjuntos,
       );
 
-     /* setBoardPositions((prev) => {
-        const nextState = {};
-        for (const id in prev) {
-          nextState[id] = prev[id] !== "" ? { ...prev[id], placed: true } : "";
-        }
-        return nextState;
-      });*/
-
       setMiTurno(false);
       setHeJugado(false);
     } catch (error) {
@@ -680,15 +645,15 @@ function Board({
         <div className="Users">
           <div>
             <img src={user4?.urlimagenPerfil || alex} />
-            <div>{user4?.nombre || "otro"}</div>
+            <div>{user4?.nombre || "bot"}</div>
           </div>
           <div>
             <img src={user3?.urlimagenPerfil || alex} />
-            <div>{user3?.nombre || "otro"}</div>
+            <div>{user3?.nombre || "bot"}</div>
           </div>
           <div>
             <img src={user2?.urlimagenPerfil || alex} />
-            <div>{user2?.nombre || "otro"}</div>
+            <div>{user2?.nombre || "bot"}</div>
           </div>
           <div className="ME">
             <img src={userPic || alex} />
