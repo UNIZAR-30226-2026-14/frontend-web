@@ -33,14 +33,12 @@ function Shop({
       try {
         const newCoins = coins - item.price;
         const updatedOwned = [...(ownedList || []), item.id];
-
         const purchase = {
           monedas: newCoins,
           [isBg ? "skinTablero" : "skinFichas"]: updatedOwned.join(","),
         };
 
         const success = await profileService.updateProfile(userId, purchase);
-
         if (success) {
           setCoins(newCoins);
           setOwnedList(updatedOwned);
@@ -64,7 +62,7 @@ function Shop({
         title: "Fondos insuficientes",
         description: (
           <span className="insufficent-founds">
-            No tienes suficientes monedas para comprar este ${type}.
+            No tienes suficientes monedas.
           </span>
         ),
       });
@@ -72,34 +70,43 @@ function Shop({
   };
 
   return (
-    <div className="shop-bg">
-      <div className="shop-popup">
-        <div className="shop-content">
-          {/* Toaster para las notificaciones */}
-          <Toaster position="top-center" />
-          <h2 className="shop-title">Tienda</h2>
-          <button className="close-button" onClick={onClose}>
-            X
-          </button>
+    <div className="shop-container">
+      <div className="shop-card">
+        <Toaster
+          position="top-center"
+          options={{
+            roundness: 12,
+            styles: {
+              title: "color: #4fe940 !important; font-weight: 800;",
+              description: "color: #1c1a1a !important;",
+            },
+          }}
+        />
 
-          <div className="shop-sections">
-            {/* SECCIÓN TABLEROS */}
-            <h3 className="bg-title">Tableros</h3>
-            <div className="backgrounds-list">
+        <button className="close-button" onClick={onClose}>
+          X
+        </button>
+        <h2 className="shop-title">Tienda</h2>
+
+        <div className="shop-scroll-area">
+          <section className="shop-section">
+            <h3 className="section-title">Tableros</h3>
+            <div className="items-grid">
               {BACKGROUNDS.map((bg) => {
                 const isEquipped = currentBackground === bg.value;
                 const isOwned = ownedBgs.includes(bg.id);
                 return (
                   <div
                     key={bg.id}
-                    className={`background-card ${isEquipped ? "active" : ""}`}
+                    className={`item-card ${isEquipped ? "active" : ""}`}
                   >
                     <div
-                      className="color-preview"
+                      className="item-preview color-box"
                       style={{ background: bg.value }}
                     />
-                    <span className="background-name">{bg.name}</span>
+                    <span className="item-name">{bg.name}</span>
                     <button
+                      className={`shop-btn ${isOwned ? "owned" : "buy"}`}
                       onClick={() => handlePurchase(bg, "bg")}
                       disabled={isEquipped}
                     >
@@ -107,27 +114,31 @@ function Shop({
                         ? isEquipped
                           ? "Equipado"
                           : "Equipar"
-                        : bg.price}
+                        : `${bg.price} 💰`}
                     </button>
                   </div>
                 );
               })}
             </div>
+          </section>
 
-            {/* SECCIÓN SKINS DE FICHAS */}
-            <h3 className="tile-title">Skins de Fichas</h3>
-            <div className="skins-list">
+          <section className="shop-section">
+            <h3 className="section-title">Skins de Fichas</h3>
+            <div className="items-grid">
               {TILE_SKINS.map((skin) => {
                 const isEquipped = currentSkin === skin.value;
                 const isOwned = ownedSkins?.includes(skin.id);
                 return (
                   <div
                     key={skin.id}
-                    className={`skin-card ${isEquipped ? "active" : ""}`}
+                    className={`item-card ${isEquipped ? "active" : ""}`}
                   >
-                    <div className={`skin-preview ${skin.value}`}>7</div>
-                    <span className="skin-name">{skin.name}</span>
+                    <div className={`item-preview tile-box ${skin.value}`}>
+                      7
+                    </div>
+                    <span className="item-name">{skin.name}</span>
                     <button
+                      className={`shop-btn ${isOwned ? "owned" : "buy"}`}
                       onClick={() => handlePurchase(skin, "skin")}
                       disabled={isEquipped}
                     >
@@ -135,26 +146,28 @@ function Shop({
                         ? isEquipped
                           ? "Equipado"
                           : "Equipar"
-                        : skin.price}
+                        : `${skin.price} 💰`}
                     </button>
                   </div>
                 );
               })}
             </div>
+          </section>
 
-            <h3 className="coins-title">Obtener Monedas</h3>
+          <section className="shop-section">
+            <h3 className="section-title">Créditos</h3>
             <div className="money-packs">
               <div className="pack-card">
-                <span>5000 💰</span>
+                <span className="pack-label">Bolsa de Monedas (5000)</span>
                 <button
-                  className="fake-pay"
+                  className="pay-btn"
                   onClick={() => setCoins(coins + 5000)}
                 >
                   4.99€
                 </button>
               </div>
             </div>
-          </div>
+          </section>
         </div>
       </div>
     </div>

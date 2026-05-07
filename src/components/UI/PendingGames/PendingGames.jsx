@@ -1,8 +1,8 @@
 import "./pendingGames.css";
 import { useState, useEffect } from "react";
-import { PENDING_GAMES } from "../../../data/itemData.jsx";
+//import { PENDING_GAMES } from "../../../data/itemData.jsx";
 import { PARTY_PREVIEW_SLOTS } from "../../../data/itemData.jsx";
-import { gameService } from "../../../services/gameService.js";
+import { friendService } from "../../../services/gameService.js";
 
 function PendingGames({
   userId,
@@ -14,12 +14,12 @@ function PendingGames({
   onInvite,
 }) {
   // if (!PENDING_GAMES || PENDING_GAMES.length === 0) return null;
-  /*const [pendingGames, setPendingGames] = useState([]);
+  const [pendingGames, setPendingGames] = useState([]);
 
   useEffect(() => {
     const loadGames = async () => {
       if (!userId) return;
-      const games = await gameService.getUserPendingGames(userId);
+      const games = await friendService.getUserPendingGames(userId);
       setPendingGames(games);
     };
 
@@ -30,7 +30,7 @@ function PendingGames({
 
   return (
     <div className="container">
-      {PENDING_GAMES.length > 0 &&
+      {pendingGames.length > 0 &&
         (() => {
           return (
             <div className="wrapper">
@@ -69,7 +69,7 @@ function PendingGames({
 
                 {pendingDropdownOpen && (
                   <div className="dropdown">
-                    {PENDING_GAMES.map((game) => {
+                    {pendingGames.map((game) => {
                       const isActive = selectedGame?.id === game.id;
                       return (
                         <div
@@ -133,7 +133,7 @@ function PendingGames({
           );
         })()}
     </div>
-  );*/
+  );
 }
 
 export default PendingGames;
