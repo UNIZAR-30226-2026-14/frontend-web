@@ -1,5 +1,5 @@
 import "./powerUpsShop.css";
-import { POWER_UPS } from "../../data/itemData";
+import { POWER_UPS } from "../../../data/itemData";
 import { sileo, Toaster } from "sileo";
 
 function PowerUpsShop({

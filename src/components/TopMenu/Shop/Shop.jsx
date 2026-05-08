@@ -24,47 +24,52 @@ function Shop({
     const setOwnedList = isBg ? setOwnedBgs : setOwnedSkins;
     const setCurrent = isBg ? setCurrentBackground : setCurrentSkin;
 
-    if (ownedList?.includes(item.id)) {
-      setCurrent(item.value);
-      return;
+    let updatedOwned = [...(ownedList || [])];
+
+    if (!updatedOwned.includes(item.id)) {
+      if (coins >= item.price) {
+        updatedOwned.push(item.id);
+      } else {
+        sileo.error({
+          title: "Fondos insuficientes",
+          description: "No tienes suficientes monedas.",
+        });
+        return;
+      }
     }
 
-    if (coins >= item.price) {
-      try {
-        const newCoins = coins - item.price;
-        const updatedOwned = [...(ownedList || []), item.id];
-        const purchase = {
-          monedas: newCoins,
-          [isBg ? "skinTablero" : "skinFichas"]: updatedOwned.join(","),
-        };
+    const formatted = updatedOwned.map((id) =>
+      id === item.id ? `*${id}` : id,
+    );
 
-        const success = await profileService.updateProfile(userId, purchase);
-        if (success) {
+    try {
+      const isNewPurchase = !ownedList.includes(item.id);
+      const newCoins = isNewPurchase ? coins - item.price : coins;
+
+      const purchaseData = {
+        monedas: newCoins,
+        [isBg ? "skinTablero" : "skinFichas"]: formattedForBackend,
+      };
+
+      const success = await profileService.updateProfile(userId, purchaseData);
+
+      if (success) {
+        if (isNewPurchase) {
           setCoins(newCoins);
-          setOwnedList(updatedOwned);
-          setCurrent(item.value);
           addXp(50);
           sileo.success({
             title: "¡Compra realizada!",
             description: `Has desbloqueado ${item.name}`,
           });
-        } else {
-          throw new Error("Error en el servidor.");
         }
-      } catch (error) {
-        sileo.error({
-          title: "Error en la transacción",
-          description: "No se pudo conectar con el servidor.",
-        });
+
+        setOwnedList(updatedOwned);
+        setCurrent(item.value);
       }
-    } else {
+    } catch (error) {
       sileo.error({
-        title: "Fondos insuficientes",
-        description: (
-          <span className="insufficent-founds">
-            No tienes suficientes monedas.
-          </span>
-        ),
+        title: "Error",
+        description: "No se pudo conectar con el servidor.",
       });
     }
   };

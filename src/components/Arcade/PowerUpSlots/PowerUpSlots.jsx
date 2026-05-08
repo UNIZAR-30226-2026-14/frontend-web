@@ -1,5 +1,5 @@
 import { useState } from "react";
-import ItemIcon from "../UI/ItemIcon.jsx";
+import ItemIcon from "../../UI/ItemIcon.jsx";
 
 function PowerUpSlots({ inventory, onActivate }) {
   const [selectedSlot, setSelectedSlot] = useState(null);

@@ -157,7 +157,7 @@ function Home({ onStart, user, onLogout, addXp }) {
       const unido = await gameService.joinGame(user.id, idDisponible);
 
       if (unido) {
-        setRoomCode(`RUM-${idPartida}`);
+        setRoomCode(`RUM-${idDisponible}`);
         setIsHost(false);
         setIsWaitingForStart(true);
         onStart(idDisponible);

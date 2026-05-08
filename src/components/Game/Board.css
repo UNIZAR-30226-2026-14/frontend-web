@@ -109,3 +109,8 @@ img {
   margin-left: 90vw;
   position: fixed;
 }
+
+.blur-grid {
+  filter: blur(5px); 
+  transition: filter 0.8s ease;
+}

@@ -62,6 +62,14 @@ function Board({
 
   const [points, setPoints] = useState(0);
 
+  // Dentro de la función Board
+  const [activeEffects, setActiveEffects] = useState({
+    isBlind: false, // Bomba de humo
+    halfTime: false, // Guindilla
+    mustScore30: false, // Techo de cristal
+    isProtected: false, // Ángel de la guarda
+  });
+
   // Función para conseguir puntos para comprar power-ups
   const sumarPuntosPorJugada = (fichasColocadas) => {
     const puntosGanados = fichasColocadas.length * 10;
@@ -188,7 +196,6 @@ function Board({
         newJoined.push(...currentRowIndices);
       }
     }
-    
 
     setJoinedSlots(newJoined);
   }, [boardPositions]); // Se ejecuta cada vez que el tablero cambie
@@ -245,36 +252,6 @@ function Board({
     });
   };
 
-  /*const actualizarTableroVisual = (tableroApi) => {
-    const n = tableroString.length;
-    if (n <= 200) {
-      //ya cambiamos el numero luego si eso
-      setSlotsTablero(200);
-    } else {
-      setSlotsTablero(n);
-    }
-    if (!tableroApi) return;
-
-    // Inicializamos vacío
-    const newBoard = {};
-    for (let i = 0; i < 200; i++) newBoard[`board-slot-${i}`] = "";
-
-    // Rellenamos (asumiendo que el string guarda posiciones, si no, los pone en orden)
-    let slotIndex = 0;
-
-    tableroApi.forEach((conjunto) => {
-      const fichasParseadas = parsearFichas(conjunto, true);
-
-      fichasParseadas.forEach((ficha) => {
-        newBoard[`board-slot-${slotIndex}`] = ficha;
-        slotIndex++;
-      });
-      slotIndex++;
-    });
-    setBoardPositions(newBoard);
-    setStartTurnBoard(newBoard);
-  };*/
-
   const actualizarTableroVisual = (tableroApi) => {
     console.log("Inicio actualizar tablero");
     if (!tableroApi) return;
@@ -282,18 +259,21 @@ function Board({
 
     const newBoard = {};
     for (let i = 0; i < 200; i++) newBoard[`board-slot-${i}`] = "";
-    
+
     setBoardPositions((prev) => {
       let slotIndex = 0;
-      const conjuntos = tableroApi.split(';');
+      const conjuntos = tableroApi.split(";");
       conjuntos.forEach((conjunto) => {
         const fichas = parsearFichas(conjunto, true);
-        let aux = ((slotIndex%25) + fichas.length);
+        let aux = (slotIndex % 25) + fichas.length;
         console.log("fichas length: ", fichas.length);
-        console.log("CUanto queda:", slotIndex%25);
+        console.log("CUanto queda:", slotIndex % 25);
         console.log("sobrante: ", aux);
         if (aux >= 25) {
-          for (let i = 0; i < fichas.length; i++) {newBoard[`board-slot-${slotIndex}`] = "";slotIndex++};
+          for (let i = 0; i < fichas.length; i++) {
+            newBoard[`board-slot-${slotIndex}`] = "";
+            slotIndex++;
+          }
         }
         fichas.forEach((ficha) => {
           if (slotIndex < 200) {
@@ -301,133 +281,53 @@ function Board({
             slotIndex++;
           }
         });
-         newBoard[`board-slot-${slotIndex}`] = "";
+        newBoard[`board-slot-${slotIndex}`] = "";
         slotIndex++;
       });
-        return newBoard;
+      return newBoard;
     });
     setStartTurnBoard(newBoard);
   };
-
-  // Detectamos si es nuestro turno
-  /*useEffect(() => {
-    if (!idPartida || !user.id || processing) return;
-
-    const sincronizar = async () => {
-      try {
-        // Obtener datos de la partida y de tu participación
-        const [resP, resU] = await Promise.all([
-          fetch(`http://localhost:8080/api/partidas/${idPartida}`),
-          fetch(
-            `http://localhost:8080/api/participaciones/${user.id}/${idPartida}`,
-          ),
-        ]);
-
-        if (!resP.ok || !resU.ok) return;
-
-        const partida = await resP.json();
-
-        const esMiTurnoAhora = Number(partida.turno) === miOrdenAsignado;
-
-        if (!esMiTurnoAhora || (esMiTurnoAhora && !miTurno)) {
-          // Si el backend lo manda como String, lo parseamos; si es Array, directo.
-          const mesaData =
-            typeof partida.conjuntoMesa === "string"
-              ? JSON.parse(partida.conjuntoMesa)
-              : partida.conjuntoMesa;
-
-          if (mesaData) {
-            actualizarTableroVisual(mesaData);
-          }
-        }
-        const participacion = await resU.json();
-
-        if (partida.bolsa) {
-          const numeroFichas = partida.bolsa
-            .split(",")
-            .filter((f) => f !== "").length;
-          setDeckSize(numeroFichas);
-        } else {
-          setDeckSize(0);
-        }
-
-        const turnoDeLaPartida = Number(partida.turno);
-        const miOrdenAsignado = Number(participacion.ordenTurno);
-
-        // Actualizar el orden si no lo teníamos
-        if (ordenTurno === null) {
-          setOrdenTurno(miOrdenAsignado);
-          actualizarManoVisual(parsearFichas(participacion.manoActual));
-        }
-        setStartTurnHand(handPositions);
-
-        // Lógica de cambio de turno
-        const esMiTurno = turnoDeLaPartida === miOrdenAsignado;
-        //actualizarTableroVisual(partida.tableroActual);
-
-        if (esMiTurno !== miTurno) {
-          setMiTurno(esMiTurno);
-          setStartTurnHand(handPositions);
-        }
-      } catch (error) {
-        console.error("Error en sincronización:", error);
-      }
-    };
-
-    sincronizar();
-    const interval = setInterval(sincronizar, 3000);
-    return () => clearInterval(interval);
-  }, [idPartida, user.id, ordenTurno, miTurno, processing]);*/
 
   useEffect(() => {
     if (!idPartida || !user.id || processing) return;
 
     const sincronizar = async () => {
       try {
-        const resP = await fetch(
-          `http://localhost:8080/api/partidas/${idPartida}`,
-        );
-        if (!resP.ok) return;
-        const partida = await resP.json();
+        const partida = await gameService.getGameStatus(idPartida);
+        if (!partida) return;
+
+        let miPosicion = ordenTurno;
+        if (miPosicion === null) {
+          const participacion = await gameService.getParticipation(
+            user.id,
+            idPartida,
+          );
+          miPosicion = Number(participacion.ordenTurno);
+          setOrdenTurno(miPosicion);
+          actualizarManoVisual(parsearFichas(participacion.manoActual));
+        }
 
         const turnoDeLaPartida = Number(partida.turno);
         const esMiTurnoAhora = turnoDeLaPartida === ordenTurno;
 
         // Actualizar bolsa
         if (partida.bolsa) {
-          setDeckSize(partida.bolsa.split(",").filter((f) => f !== "").length);
+          setDeckSize(
+            partida.bolsa.split(",").filter((f) => f.trim() !== "").length,
+          );
         }
 
         // Si acaba de empezar mi turno, sincronizamos frontend y backend
         if (esMiTurnoAhora && !miTurno) {
-          const resU = await fetch(
-            `http://localhost:8080/api/participaciones/${user.id}/${idPartida}`,
-          );
-          if (resU.ok) {
-            const participacion = await resU.json();
-            //console.log("conjunto mesa:", partida.conjuntoMesa)
-            
-            /*const mesaData =
-              typeof partida.conjuntoMesa === "string"
-                ? JSON.parse(partida.conjuntoMesa)
-                : partida.conjuntoMesa;*/
-            const mesaData = partida.conjuntoMesa;
-
-            //console.log("mesaData: ", mesaData);    
-
-            actualizarTableroVisual(mesaData);
-            //actualizarManoVisual(parsearFichas(participacion.manoActual));
-
-            // Guardar backup para el botón "Deshacer"
-            
-            setStartTurnHand(handPositions);
-            setMiTurno(true);
-          }
+          const resU = await gameService.getParticipation(user.id, idPartida);
+          actualizarTableroVisual(partida.conjuntoMesa);
+          setStartTurnHand(handPositions);
+          setMiTurno(true);
         } else if (!esMiTurnoAhora) {
           // Si no es mi turno, solo actualizamos tablero
-          const mesaData = partida.conjuntoMesa;
-          actualizarTableroVisual(mesaData);
-          if (miTurno) setMiTurno(false);
+          actualizarTableroVisual(partida.conjuntoMesa);
+          setMiTurno(false);
         }
       } catch (error) {
         console.error("Error en sincronización:", error);
@@ -436,12 +336,10 @@ function Board({
 
     // Carga inicial del orden de turno
     if (ordenTurno === null) {
-      fetch(`http://localhost:8080/api/participaciones/${user.id}/${idPartida}`)
-        .then((res) => res.json())
-        .then((data) => {
-          setOrdenTurno(Number(data.ordenTurno));
-          actualizarManoVisual(parsearFichas(data.manoActual));
-        });
+      gameService.getParticipation(user.id, idPartida).then((data) => {
+        setOrdenTurno(Number(data.ordenTurno));
+        actualizarManoVisual(parsearFichas(data.manoActual));
+      });
     }
 
     const interval = setInterval(sincronizar, 3000);
@@ -526,47 +424,6 @@ function Board({
     }
   };
 
-  /*const cambiarTurno = async () => {
-    try {
-      setProcessing(true);
-      const conjuntos = obtenerConjuntosDelTablero(boardPositions);
-
-      if (conjuntos.length === 0) {
-        // Resetear si obligamos al usuario a empezar de cero
-        //setBoardPositions(startTurnBoard);
-        //setHandPositions(startTurnHand);
-        setProcessing(false);
-        return;
-      }
-
-      await gameService.playAdvanced(
-        user.id,
-        idPartida,
-        "replace_board",
-        conjuntos,
-      );
-
-      setBoardPositions((prev) => {
-        const nextState = {};
-        for (const id in prev) {
-          const currentTile = prev[id];
-          if (currentTile && typeof currentTile === "object") {
-            nextState[id] = { ...currentTile, placed: true };
-          } else {
-            nextState[id] = currentTile;
-          }
-        }
-        return nextState;
-      });
-
-      setMiTurno(false);
-    } catch (error) {
-      console.error("Error al terminar turno:", error);
-    } finally {
-      setProcessing(false);
-    }
-  };*/
-
   const cambiarTurno = async () => {
     try {
       setProcessing(true);
@@ -601,13 +458,43 @@ function Board({
     drawTile();
   };
 
+  // Dentro de tu componente Board, antes del return
+  useEffect(() => {
+    const handleDebugHumo = (e) => {
+      // Si pulsas la tecla 'b' (de Bomba de humo)
+      if (e.key.toLowerCase() === "b") {
+        setActiveEffects((prev) => ({
+          ...prev,
+          isBlind: !prev.isBlind,
+        }));
+
+        // Opcional: Mostrar un mensaje en consola para confirmar
+        console.log("Estado Bomba de Humo:", !activeEffects.isBlind);
+      }
+    };
+
+    // Escuchamos el teclado
+    window.addEventListener("keydown", handleDebugHumo);
+
+    // Limpiamos el evento al desmontar el componente
+    return () => window.removeEventListener("keydown", handleDebugHumo);
+  }, [activeEffects.isBlind]); // Dependencia para que use el valor actualizado
+
   return (
     <DndContext onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
-      <div className="game-container" style={{backgroundcolor: currentBackground}}>
+      <div
+        className={`game-container ${activeEffects.isBlind ? "smoke-screen" : ""}`}
+        style={{ backgroundcolor: currentBackground }}
+      >
         {/* HEADER: Información del mazo y botón de robar */}
         <div className="header">RUMMIPLUS TABLE</div>
 
-        <BoardGrid boardPositions={boardPositions} joinedSlots={joinedSlots} />
+        <div className={activeEffects.isBlind ? "blur-grid" : ""}>
+          <BoardGrid
+            boardPositions={boardPositions}
+            joinedSlots={joinedSlots}
+          />
+        </div>
 
         <Deck
           deckSize={deckSize}
