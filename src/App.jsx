@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import "./app.css";
+import "./App.css";
 import Board from "./components/Game/Board";
 import Home from "./components/Home/Home";
 import Loading from "./components/Loading/Loading";
