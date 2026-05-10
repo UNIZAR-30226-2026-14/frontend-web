@@ -2,7 +2,7 @@ import { useState } from "react";
 import { sileo } from "sileo";
 
 import "./Login.css";
-import logo from "../../assets/logo.svg";
+import logo from "../../assets/Logo.svg";
 
 import { authService, gameService } from "../../services/gameService";
 

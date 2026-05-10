@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import Shop from "../components/UI/Shop/Shop";
+import Shop from "../components/TopMenu/Shop/Shop";
 import { BACKGROUNDS } from "../data/itemData";
 
 const { mocks } = vi.hoisted(() => ({
