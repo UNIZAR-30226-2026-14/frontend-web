@@ -1,4 +1,4 @@
-import "./TopMenu.css";
+import "./topMenu.css";
 import { getAvatarDisplay } from "../../data/itemData";
 
 function TopMenu({

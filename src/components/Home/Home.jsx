@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import "./home.css";
+import "./Home.css";
 import FriendsList from "../TopMenu/FriendsList/FriendsList.jsx";
 import Shop from "../TopMenu/Shop/Shop.jsx";
 import Profile from "../TopMenu/Profile/Profile.jsx";

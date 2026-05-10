@@ -1,5 +1,5 @@
 import { sileo, Toaster } from "sileo";
-import "./shop.css";
+import "./Shop.css";
 import { BACKGROUNDS, TILE_SKINS } from "../../../data/itemData";
 import { profileService } from "../../../services/gameService";
 

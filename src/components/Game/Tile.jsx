@@ -1,4 +1,4 @@
-import "./tile.css";
+import "./Tile.css";
 import rojo from "../../assets/j-rojo.svg";
 import negro from "../../assets/j-negro.svg";
 

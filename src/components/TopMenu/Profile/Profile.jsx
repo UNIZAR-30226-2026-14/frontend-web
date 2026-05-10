@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./profile.css";
+import "./Profile.css";
 import { getAvatarDisplay } from "../../../data/itemData";
 import alex from "../../../assets/avatars/alex.png";
 import { profileService } from "../../../services/gameService";

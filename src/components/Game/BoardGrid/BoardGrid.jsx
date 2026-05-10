@@ -1,7 +1,7 @@
 import React from "react";
 import Hand from "../Hand.jsx";
 import DraggableTile from "../draggableTile.jsx";
-import "./BoardGrid.css";
+import "./boardGrid.css";
 
 const BoardGrid = ({ boardPositions, joinedSlots }) => {
   const slots = Object.keys(boardPositions);
