@@ -1,0 +1,44 @@
+name: Auto-Deploy React to Backend
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar Frontend
+        uses: actions/checkout@v4
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Construir React
+        run: |
+          npm install
+          npm run build
+
+      - name: Clonar Backend
+        uses: actions/checkout@v4
+        with:
+          repository: UNIZAR-30226-2026-14/backend
+          path: backend-repo
+          token: ${{ secrets.PAT_GITHUB }}
+
+      - name: Mover archivos al Backend
+        run: |
+          mkdir -p backend-repo/public
+          rm -rf backend-repo/public/*
+          cp -a dist/. backend-repo/public/
+
+      - name: Push al Backend
+        run: |
+          cd backend-repo
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git add public/
+          git commit -m "Frontend web actualizado automaticamente" || echo "Sin cambios"
+          git push
