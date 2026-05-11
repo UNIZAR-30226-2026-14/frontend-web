@@ -19,50 +19,59 @@ describe("friendService", () => {
 
   it("Filtrar solicitudes enviadas y pendientes", async () => {
     const mockData = [
-      { jugador1: 1, jugador2: 5, estado: "PENDIENTE" },
-      { jugador1: 4, jugador2: 1, estado: "PENDIENTE" },
+      { jugador1Id: 1, jugador2Id: 5, estado: "PENDIENTE" },
+      { jugador1Id: 4, jugador2Id: 1, estado: "PENDIENTE" },
     ];
     mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockData });
 
     const sent = await friendService.getSentRequests(userId);
     expect(sent).toHaveLength(1);
-    expect(sent.jugador2).toBe(5);
+    expect(sent[0].jugador2Id).toBe(5);
   });
 
   it("Filtrar solo aceptadas y calcular el ID del amigo correctamente", async () => {
     const mockData = [
-      { jugador1: 1, jugador2: 2, estado: "ACEPTADA" },
-      { jugador1: 3, jugador2: 1, estado: "ACEPTADA" },
-      { jugador1: 1, jugador2: 4, estado: "PENDIENTE" },
+      {
+        estado: "ACEPTADA",
+        amigoId: 2,
+        amigoNombre: "Ana",
+      },
+      {
+        estado: "ACEPTADA",
+        amigoId: 3,
+        amigoNombre: "Luis",
+      },
+      {
+        estado: "PENDIENTE",
+        amigoId: 4,
+        amigoNombre: "Pepe",
+      },
     ];
 
     mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockData });
 
     const friends = await friendService.getFriends(userId);
 
-    // Tiene que haber filtrado la pendiente
     expect(friends).toHaveLength(2);
 
-    // Comprobar que calculó bien el id de los amigos
     expect(friends[0].id).toBe(2);
     expect(friends[1].id).toBe(3);
 
-    // Comprobar que añade los campos avatar y status
     expect(friends[0]).toHaveProperty("avatar");
     expect(friends[0].status).toBe("online");
   });
 
   it("Filtrar solicitudes recibidas y pendientes", async () => {
     const mockData = [
-      { jugador1: 2, jugador2: 1, estado: "PENDIENTE" },
-      { jugador1: 1, jugador2: 3, estado: "PENDIENTE" },
-      { jugador1: 2, jugador2: 1, estado: "ACEPTADA" },
+      { jugador1Id: 2, jugador2Id: 1, estado: "PENDIENTE" },
+      { jugador1Id: 1, jugador2Id: 3, estado: "PENDIENTE" },
+      { jugador1Id: 2, jugador2Id: 1, estado: "ACEPTADA" },
     ];
     mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockData });
 
     const pending = await friendService.getPendingRequests(userId);
     expect(pending).toHaveLength(1);
-    expect(pending.jugador1).toBe(2);
+    expect(pending[0].jugador1Id).toBe(2);
   });
 
   it("Lanza error si la respuesta no es ok", async () => {
@@ -79,7 +88,6 @@ describe("friendService", () => {
     const targetId = "5";
     await friendService.sendRequest(userId, targetId);
 
-    // Verificamos que el body lleve la fecha en formato YYYY-MM-DD
     const [url, options] = mockFetch.mock.calls[0];
 
     expect(options).toBeDefined();
@@ -90,11 +98,16 @@ describe("friendService", () => {
     expect(body.jugador2Id).toBe(5);
     expect(body.fecha).toMatch(/^\d{4}-\d{2}-\d{2}$/);
 
-    expect(url).toContain("/amigos");
+    expect(url).toContain("/api/amigos");
   });
 });
 
 describe("authService", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    localStorage.clear();
+  });
+
   it("Error si las credenciales son incorrectas", async () => {
     mockFetch.mockResolvedValueOnce({ ok: false });
 
@@ -114,6 +127,12 @@ describe("gameService", () => {
   const gameId = 99;
   const userId = 1;
 
+  beforeEach(() => {
+    vi.clearAllMocks();
+    localStorage.clear();
+    localStorage.setItem("rummi-token", "token-de-prueba");
+  });
+
   it("Envia los datos iniciales de la partida", async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
@@ -127,6 +146,7 @@ describe("gameService", () => {
 
     expect(body.corriendo).toBe(false);
     expect(game.id).toBe(99);
+    expect(mockFetch.mock.calls[0][0]).toContain("/api/partidas");
   });
 
   it("drawTile y passTurn realizan peticiones POST correctas", async () => {
@@ -138,9 +158,12 @@ describe("gameService", () => {
     await gameService.drawTile(userId, gameId);
     await gameService.passTurn(userId, gameId);
 
-    // Verificamos que se llamó a las URLs de robar y pasar
-    expect(mockFetch.mock.calls[0]).toContain(`/partidas/${gameId}/robar`);
-    expect(mockFetch.mock.calls[1]).toContain(`/partidas/${gameId}/pasar`);
+    expect(mockFetch.mock.calls[0][0]).toContain(
+      `/partidas/${gameId}/robar`,
+    );
+    expect(mockFetch.mock.calls[1][0]).toContain(
+      `/partidas/${gameId}/pasar`,
+    );
   });
 
   it("Obtiene los datos del jugador en la partida", async () => {

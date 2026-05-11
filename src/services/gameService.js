@@ -1,5 +1,6 @@
-import { API_BASE_URL } from "../lib/apiBase.js";
+import { apiFetch } from "../lib/apiBase.js";
 
+/** Cabeceras comunes: JSON y token JWT si existe en localStorage. */
 const getHeaders = () => {
   const token = localStorage.getItem("rummi-token");
   return {
@@ -11,7 +12,7 @@ const getHeaders = () => {
 export const authService = {
   // Iniciar sesión
   login: async (username, password) => {
-    const res = await fetch(`${API_BASE_URL}/auth/login`, {
+    const res = await apiFetch("auth/login", {
       method: "POST",
       headers: getHeaders(),
       body: JSON.stringify({
@@ -25,7 +26,7 @@ export const authService = {
 
   // Registrarse
   register: async (username, password) => {
-    const res = await fetch(`${API_BASE_URL}/jugadores`, {
+    const res = await apiFetch("jugadores", {
       method: "POST",
       headers: getHeaders(),
       body: JSON.stringify({
@@ -36,9 +37,9 @@ export const authService = {
     return res.ok;
   },
 
-  // Para no tener que volver a iniciar sesion
+  // Para no tener que volver a iniciar sesión
   getMe: async () => {
-    const res = await fetch(`${API_BASE_URL}/auth/me`, {
+    const res = await apiFetch("auth/me", {
       headers: getHeaders(),
     });
 
@@ -52,7 +53,7 @@ export const authService = {
   // Cerrar sesión
   logout: async () => {
     try {
-      await fetch(`${API_BASE_URL}/auth/logout`, {
+      await apiFetch("auth/logout", {
         method: "POST",
         headers: getHeaders(),
       });
@@ -68,7 +69,7 @@ export const authService = {
 export const friendService = {
   // Obtener los amigos
   getFriends: async (userId) => {
-    const res = await fetch(`${API_BASE_URL}/amigos?jugadorId=${userId}`, {
+    const res = await apiFetch(`amigos?jugadorId=${userId}`, {
       headers: getHeaders(),
     });
     if (!res.ok) throw new Error("Error al cargar amigos");
@@ -89,7 +90,7 @@ export const friendService = {
 
   // Enviar solicitud de amistad
   sendRequest: async (userId, targetId) => {
-    const res = await fetch(`${API_BASE_URL}/amigos`, {
+    const res = await apiFetch("amigos", {
       method: "POST",
       headers: getHeaders(),
       body: JSON.stringify({
@@ -105,13 +106,10 @@ export const friendService = {
   // Eliminar relación de amistad
   removeFriendship: async (jugador1Id, jugador2Id) => {
     try {
-      const res = await fetch(
-        `${API_BASE_URL}/amigos/${jugador1Id}/${jugador2Id}`,
-        {
-          method: "DELETE",
-          headers: getHeaders(),
-        },
-      );
+      const res = await apiFetch(`amigos/${jugador1Id}/${jugador2Id}`, {
+        method: "DELETE",
+        headers: getHeaders(),
+      });
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
@@ -129,7 +127,7 @@ export const friendService = {
 
   // Obtener solicitudes de amistad
   getPendingRequests: async (userId) => {
-    const res = await fetch(`${API_BASE_URL}/amigos?jugadorId=${userId}`, {
+    const res = await apiFetch(`amigos?jugadorId=${userId}`, {
       headers: getHeaders(),
     });
     if (!res.ok) throw new Error("Error al cargar solicitudes pendientes.");
@@ -143,7 +141,7 @@ export const friendService = {
 
   // Obtener solicitudes enviadas pendientes
   getSentRequests: async (userId) => {
-    const res = await fetch(`${API_BASE_URL}/amigos?jugadorId=${userId}`, {
+    const res = await apiFetch(`amigos?jugadorId=${userId}`, {
       headers: getHeaders(),
     });
     if (!res.ok)
@@ -158,8 +156,8 @@ export const friendService = {
 
   // Aceptar o rechazar solicitud
   answerRequest: async (jugador1Id, jugador2Id, accept) => {
-    const res = await fetch(
-      `${API_BASE_URL}/amigos/${jugador1Id}/${jugador2Id}/estado`,
+    const res = await apiFetch(
+      `amigos/${jugador1Id}/${jugador2Id}/estado`,
       {
         method: "PATCH",
         headers: getHeaders(),
@@ -172,8 +170,9 @@ export const friendService = {
   // Obtener perfil de un amigo
   getFriendsProfile: async (userId, friendId) => {
     try {
-      const res = await fetch(
-        `${API_BASE_URL}/jugadores/${userId}/amigos/perfiles?estado=ACEPTADA`,
+      const res = await apiFetch(
+        `jugadores/${userId}/amigos/perfiles?estado=ACEPTADA`,
+        { headers: getHeaders() },
       );
       if (!res.ok) throw new Error("Error al conectar con el servidor");
       const amigos = await res.json();
@@ -188,7 +187,7 @@ export const friendService = {
   // Obtener partidas pendientes
   getUserPendingGames: async (userId) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/partidas?usuarioId=${userId}`, {
+      const res = await apiFetch(`partidas?usuarioId=${userId}`, {
         headers: getHeaders(),
       });
       if (!res.ok)
@@ -206,7 +205,7 @@ export const friendService = {
 export const gameService = {
   // Crear nueva partida
   createGame: async () => {
-    const res = await fetch(`${API_BASE_URL}/partidas`, {
+    const res = await apiFetch("partidas", {
       method: "POST",
       headers: getHeaders(),
       body: JSON.stringify({
@@ -225,7 +224,7 @@ export const gameService = {
 
   // Obtener el estado de la partida
   getGameStatus: async (gameId) => {
-    const res = await fetch(`${API_BASE_URL}/partidas/${gameId}`, {
+    const res = await apiFetch(`partidas/${gameId}`, {
       headers: getHeaders(),
     });
 
@@ -235,7 +234,7 @@ export const gameService = {
 
   // Iniciar la partida
   startGame: async (gameId) => {
-    const res = await fetch(`${API_BASE_URL}/partidas/${gameId}/iniciar`, {
+    const res = await apiFetch(`partidas/${gameId}/iniciar`, {
       method: "POST",
       headers: getHeaders(),
     });
@@ -244,7 +243,7 @@ export const gameService = {
 
   // Unirse a una partida
   joinGame: async (userId, gameId) => {
-    const res = await fetch(`${API_BASE_URL}/participaciones`, {
+    const res = await apiFetch("participaciones", {
       method: "POST",
       headers: getHeaders(),
       body: JSON.stringify({
@@ -259,7 +258,7 @@ export const gameService = {
 
   // Robar ficha
   drawTile: async (userId, gameId) => {
-    const res = await fetch(`${API_BASE_URL}/partidas/${gameId}/robar`, {
+    const res = await apiFetch(`partidas/${gameId}/robar`, {
       method: "POST",
       headers: getHeaders(),
       body: JSON.stringify({
@@ -272,7 +271,7 @@ export const gameService = {
 
   // Pasar turno
   passTurn: async (userId, gameId) => {
-    const res = await fetch(`${API_BASE_URL}/partidas/${gameId}/pasar`, {
+    const res = await apiFetch(`partidas/${gameId}/pasar`, {
       method: "POST",
       headers: getHeaders(),
       body: JSON.stringify({
@@ -285,10 +284,9 @@ export const gameService = {
 
   // Obtener participación
   getParticipation: async (userId, gameId) => {
-    const res = await fetch(
-      `${API_BASE_URL}/participaciones/${userId}/${gameId}`,
-      { headers: getHeaders() },
-    );
+    const res = await apiFetch(`participaciones/${userId}/${gameId}`, {
+      headers: getHeaders(),
+    });
     if (!res.ok)
       throw new Error("Error al obtener la participación del juagdor.");
     return await res.json();
@@ -297,7 +295,7 @@ export const gameService = {
   // Obtener todas las partidas
   getAllGames: async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/partidas`, {
+      const res = await apiFetch("partidas", {
         headers: getHeaders(),
       });
       if (!res.ok) {
@@ -313,15 +311,14 @@ export const gameService = {
 
   // Obtener participaciones de una partida
   getParticipationByGame: async (gameId) => {
-    const res = await fetch(
-      `${API_BASE_URL}/participaciones?partidaId=${gameId}`,
-      { headers: getHeaders() },
-    );
+    const res = await apiFetch(`participaciones?partidaId=${gameId}`, {
+      headers: getHeaders(),
+    });
     if (!res.ok) throw new Error("Error al obtener participantes");
     return await res.json();
   },
 
-  // Jugar
+  // Jugar (movimiento avanzado)
   playAdvanced: async (userId, gameId, moveType, board) => {
     const body = {
       idJugador: userId,
@@ -334,14 +331,11 @@ export const gameService = {
       // body.extendedIndex = ...
       // body.extensionTiles = ...
     }
-    const res = await fetch(
-      `${API_BASE_URL}/partidas/${gameId}/jugar-avanzado`,
-      {
-        method: "POST",
-        headers: getHeaders(),
-        body: JSON.stringify(body),
-      },
-    );
+    const res = await apiFetch(`partidas/${gameId}/jugar-avanzado`, {
+      method: "POST",
+      headers: getHeaders(),
+      body: JSON.stringify(body),
+    });
     if (!res.ok) {
       const errorData = await res.json();
       throw new Error(res.message || "Movimiento rechazado por el árbitro");
@@ -352,7 +346,7 @@ export const gameService = {
 
   // Abandonar la partida
   leaveGame: async (gameId, userId) => {
-    const res = await fetch(`${API_BASE_URL}/partidas/${gameId}/salir`, {
+    const res = await apiFetch(`partidas/${gameId}/salir`, {
       method: "POST",
       headers: getHeaders(),
       body: JSON.stringify({ idJugador: userId }),
@@ -365,7 +359,7 @@ export const profileService = {
   // Cambiar el nombre o avatar
   updateProfile: async (userId, data) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/jugadores/${userId}/perfil`, {
+      const res = await apiFetch(`jugadores/${userId}/perfil`, {
         method: "PATCH",
         headers: getHeaders(),
         body: JSON.stringify(data),

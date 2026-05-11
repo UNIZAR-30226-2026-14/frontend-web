@@ -4,7 +4,7 @@ import { sileo } from "sileo";
 import "./Login.css";
 import logo from "../../assets/Logo.svg";
 
-import { authService, gameService } from "../../services/gameService";
+import { authService } from "../../services/gameService";
 
 const Login = ({ onLogin }) => {
   const [isLogin, setIsLogin] = useState(true);
@@ -20,31 +20,29 @@ const Login = ({ onLogin }) => {
       return;
     }
 
+    if (!isLogin && password.trim().length < 6) {
+      sileo.error({
+        title: "Contraseña demasiado corta",
+        description: "La contraseña debe tener al menos 6 caracteres.",
+      });
+      return;
+    }
+
     try {
       if (!isLogin) {
-        const success = await authService.register(username, password)
-
-        if (success) {
-          sileo.success({
-            title: "¡Cuenta creada con éxito!",
-          });
-          setUsername("");
-          setPassword("");
-          setIsLogin(true);
-        } else {
-          sileo.error({
-            title: "Error al registrar.",
-            description: "El nombre de usuario ya existe. Prueba otro.",
-          });
-        }
+        await authService.register(username, password);
+        sileo.success({ title: "¡Cuenta creada con éxito!" });
+        setUsername("");
+        setPassword("");
+        setIsLogin(true);
       } else {
-        const data = await authService.login(username, password)
+        const data = await authService.login(username, password);
         localStorage.setItem("rummi-token", data.token);
         localStorage.setItem("rummi-expire", data.expiraEn);
         onLogin(data.jugador);
       }
     } catch (error) {
-      sileo.error({title: "Error", description: error.message})
+      sileo.error({ title: "Error", description: error.message });
     }
   };
 

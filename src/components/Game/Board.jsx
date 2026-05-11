@@ -10,6 +10,7 @@ import { areCompatible } from "../../hooks/deckFactory.js";
 import { sortColor, sortNum } from "./botones_f.js";
 import { handleDragLogic } from "./dragHandlers.js";
 import alex from "../../assets/avatars/bot.png";
+import { getAvatarDisplay } from "../../data/itemData.jsx";
 
 import PlayerRack from "./PlayerRack/PlayerRack.jsx";
 import BoardGrid from "./BoardGrid/BoardGrid.jsx";
@@ -531,19 +532,31 @@ function Board({
 
         <div className="Users">
           <div>
-            <img src={user4?.urlimagenPerfil || alex} />
+            <img
+              src={getAvatarDisplay(
+                user4?.urlimagenPerfil ?? user4?.urlImgPerfil,
+              )}
+            />
             <div>{user4?.nombre || "bot"}</div>
           </div>
           <div>
-            <img src={user3?.urlimagenPerfil || alex} />
+            <img
+              src={getAvatarDisplay(
+                user3?.urlimagenPerfil ?? user3?.urlImgPerfil,
+              )}
+            />
             <div>{user3?.nombre || "bot"}</div>
           </div>
           <div>
-            <img src={user2?.urlimagenPerfil || alex} />
+            <img
+              src={getAvatarDisplay(
+                user2?.urlimagenPerfil ?? user2?.urlImgPerfil,
+              )}
+            />
             <div>{user2?.nombre || "bot"}</div>
           </div>
           <div className="ME">
-            <img src={userPic || alex} />
+            <img src={getAvatarDisplay(userPic)} />
             <div>{user.nombre}</div>
           </div>
         </div>

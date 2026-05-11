@@ -8,8 +8,11 @@ import PendingGames from "../UI/PendingGames/PendingGames.jsx";
 import { gameService, friendService } from "../../services/gameService.js";
 
 import alex from "../../assets/avatars/alex.png";
-import { AVATAR_LIST } from "../../data/itemData.jsx";
-import { PENDING_GAMES } from "../../data/itemData.jsx";
+import {
+  AVATAR_LIST,
+  PENDING_GAMES,
+  getAvatarDisplay,
+} from "../../data/itemData.jsx";
 
 function Home({ onStart, user, onLogout, addXp }) {
   const [activePopup, setActivePopup] = useState(null);
@@ -17,9 +20,10 @@ function Home({ onStart, user, onLogout, addXp }) {
   const [pendingDropdownOpen, setPendingDropdownOpen] = useState(false);
   const [selectedFriendProfile, setSelectedFriendProfile] = useState(null);
 
-  // Avatar
+  // Avatar (el backend puede mandar urlImgPerfil o urlimagenPerfil; id numérico o URL)
   const [userAvatar, setUserAvatar] = useState(() => {
-    return user?.urlimagenPerfil || alex;
+    const raw = user?.urlImgPerfil ?? user?.urlimagenPerfil;
+    return raw != null && raw !== "" ? getAvatarDisplay(raw) : alex;
   });
 
   // Monedas
@@ -91,7 +95,7 @@ function Home({ onStart, user, onLogout, addXp }) {
     setSelectedFriendProfile({
       userId: profile.id,
       user: profile,
-      avatar: profile.urlImgPerfil || alex,
+      avatar: getAvatarDisplay(profile.urlImgPerfil ?? profile.urlimagenPerfil),
       coins: profile.monedas || 0,
       level: 1,
       stats: {
@@ -234,8 +238,10 @@ function Home({ onStart, user, onLogout, addXp }) {
   }, [isWaitingForStart, roomCode, onStart]);
 
   useEffect(() => {
-    if (user && user.urlImgPerfil) {
-      setUserAvatar(user.urlImgPerfil);
+    if (!user) return;
+    const raw = user.urlImgPerfil ?? user.urlimagenPerfil;
+    if (raw != null && raw !== "") {
+      setUserAvatar(getAvatarDisplay(raw));
     }
   }, [user]);
 

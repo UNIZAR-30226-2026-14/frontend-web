@@ -112,8 +112,27 @@ export const AVATAR_LIST = [
   { id: 6, url: miguel, name: "Miguel" },
 ];
 
-export const getAvatarDisplay = (avatarId) => {
-  const found = AVATAR_LIST.find((a) => String(a.id) === String(avatarId));
+export const getAvatarDisplay = (avatarRef) => {
+  if (avatarRef == null || avatarRef === "") {
+    return alex;
+  }
+  if (typeof avatarRef === "string") {
+    const s = avatarRef.trim();
+    if (
+      s.startsWith("data:") ||
+      s.startsWith("http://") ||
+      s.startsWith("https://") ||
+      s.startsWith("/")
+    ) {
+      return s;
+    }
+  }
+  const ref = String(avatarRef).trim();
+  const found = AVATAR_LIST.find(
+    (a) =>
+      String(a.id) === ref ||
+      a.name.toLowerCase() === ref.toLowerCase(),
+  );
   return found ? found.url : alex;
 };
 
