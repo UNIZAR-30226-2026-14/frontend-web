@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://localhost:8443/api";
+import { API_BASE_URL } from "../lib/apiBase.js";
 
 const getHeaders = () => {
   const token = localStorage.getItem("rummi-token");
