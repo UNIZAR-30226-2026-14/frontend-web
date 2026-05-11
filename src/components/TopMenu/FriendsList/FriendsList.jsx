@@ -2,7 +2,7 @@ import "./FriendsList.css";
 import { useState, useEffect } from "react";
 import { friendService } from "../../../services/gameService";
 import { sileo, Toaster } from "sileo";
-import { loadDiffConfig } from "vitest/internal/browser";
+import { getAvatarDisplay } from "../../../data/itemData.jsx";
 
 function FriendsList({ onClose, onOpenProfile, userId }) {
   const [challengeId, setChallengeId] = useState(null);
@@ -180,7 +180,7 @@ function FriendsList({ onClose, onOpenProfile, userId }) {
                           onClick={() => onOpenProfile?.(friend.id)}
                         >
                           <img
-                            src={friend.avatar}
+                            src={getAvatarDisplay(friend.avatar)}
                             alt=""
                             className="friend-avatar"
                           />

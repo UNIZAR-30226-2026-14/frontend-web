@@ -9,8 +9,10 @@ import { CSS } from "@dnd-kit/utilities";
 import { areCompatible } from "../../hooks/deckFactory.js";
 import { sortColor, sortNum } from "./botones_f.js";
 import { handleDragLogic } from "./dragHandlers.js";
-import alex from "../../assets/avatars/bot.png";
-import { getAvatarDisplay } from "../../data/itemData.jsx";
+import {
+  getAvatarDisplay,
+  getProfileImageRaw,
+} from "../../data/itemData.jsx";
 
 import PlayerRack from "./PlayerRack/PlayerRack.jsx";
 import BoardGrid from "./BoardGrid/BoardGrid.jsx";
@@ -28,12 +30,6 @@ function Board({
   objetos,
   user,
   userPic,
-  user2,
-  user2Pic,
-  user3,
-  user3Pic,
-  user4,
-  user4Pic,
   currentBackground,
   onWin,
   isArcade,
@@ -50,6 +46,9 @@ function Board({
   const [matchPoints, setMatchPoints] = useState(0);
   const [activeEvent, setActiveEvent] = useState(null);
   const [deckSize, setDeckSize] = useState(0);
+
+  // Datos de los oponentes (participaciones del juego, cargadas al inicio)
+  const [opponents, setOpponents] = useState([]);
 
   const [slotsNecesarios, setSlotsNecesarios] = useState(20);
   const [slotsTablero, setSlotsTablero] = useState(200);
@@ -335,12 +334,17 @@ function Board({
       }
     };
 
-    // Carga inicial del orden de turno
+    // Carga inicial del orden de turno y oponentes
     if (ordenTurno === null) {
       gameService.getParticipation(user.id, idPartida).then((data) => {
         setOrdenTurno(Number(data.ordenTurno));
         actualizarManoVisual(parsearFichas(data.manoActual));
       });
+
+      gameService.getParticipationByGame(idPartida).then((lista) => {
+        const otros = lista.filter((p) => p.idJugador !== user.id);
+        setOpponents(otros);
+      }).catch(() => {});
     }
 
     const interval = setInterval(sincronizar, 3000);
@@ -531,32 +535,23 @@ function Board({
         <GameControls onSortColor={sortByColor} onSortNum={sortByNumber} />
 
         <div className="Users">
-          <div>
-            <img
-              src={getAvatarDisplay(
-                user4?.urlimagenPerfil ?? user4?.urlImgPerfil,
-              )}
-            />
-            <div>{user4?.nombre || "bot"}</div>
-          </div>
-          <div>
-            <img
-              src={getAvatarDisplay(
-                user3?.urlimagenPerfil ?? user3?.urlImgPerfil,
-              )}
-            />
-            <div>{user3?.nombre || "bot"}</div>
-          </div>
-          <div>
-            <img
-              src={getAvatarDisplay(
-                user2?.urlimagenPerfil ?? user2?.urlImgPerfil,
-              )}
-            />
-            <div>{user2?.nombre || "bot"}</div>
-          </div>
+          {[2, 1, 0].map((idx) => {
+            const op = opponents[idx];
+            return (
+              <div key={idx}>
+                <img
+                  alt=""
+                  src={getAvatarDisplay(getProfileImageRaw(op))}
+                />
+                <div>{op?.jugadorNombre || "bot"}</div>
+              </div>
+            );
+          })}
           <div className="ME">
-            <img src={getAvatarDisplay(userPic)} />
+            <img
+              alt=""
+              src={getAvatarDisplay(userPic ?? getProfileImageRaw(user))}
+            />
             <div>{user.nombre}</div>
           </div>
         </div>

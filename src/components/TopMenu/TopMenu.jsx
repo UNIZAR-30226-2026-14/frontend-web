@@ -15,37 +15,20 @@ function TopMenu({
     <div className="top-menu">
       <div className="top-left">
         <div className="profile-section">
-          {/* Avatar */}
-          <svg className="profile-avatar" viewBox="-50 -50 100 100">
-            <defs>
-              <pattern
-                id={`userProfilePattern`}
-                x="0"
-                y="0"
-                width="1"
-                height="1"
-                viewBox="0 0 100 100"
-              >
-                <image
-                  x="0"
-                  y="0"
-                  width="100"
-                  height="100"
-                  href={getAvatarDisplay(userAvatar)}
-                  preserveAspectRatio="xMidYMid slice"
-                />
-              </pattern>
-            </defs>
-            <circle
-              key={userAvatar}
-              className="profile"
-              cx={0}
-              cy={0}
-              r={45}
-              fill="url(#userProfilePattern)"
-              onClick={openOwnProfile}
+          <button
+            type="button"
+            className="profile-avatar-button"
+            onClick={openOwnProfile}
+            aria-label="Abrir perfil"
+          >
+            <img
+              className="profile-avatar"
+              src={getAvatarDisplay(userAvatar)}
+              alt=""
+              width={75}
+              height={75}
             />
-          </svg>
+          </button>
 
           {/* Info: nombre + barra XP + nivel */}
           <div className="profile-info">

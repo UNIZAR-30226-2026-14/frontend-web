@@ -11,6 +11,7 @@ import {
   AVATAR_LIST,
   PENDING_GAMES,
   getAvatarDisplay,
+  getProfileImageRaw,
 } from "../../data/itemData.jsx";
 
 function Home({
@@ -95,7 +96,7 @@ function Home({
     setSelectedFriendProfile({
       userId: profile.id,
       user: profile,
-      avatar: getAvatarDisplay(profile.urlImgPerfil ?? profile.urlimagenPerfil),
+      avatar: getAvatarDisplay(getProfileImageRaw(profile)),
       coins: profile.monedas || 0,
       level: 1,
       stats: {

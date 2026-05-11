@@ -5,11 +5,30 @@
   user-select: none;
 }
 
+.profile-avatar-button {
+  padding: 0;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  cursor: pointer;
+  line-height: 0;
+}
+
+.profile-avatar-button:focus-visible {
+  outline: 2px solid #f39c12;
+  outline-offset: 2px;
+}
+
 .profile-avatar {
   width: 75px;
   height: 75px;
   flex-shrink: 0;
   cursor: pointer;
+  object-fit: cover;
+  display: block;
+  border-radius: 50%;
 }
 
 .profile-info {

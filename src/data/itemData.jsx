@@ -112,19 +112,62 @@ export const AVATAR_LIST = [
   { id: 6, url: miguel, name: "Miguel" },
 ];
 
+/** Claves habituales en JSON (Spring / front) para la foto o id de preset.
+ *  La primera coincidencia no vacía gana — las más específicas van primero.
+ *  Confirmado por el backend: el DTO Jugador usa "imagenPerfil";
+ *  el DTO Participacion usa "jugadorImagenPerfil". */
+const PROFILE_IMAGE_KEYS = [
+  "imagenPerfil",
+  "jugadorImagenPerfil",
+  "urlImgPerfil",
+  "urlImagenPerfil",
+  "urlimagenPerfil",
+  "url_imagen_perfil",
+  "avatarId",
+  "idAvatar",
+  "fotoPerfil",
+];
+
+/**
+ * Obtiene el valor crudo de imagen de perfil desde un jugador o DTO anidado.
+ */
+export function getProfileImageRaw(entity) {
+  if (entity == null) {
+    return undefined;
+  }
+  if (typeof entity !== "object") {
+    return entity;
+  }
+  for (const k of PROFILE_IMAGE_KEYS) {
+    if (
+      Object.prototype.hasOwnProperty.call(entity, k) &&
+      entity[k] != null &&
+      entity[k] !== ""
+    ) {
+      return entity[k];
+    }
+  }
+  if (entity.jugador && typeof entity.jugador === "object") {
+    return getProfileImageRaw(entity.jugador);
+  }
+  return undefined;
+}
+
 export const getAvatarDisplay = (avatarRef) => {
   if (avatarRef == null || avatarRef === "") {
     return alex;
   }
   if (typeof avatarRef === "string") {
     const s = avatarRef.trim();
-    if (
+    const isAbsoluteOrAsset =
       s.startsWith("data:") ||
       s.startsWith("http://") ||
       s.startsWith("https://") ||
-      s.startsWith("/")
-    ) {
-      return s;
+      s.startsWith("//") ||
+      s.startsWith("/") ||
+      s.startsWith("./");
+    if (isAbsoluteOrAsset) {
+      return s.startsWith("//") ? `https:${s}` : s;
     }
   }
   const ref = String(avatarRef).trim();
