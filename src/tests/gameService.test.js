@@ -109,17 +109,33 @@ describe("authService", () => {
   });
 
   it("Error si las credenciales son incorrectas", async () => {
-    mockFetch.mockResolvedValueOnce({ ok: false });
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 401,
+      text: async () => "",
+    });
 
     await expect(authService.login("pepe", "123")).rejects.toThrow(
-      "Credenciales incorrectas",
+      "Credenciales incorrectas.",
     );
   });
 
   it("Devuelve true si el registro es exitoso", async () => {
-    mockFetch.mockResolvedValueOnce({ ok: true });
+    mockFetch.mockResolvedValueOnce({ ok: true, text: async () => "" });
     const result = await authService.register("nuevoUser", "pass123");
     expect(result).toBe(true);
+  });
+
+  it("Registro fallido lanza error con mensaje del servidor si viene en JSON", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 409,
+      text: async () =>
+        JSON.stringify({ message: "El nombre de jugador ya existe" }),
+    });
+    await expect(authService.register("dup", "secret12")).rejects.toThrow(
+      "El nombre de jugador ya existe",
+    );
   });
 });
 

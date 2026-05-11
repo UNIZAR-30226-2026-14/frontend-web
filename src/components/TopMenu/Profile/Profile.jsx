@@ -50,7 +50,7 @@ function Profile({
     });
 
     if (succes) {
-      setUserAvatar(avatarId);
+      setUserAvatar(getAvatarDisplay(avatarId));
       setIsEditing(false);
     } else {
       sileo.error({

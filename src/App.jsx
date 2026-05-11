@@ -7,6 +7,7 @@ import Login from "./components/Login/Login";
 import alex from "./assets/avatars/alex.png";
 import Realistic from "react-canvas-confetti/dist/presets/realistic";
 import { authService } from "./services/gameService";
+import { getAvatarDisplay } from "./data/itemData.jsx";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -42,7 +43,8 @@ function App() {
   // Avatar
   const [userAvatar, setUserAvatar] = useState(() => {
     const saved = localStorage.getItem("rummi-avatar");
-    return saved ? saved : alex;
+    if (!saved) return alex;
+    return getAvatarDisplay(saved);
   });
 
   const [showConfetti, setShowConfetti] = useState(false);
@@ -82,10 +84,14 @@ function App() {
       const token = localStorage.getItem("rummi-token");
       if (token) {
         try {
-          const user = await authService.getMe();
-          setUser(user);
+          const u = await authService.getMe();
+          setUser(u);
+          const raw = u.urlImgPerfil ?? u.urlimagenPerfil;
+          if (raw != null && raw !== "") {
+            setUserAvatar(getAvatarDisplay(raw));
+          }
           setScreen("home");
-        } catch (err) {
+        } catch {
           console.error("Token inválido o expirado");
           localStorage.removeItem("rummi-token");
           setUser(null);
@@ -98,6 +104,10 @@ function App() {
 
   const handleLogin = (jugador) => {
     setUser(jugador);
+    const raw = jugador.urlImgPerfil ?? jugador.urlimagenPerfil;
+    if (raw != null && raw !== "") {
+      setUserAvatar(getAvatarDisplay(raw));
+    }
     setCoins(jugador.monedas);
     setScreen("home");
   };
@@ -105,6 +115,7 @@ function App() {
   const handleLogout = async () => {
     await authService.logout();
     setUser(null);
+    setUserAvatar(alex);
     setScreen("login");
   };
 

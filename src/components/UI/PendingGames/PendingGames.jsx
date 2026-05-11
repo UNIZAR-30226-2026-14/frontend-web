@@ -1,7 +1,10 @@
 import "./pendingGames.css";
 import { useState, useEffect } from "react";
 //import { PENDING_GAMES } from "../../../data/itemData.jsx";
-import { PARTY_PREVIEW_SLOTS } from "../../../data/itemData.jsx";
+import {
+  PARTY_PREVIEW_SLOTS,
+  getAvatarDisplay,
+} from "../../../data/itemData.jsx";
 import { friendService } from "../../../services/gameService.js";
 
 function PendingGames({
@@ -49,7 +52,7 @@ function PendingGames({
                     <div key={i} className="circle">
                       <img
                         className="avatar"
-                        src={slot.avatar || userAvatar}
+                        src={getAvatarDisplay(slot.avatar || userAvatar)}
                         alt={slot.name}
                       />
                     </div>
@@ -85,7 +88,7 @@ function PendingGames({
                               <div key={i} className="circle mini">
                                 <img
                                   className="avatar"
-                                  src={p.avatar || userAvatar}
+                                  src={getAvatarDisplay(p.avatar || userAvatar)}
                                   alt={p.name}
                                 />
                               </div>

@@ -1,5 +1,47 @@
 import { apiFetch } from "../lib/apiBase.js";
 
+/**
+ * Intenta extraer un mensaje legible del cuerpo de error (JSON Spring u otro).
+ */
+async function readApiErrorMessage(res, fallback) {
+  try {
+    const text = await res.text();
+    if (!text?.trim()) {
+      return fallback;
+    }
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      return text.length > 280 ? `${text.slice(0, 280)}…` : text;
+    }
+    if (typeof data.message === "string" && data.message.trim()) {
+      return data.message.trim();
+    }
+    if (typeof data.error === "string" && data.error.trim()) {
+      return data.error.trim();
+    }
+    if (Array.isArray(data.errors) && data.errors.length > 0) {
+      const first = data.errors[0];
+      if (typeof first === "string") {
+        return first;
+      }
+      if (first && typeof first.defaultMessage === "string") {
+        return first.defaultMessage;
+      }
+    }
+    const firstString = Object.values(data).find(
+      (v) => typeof v === "string" && String(v).trim().length > 0,
+    );
+    if (firstString) {
+      return String(firstString).trim();
+    }
+  } catch {
+    /* ignorar */
+  }
+  return fallback;
+}
+
 /** Cabeceras comunes: JSON y token JWT si existe en localStorage. */
 const getHeaders = () => {
   const token = localStorage.getItem("rummi-token");
@@ -20,7 +62,16 @@ export const authService = {
         contrasena: password,
       }),
     });
-    if (!res.ok) throw new Error("Credenciales incorrectas");
+    if (!res.ok) {
+      const fallback =
+        res.status === 401 || res.status === 403
+          ? "Credenciales incorrectas."
+          : res.status >= 500
+            ? "El servidor no está disponible. Inténtalo más tarde."
+            : "No se pudo iniciar sesión.";
+      const msg = await readApiErrorMessage(res, fallback);
+      throw new Error(msg);
+    }
     return await res.json();
   },
 
@@ -34,7 +85,19 @@ export const authService = {
         contrasena: password,
       }),
     });
-    return res.ok;
+    if (!res.ok) {
+      const fallback =
+        res.status === 409
+          ? "Ese nombre de usuario ya está en uso."
+          : res.status === 400
+            ? "Revisa el nombre y la contraseña (mínimo 6 caracteres)."
+            : res.status >= 500
+              ? "El servidor no está disponible. Inténtalo más tarde."
+              : "No se pudo crear la cuenta.";
+      const msg = await readApiErrorMessage(res, fallback);
+      throw new Error(msg);
+    }
+    return true;
   },
 
   // Para no tener que volver a iniciar sesión

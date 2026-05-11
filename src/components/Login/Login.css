@@ -30,12 +30,31 @@
   border: none;
   padding: 10px;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease;
   width: 100px;
 }
 
-.submit-button:hover {
+.submit-button:hover:not(:disabled) {
   transform: scale(1.05);
+}
+
+.submit-button:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+.auth-feedback {
+  margin: 0;
+  width: 100%;
+  max-width: 280px;
+  color: #ffcccc;
+  background-color: rgba(192, 57, 43, 0.35);
+  font-size: 0.9rem;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(231, 76, 60, 0.6);
+  text-align: center;
+  animation: fadeIn 0.25s ease-out;
 }
 
 input {

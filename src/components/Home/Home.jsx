@@ -7,24 +7,24 @@ import TopMenu from "../TopMenu/TopMenu.jsx";
 import PendingGames from "../UI/PendingGames/PendingGames.jsx";
 import { gameService, friendService } from "../../services/gameService.js";
 
-import alex from "../../assets/avatars/alex.png";
 import {
   AVATAR_LIST,
   PENDING_GAMES,
   getAvatarDisplay,
 } from "../../data/itemData.jsx";
 
-function Home({ onStart, user, onLogout, addXp }) {
+function Home({
+  onStart,
+  user,
+  onLogout,
+  addXp,
+  userAvatar,
+  setUserAvatar,
+}) {
   const [activePopup, setActivePopup] = useState(null);
   const [selectedGame, setSelectedGame] = useState(null);
   const [pendingDropdownOpen, setPendingDropdownOpen] = useState(false);
   const [selectedFriendProfile, setSelectedFriendProfile] = useState(null);
-
-  // Avatar (el backend puede mandar urlImgPerfil o urlimagenPerfil; id numérico o URL)
-  const [userAvatar, setUserAvatar] = useState(() => {
-    const raw = user?.urlImgPerfil ?? user?.urlimagenPerfil;
-    return raw != null && raw !== "" ? getAvatarDisplay(raw) : alex;
-  });
 
   // Monedas
   const [coins, setCoins] = useState(user?.monedas);
@@ -236,14 +236,6 @@ function Home({ onStart, user, onLogout, addXp }) {
 
     return () => clearInterval(interval);
   }, [isWaitingForStart, roomCode, onStart]);
-
-  useEffect(() => {
-    if (!user) return;
-    const raw = user.urlImgPerfil ?? user.urlimagenPerfil;
-    if (raw != null && raw !== "") {
-      setUserAvatar(getAvatarDisplay(raw));
-    }
-  }, [user]);
 
   useEffect(() => {
     let interval;
