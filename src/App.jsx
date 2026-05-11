@@ -4,10 +4,13 @@ import Board from "./components/Game/Board";
 import Home from "./components/Home/Home";
 import Loading from "./components/Loading/Loading";
 import Login from "./components/Login/Login";
-import alex from "./assets/avatars/alex.png";
 import Realistic from "react-canvas-confetti/dist/presets/realistic";
 import { authService } from "./services/gameService";
-import { getAvatarDisplay } from "./data/itemData.jsx";
+import {
+  getAvatarDisplay,
+  getProfileImageRaw,
+  defaultAvatarUrl,
+} from "./data/itemData.jsx";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -40,10 +43,10 @@ function App() {
     return saved ? JSON.parse(saved) : ["default"];
   });
 
-  // Avatar
+  // Avatar: siempre URL lista para <img> (el back suele mandar id numérico, no una ruta)
   const [userAvatar, setUserAvatar] = useState(() => {
     const saved = localStorage.getItem("rummi-avatar");
-    if (!saved) return alex;
+    if (!saved) return defaultAvatarUrl;
     return getAvatarDisplay(saved);
   });
 
@@ -58,6 +61,18 @@ function App() {
    * Añade XP al jugador y gestiona la subida de nivel con efectos visuales.
    * @param {number} ammount - Cantidad de XP ganada.
    */
+  /** Sincroniza estado React con un jugador devuelto por la API (login, getMe, etc.). */
+  const applySessionUser = (u) => {
+    setUser(u);
+    const raw = getProfileImageRaw(u);
+    setUserAvatar(
+      raw != null && raw !== "" ? getAvatarDisplay(raw) : defaultAvatarUrl,
+    );
+    if (u.monedas != null) {
+      setCoins(u.monedas);
+    }
+  };
+
   const addXp = (ammount) => {
     let newXp = xp + ammount;
     let newLevel = level;
@@ -85,11 +100,7 @@ function App() {
       if (token) {
         try {
           const u = await authService.getMe();
-          setUser(u);
-          const raw = u.urlImgPerfil ?? u.urlimagenPerfil;
-          if (raw != null && raw !== "") {
-            setUserAvatar(getAvatarDisplay(raw));
-          }
+          applySessionUser(u);
           setScreen("home");
         } catch {
           console.error("Token inválido o expirado");
@@ -103,19 +114,14 @@ function App() {
   }, []);
 
   const handleLogin = (jugador) => {
-    setUser(jugador);
-    const raw = jugador.urlImgPerfil ?? jugador.urlimagenPerfil;
-    if (raw != null && raw !== "") {
-      setUserAvatar(getAvatarDisplay(raw));
-    }
-    setCoins(jugador.monedas);
+    applySessionUser(jugador);
     setScreen("home");
   };
 
   const handleLogout = async () => {
     await authService.logout();
     setUser(null);
-    setUserAvatar(alex);
+    setUserAvatar(defaultAvatarUrl);
     setScreen("login");
   };
 

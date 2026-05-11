@@ -1,7 +1,6 @@
 import { useState } from "react";
 import "./Profile.css";
 import { getAvatarDisplay } from "../../../data/itemData";
-import alex from "../../../assets/avatars/alex.png";
 import { profileService } from "../../../services/gameService";
 import { sileo } from "sileo";
 import { LogOut } from "lucide-react";

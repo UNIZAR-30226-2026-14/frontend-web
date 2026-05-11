@@ -1,9 +1,6 @@
-import alex from "../assets/avatars/alex.png";
-import dani from "../assets/avatars/dani.png";
-import dian from "../assets/avatars/dian.png";
-import fernando from "../assets/avatars/fernando.png";
-import gonzalo from "../assets/avatars/gonzalo.png";
-import miguel from "../assets/avatars/miguel.png";
+const DICEBEAR = "https://api.dicebear.com/7.x/avataaars/svg";
+
+export const defaultAvatarUrl = `${DICEBEAR}?seed=Alex&backgroundColor=b6e3f4`;
 
 export const BACKGROUNDS = [
   {
@@ -104,12 +101,12 @@ export const POWER_UPS = [
 ];
 
 export const AVATAR_LIST = [
-  { id: 1, url: alex, name: "Alex" },
-  { id: 2, url: dani, name: "Dani" },
-  { id: 3, url: dian, name: "Dian" },
-  { id: 4, url: fernando, name: "Fernando" },
-  { id: 5, url: gonzalo, name: "Gonzalo" },
-  { id: 6, url: miguel, name: "Miguel" },
+  { id: 1, url: `${DICEBEAR}?seed=Alex&backgroundColor=b6e3f4`, name: "Alex" },
+  { id: 2, url: `${DICEBEAR}?seed=Dani&backgroundColor=c0aede`, name: "Dani" },
+  { id: 3, url: `${DICEBEAR}?seed=Dian&backgroundColor=d1d4f9`, name: "Dian" },
+  { id: 4, url: `${DICEBEAR}?seed=Fernando&backgroundColor=ffd5dc`, name: "Fernando" },
+  { id: 5, url: `${DICEBEAR}?seed=Gonzalo&backgroundColor=ffdfbf`, name: "Gonzalo" },
+  { id: 6, url: `${DICEBEAR}?seed=Miguel&backgroundColor=c0aede`, name: "Miguel" },
 ];
 
 /** Claves habituales en JSON (Spring / front) para la foto o id de preset.
@@ -155,7 +152,7 @@ export function getProfileImageRaw(entity) {
 
 export const getAvatarDisplay = (avatarRef) => {
   if (avatarRef == null || avatarRef === "") {
-    return alex;
+    return defaultAvatarUrl;
   }
   if (typeof avatarRef === "string") {
     const s = avatarRef.trim();
@@ -176,7 +173,7 @@ export const getAvatarDisplay = (avatarRef) => {
       String(a.id) === ref ||
       a.name.toLowerCase() === ref.toLowerCase(),
   );
-  return found ? found.url : alex;
+  return found ? found.url : defaultAvatarUrl;
 };
 
 export const PENDING_GAMES = [
