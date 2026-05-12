@@ -62,6 +62,7 @@ export const authService = {
         contrasena: password,
       }),
     });
+    console.log("Respuesta: ", res)
     if (!res.ok) {
       const fallback =
         res.status === 401 || res.status === 403
@@ -400,9 +401,9 @@ export const gameService = {
       body: JSON.stringify(body),
     });
     if (!res.ok) {
-      const errorData = await res.json();
-      throw new Error(res.message || "Movimiento rechazado por el árbitro");
-    }
+  const errorData = await res.json().catch(() => ({}));
+  throw new Error(errorData.message);
+}
 
     return await res.json();
   },

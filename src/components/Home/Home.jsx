@@ -132,6 +132,7 @@ function Home({
       const nuevaPartida = await gameService.createGame();
       const idNuevaPartida = nuevaPartida.idPartida;
       const unido = await gameService.joinGame(user.id, idNuevaPartida);
+      setShowPlayOptions(false);
 
       if (unido) {
         setRoomCode(`RUM-${idNuevaPartida}`);

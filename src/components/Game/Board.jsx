@@ -18,6 +18,7 @@ import PlayerRack from "./PlayerRack/PlayerRack.jsx";
 import BoardGrid from "./BoardGrid/BoardGrid.jsx";
 import GameControls from "./GameControls/GameControls.jsx";
 import Deck from "./Deck/Deck.jsx";
+import PowerUpSlots from "../Arcade/PowerUpSlots/PowerUpSlots.jsx"
 
 import {
   parsearFichas,
@@ -485,6 +486,7 @@ function Board({
     return () => window.removeEventListener("keydown", handleDebugHumo);
   }, [activeEffects.isBlind]); // Dependencia para que use el valor actualizado
 
+
   return (
     <DndContext onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
       <div
@@ -516,6 +518,8 @@ function Board({
             🗘
           </button>
         </div>
+
+        {/*<PowerUpSlots inventory={inventory}/> */}
 
         <div className="FINISH">
           <button

@@ -81,9 +81,11 @@ img {
 
 
 .UNDO{
-  position: relative;
-  top: 44vw;
-  right: 35vw;
+  position: fixed;
+  bottom: 1vw;
+  left: 80%;
+  display: flex;
+  flex-direction: column;
 }
 
 .UNDO button{
@@ -104,10 +106,13 @@ img {
 }
 
 .FINISH{
-  font-size: 1.3rem;
-  margin-top: 40vw;
-  margin-left: 90vw;
   position: fixed;
+  bottom: 6vw;
+  left: 86%;
+  display: flex;
+  flex-direction: column;
+  font-size: 1.3rem;
+ 
 }
 
 .blur-grid {
