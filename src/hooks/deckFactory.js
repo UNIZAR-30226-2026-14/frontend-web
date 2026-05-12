@@ -54,11 +54,17 @@ export const isValidSameNumberGroup = (tiles) => {
       (ficha) => ficha.number === "J" || ficha.number === firstTile.number,
     );
 
-    const realTiles = tiles.filter((t) => t.number !== "J");
-    const uniqueColors = new Set(realTiles.map((t) => t.color));
-    const jokersCount = tiles.length - realTiles.length;
+    const countAUX = tiles.filter((t) => t.number !== "J");
+    const colors = countAUX.map((t) => t.color );
+    const uniqueColors = new Set(colors);
+    const countJ = tiles.filter((t) => t.number === "J").length;
+    console.log("sameNumber: ", sameNumber);
+    console.log("COlores distintos: ", uniqueColors);
+    console.log("JOLLY HOKERS: ", countJ);
+    console.log("total: ", uniqueColors.size + countJ);
+    console.log("Tamanio: ", tiles.length);
 
-    return sameNumber && uniqueColors.size + jokersCount === tiles.length;
+    return sameNumber && uniqueColors.size + countJ === tiles.length;
   } else {
     return false;
   }
@@ -114,10 +120,10 @@ export const isValidSameNumber = (tiles) => {
     const sameNumber = tiles.every(
       (ficha) => ficha.number === "J" || ficha.number === firstTile.number,
     );
-    const colors = tiles.map((t) => t.color);
+    const countAUX = tiles.filter((t) => t.number !== "J");
+    const colors = countAUX.map((t) => t.color );
     const uniqueColors = new Set(colors);
     const countJ = tiles.filter((t) => t.number === "J").length;
-
     return sameNumber && uniqueColors.size + countJ === tiles.length;
   } else {
     return false;

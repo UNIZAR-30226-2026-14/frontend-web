@@ -57,7 +57,7 @@ export const parsearFichas = (datosFichas, esMesa = false) => {
     if (f === "J*") {
       return {
         id: `J-${Math.random()}`,
-        color: "black",
+        color: "",
         number: "J",
         placed: esMesa,
         habilidad: "joker",
@@ -97,7 +97,7 @@ export const monoFicha = (datosFichas, esMesa = false) => {
     if (datosFichas === "J*") {
       return {
         id: `J-${index}`,
-        color: "black",
+        color: "",
         number: "J",
         placed: esMesa,
         habilidad: "joker",
