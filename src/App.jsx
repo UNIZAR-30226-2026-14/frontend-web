@@ -54,6 +54,8 @@ function App() {
 
   const [activeGameId, setActiveGameId] = useState(null);
 
+  const [modeChosen, setModeChosen] = useState("");
+
   // Experiencia para subir al siguiente nivel
   const xpToNextLevel = (level - 1) ** 2 * 50 + 100;
 
@@ -163,6 +165,8 @@ function App() {
           setOwnedSkins={setOwnedSkins}
           showConfetti={showConfetti}
           setShowConfetti={setShowConfetti}
+          modeChosen={modeChosen}
+          setModeChosen={setModeChosen}
         />
       )}
 
@@ -193,6 +197,7 @@ function App() {
               setScreen("home");
             }, 4000);
           }}
+          isArcade={modeChosen === "arcade"}
         />
       )}
 

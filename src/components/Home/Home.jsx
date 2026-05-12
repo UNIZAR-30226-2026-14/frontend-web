@@ -21,11 +21,14 @@ function Home({
   addXp,
   userAvatar,
   setUserAvatar,
+  modeChosen,
+  setModeChosen,
 }) {
   const [activePopup, setActivePopup] = useState(null);
   const [selectedGame, setSelectedGame] = useState(null);
   const [pendingDropdownOpen, setPendingDropdownOpen] = useState(false);
   const [selectedFriendProfile, setSelectedFriendProfile] = useState(null);
+  
 
   // Monedas
   const [coins, setCoins] = useState(user?.monedas);
@@ -127,9 +130,9 @@ function Home({
     }
   };
 
-  const handleCreatePrivateGame = async () => {
+  const handleCreatePrivateGame = async (mode) => {
     try {
-      const nuevaPartida = await gameService.createGame();
+      const nuevaPartida = await gameService.createGame((mode==="arcade"));
       const idNuevaPartida = nuevaPartida.idPartida;
       const unido = await gameService.joinGame(user.id, idNuevaPartida);
       setShowPlayOptions(false);
@@ -145,9 +148,9 @@ function Home({
     }
   };
 
-  const handleQuickMatch = async () => {
+  const handleQuickMatch = async (mode) => {
     try {
-      const partidas = await gameService.getAllGames();
+      const partidas = await gameService.getAllGames((mode==="arcade"));
       const partidaDisponible = partidas.find(
         (p) => p.estado === "WAITING" || !p.corriendo,
       );
@@ -350,18 +353,18 @@ function Home({
               X
             </button>
 
-            <h2 className="selection-title">MODO CLÁSICO</h2>
+            <h2 className="selection-title">{modeChosen=== "classic" ? "MODO CLÁSICO" : "MODO ARCADE"}</h2>
 
             <div className="selection-options-container">
               {/* Buscar partida (Matchmaking) */}
-              <div className="selection-card" onClick={handleQuickMatch}>
+              <div className="selection-card" onClick={() => handleQuickMatch(modeChosen)}>
                 <div className="selection-icon">🌍</div>
                 <h3>Partida Pública</h3>
                 <p>Buscar una mesa libre para jugar ahora</p>
               </div>
 
               {/* Crear partida privada */}
-              <div className="selection-card" onClick={handleCreatePrivateGame}>
+              <div className="selection-card" onClick={() => handleCreatePrivateGame(modeChosen)}>
                 <div className="selection-icon">🔑</div>
                 <h3>Crear Partida Privada</h3>
                 <p>Genera un código para invitar a un amigo</p>
@@ -390,7 +393,7 @@ function Home({
       <div className="gamemodes">
         <div
           className={`gamemode-card classic ${selectedGame ? "" : ""} ${selectedGame && selectedGame.mode !== "classic" ? "disabled" : ""}`}
-          onClick={() => setShowPlayOptions(true)}
+          onClick={() => {setModeChosen("classic"); setShowPlayOptions(true);}}
         >
           <div className="gamemode-glow" />
           <div className="gamemode-icon">
@@ -427,9 +430,7 @@ function Home({
 
         <div
           className={`gamemode-card arcade ${selectedGame && selectedGame.mode !== "arcade" ? "disabled" : ""}`}
-          onClick={() => {
-            if (selectedGame && selectedGame.mode !== "arcade") return;
-          }}
+          onClick={() => {setModeChosen("arcade"); setShowPlayOptions(true);}}
         >
           <div className="gamemode-glow" />
           <div className="gamemode-icon">
@@ -457,7 +458,11 @@ function Home({
           </div>
           <h2 className="gamemode-title">Modo Arcade</h2>
           <p className="gamemode-desc">Power-ups y caos</p>
-          <span className="gamemode-badge coming-soon">PRONTO</span>
+          <span className="gamemode-badge">
+            {selectedGame && selectedGame.mode === "arcade"
+              ? "CONTINUAR"
+              : "JUGAR"}
+          </span>
         </div>
       </div>
     </div>

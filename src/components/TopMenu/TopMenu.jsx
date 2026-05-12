@@ -30,10 +30,8 @@ function TopMenu({
             />
           </button>
 
-          {/* Info: nombre + barra XP + nivel */}
-          <div className="profile-info">
-            <h1 className="profile-username">{user.nombre || "Invitado"}</h1>
-            <div className="xp-row">
+          {/* Info: nombre + barra XP + nivel 
+          <div className="xp-row">
               <div className="xp-bar-container">
                 <div
                   className="xp-fill"
@@ -44,7 +42,12 @@ function TopMenu({
                 </span>
               </div>
               <span className="xp-level">Nivel {level}</span>
-            </div>
+            </div>*/}
+          <div className="profile-info">
+            <h1 className="profile-username">{user.nombre || "Invitado"}</h1>
+
+            
+
           </div>
         </div>
       </div>

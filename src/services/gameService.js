@@ -268,7 +268,7 @@ export const friendService = {
 
 export const gameService = {
   // Crear nueva partida
-  createGame: async () => {
+  createGame: async (esArcade) => {
     const res = await apiFetch("partidas", {
       method: "POST",
       headers: getHeaders(),
@@ -278,6 +278,7 @@ export const gameService = {
         corriendo: false,
         mercado: "",
         bolsa: "",
+        modoArcade: esArcade,
         conjuntoMesa: "",
       }),
     });
@@ -357,10 +358,14 @@ export const gameService = {
   },
 
   // Obtener todas las partidas
-  getAllGames: async () => {
+  getAllGames: async (esArcade) => {
     try {
       const res = await apiFetch("partidas", {
         headers: getHeaders(),
+          body: JSON.stringify({ //NO SE SI ASÍ ESTÁ BIEN LA VERDAD
+          modoArcade: esArcade,
+
+        }),
       });
       if (!res.ok) {
         throw new Error("Error al obtener la lista de partidas");

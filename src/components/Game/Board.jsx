@@ -149,6 +149,7 @@ function Board({
     // Inicializamos 20 huecos vacíos
     const initial = {};
     for (let i = 0; i < 20; i++) initial[`hand-slot-${i}`] = "";
+    console.log("Es arcade: ", isArcade);
     return initial;
   });
 
