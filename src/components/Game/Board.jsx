@@ -45,6 +45,7 @@ function Board({
   const [ordenTurno, setOrdenTurno] = useState(null);
 
   const [matchPoints, setMatchPoints] = useState(0);
+  const [primeraJugada, setPrimeraJugada] = useState(true);
   const [activeEvent, setActiveEvent] = useState(null);
   const [deckSize, setDeckSize] = useState(0);
 
@@ -77,8 +78,27 @@ function Board({
   });
 
   // Función para conseguir puntos para comprar power-ups
-  const sumarPuntosPorJugada = (fichasColocadas) => {
-    const puntosGanados = fichasColocadas.length;
+  const sumarPuntosPorJugada = () => {
+    let puntosGanados = 0;
+    for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 25; col++) {
+          const index = row * 25 + col;
+          const tile = boardPositions[`board-slot-${index}`];
+          console.log(tile);
+          if (tile !== "" && tile.placed === false) {
+            if (tile.habilidad === "dorada") {
+              puntosGanados = puntosGanados + 2;
+              console.log(" DORADA Pontos: ", puntosGanados);
+            }
+            else {
+              puntosGanados++;
+              console.log("NORMAL Pontos: ", puntosGanados);
+            }
+          } 
+        }
+      }
+      console.log("Pontos: ", puntosGanados);
+
     setMatchPoints((prev) => prev + puntosGanados);
   };
 
@@ -123,7 +143,7 @@ function Board({
     if (miTurno && !processing) {
 
       // Verificar si hay un evento de inicio de turno
-      switch (activeEvent?.id) {
+      switch (activeEvent) {
         case "AUTO_DRAW":
           setDiscount(false);
           drawTile_NOPASS();
@@ -275,9 +295,6 @@ function Board({
       conjuntos.forEach((conjunto) => {
         const fichas = parsearFichas(conjunto, true);
         let aux = (slotIndex % 25) + fichas.length;
-        console.log("fichas length: ", fichas.length);
-        console.log("CUanto queda:", slotIndex % 25);
-        console.log("sobrante: ", aux);
         if (aux >= 25) {
           for (let i = 0; i < fichas.length; i++) {
             newBoard[`board-slot-${slotIndex}`] = "";
@@ -329,6 +346,9 @@ function Board({
 
         // Si acaba de empezar mi turno, sincronizamos frontend y backend
         if (esMiTurnoAhora && !miTurno) {
+          if (isArcade) {
+            ;
+          }
           const resU = await gameService.getParticipation(user.id, idPartida);
           setMyTime(30);
           actualizarTableroVisual(partida.conjuntoMesa);
@@ -492,6 +512,7 @@ function Board({
         setProcessing(false);
         return;
       }
+      sumarPuntosPorJugada();
 
       await gameService.playAdvanced(
         user.id,
@@ -499,6 +520,7 @@ function Board({
         "replace_board",
         conjuntos,
       );
+      
 
       setMiTurno(false);
       setHeJugado(false);
