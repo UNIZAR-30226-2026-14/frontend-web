@@ -69,6 +69,8 @@ function Profile({
   }, [user.nombre]);
 
   const handleChangeUsername = async (newUsername) => {
+    if (myId !== userId) return;
+
     if (!newUsername || newUsername === user.nombre) {
       setIsEditingName(false);
       return;
@@ -94,6 +96,8 @@ function Profile({
   const [oldPass, setOldPass] = useState("");
 
   const handlePasswordChange = async () => {
+    if (myId !== userId) return;
+
     if (newPass.length < 6) {
       sileo.error({
         title: "Error",

@@ -61,8 +61,20 @@ function Home({
 
   const [userName, setUserName] = useState(user?.nombre || "Invitado");
 
+  const [showResumeModal, setShowResumeModal] = useState(false);
+
+  const [friends, setFriends] = useState([]);
+
   const handleNameChange = (newName) => {
     setUserName(newName);
+  };
+
+  const [challengeId, setChallengeId] = useState(null);
+
+  const handleChallenge = (id) => {
+    setChallengeId(id);
+    // Aquí deberías llamar al servicio para enviar la invitación real
+    setTimeout(() => setChallengeId(null), 2000);
   };
 
   /**
@@ -239,12 +251,28 @@ function Home({
         const partida = await gameService.getGameStatus(id);
         if (partida.estado === "RUNNING") {
           clearInterval(interval);
-          onStart(id); // Esto confirma el cambio a Board en App.jsx
+          onStart(id);
         }
       }, 2000);
     }
     return () => clearInterval(interval);
   }, [isWaitingForStart, isHost, roomCode]);
+
+  const loadFriendList = async () => {
+    try {
+      const listaAmigos = await friendService.getFriends(user.id);
+      setFriends(listaAmigos);
+    } catch (err) {
+      sileo.error({
+        title: "Error de conexión.",
+        description: "No se pudieron sincronizar tus amigos.",
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (user.id) loadFriendList();
+  }, [user.id]);
 
   return (
     <div className="home-screen">
@@ -313,22 +341,69 @@ function Home({
         />
       )}
 
-      <PendingGames
-        userId={user.id}
-        userAvatar={userAvatar}
-        selectedGame={selectedGame}
-        setSelectedGame={setSelectedGame}
-        pendingDropdownOpen={pendingDropdownOpen}
-        setPendingDropdownOpen={setPendingDropdownOpen}
-        onInvite={() => setActivePopup("friends")}
-      />
-
       {showCodeModal && (
         <div className="lobby-overlay">
-          <div className="lobby-modal">
-            <h2>CÓDIGO: {roomCode}</h2>
-            <button onClick={handleStartLobbyGame}>INICIAR PARTIDA</button>
-            <button onClick={() => setShowCodeModal(false)}>CANCELAR</button>
+          <div className="lobby-modal custom-lobby">
+            <button
+              className="close-button-top"
+              onClick={() => setShowCodeModal(false)}
+            >
+              ✕
+            </button>
+
+            <div className="lobby-slots-container">
+              {[1, 2, 3, 4].map((slot, index) => (
+                <div key={index} className="player-slot">
+                  {/* Aquí podrías mapear los jugadores reales de la sala */}
+                  {index === 0 ? (
+                    <div className="slot-avatar">{userAvatar}</div> // El host
+                  ) : (
+                    <div className="slot-empty" />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div className="lobby-friends-section">
+              <div className="friends-invite-list">
+                {friends.length > 0 ? (
+                  friends.map((friend) => (
+                    <div key={`friend-${friend.id}`} className="friend-card">
+                      <div
+                        className="friend-profile-hit"
+                        onClick={() => onOpenProfile?.(friend.id)}
+                      >
+                        <div className="friend-info">
+                          <span className="friend-name">{friend.name}</span>
+                          <span
+                            className={`status-indicator ${friend.status}`}
+                          ></span>
+                        </div>
+                      </div>
+                      {friend.status === "online" && (
+                        <button
+                          className="challenge-button"
+                          onClick={() => handleChallenge(friend.id)}
+                          disabled={challengeId === friend.id}
+                        >
+                          {challengeId === friend.id ? "..." : "Retar"}
+                        </button>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <p className="no-results">No se han encontrado amigos</p>
+                )}
+              </div>
+            </div>
+
+            <div className="lobby-actions">
+              <button className="start-game-btn" onClick={handleStartLobbyGame}>
+                Empezar
+              </button>
+            </div>
+
+            <div className="lobby-code-display">{roomCode}</div>
           </div>
         </div>
       )}
@@ -383,6 +458,60 @@ function Home({
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {showResumeModal && (
+        <div className="lobby-overlay">
+          <div className="lobby-modal resume-modal">
+            <button
+              className="close-button"
+              onClick={() => setShowResumeModal(false)}
+            >
+              X
+            </button>
+
+            <h2 className="selection-title" style={{ color: "#058b90" }}>
+              PARTIDAS PAUSADAS
+            </h2>
+
+            <div className="resume-list-container">
+              {user.partidasPendientes > 0 ? (
+                <PendingGames
+                  userId={user.id}
+                  userAvatar={userAvatar}
+                  selectedGame={selectedGame}
+                  setSelectedGame={(game) => {
+                    setSelectedGame(game);
+                    onStart(game.idPartida);
+                    setShowResumeModal(false);
+                  }}
+                  pendingDropdownOpen={true}
+                  setPendingDropdownOpen={() => {}}
+                  onInvite={() => setActivePopup("friends")}
+                />
+              ) : (
+                <p
+                  style={{
+                    color: "white",
+                    textAlign: "center",
+                    marginTop: "20px",
+                  }}
+                >
+                  No tienes partidas pendientes en este momento.
+                </p>
+              )}
+            </div>
+
+            {selectedGame && (
+              <button
+                className="resume-confirm-btn"
+                onClick={() => onStart(selectedGame.idPartida)}
+              >
+                REANUDAR PARTIDA #{selectedGame.idPartida}
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -462,6 +591,45 @@ function Home({
           </div>
           <h2 className="gamemode-title">Modo Arcade</h2>
           <p className="gamemode-desc">Power-ups y caos</p>
+          <span className="gamemode-badge">
+            {selectedGame && selectedGame.mode === "arcade"
+              ? "CONTINUAR"
+              : "JUGAR"}
+          </span>
+        </div>
+
+        <div
+          className="gamemode-card resume"
+          onClick={() => {
+            setShowResumeModal(true);
+          }}
+        >
+          <div className="gamemode-glow" />
+          <div className="gamemode-icon">
+            <svg viewBox="0 0 100 120" className="tile-icon">
+              <rect
+                x="10"
+                y="10"
+                width="80"
+                height="100"
+                rx="8"
+                className="tile-back"
+              />
+              <rect
+                x="18"
+                y="18"
+                width="64"
+                height="84"
+                rx="5"
+                className="tile-front"
+              />
+              <text x="50" y="72" textAnchor="middle" className="tile-play">
+                ⯈
+              </text>
+            </svg>
+          </div>
+          <h2 className="gamemode-title">Reanudar Partida</h2>
+          <p className="gamemode-desc">Termina lo que empezaste</p>
           <span className="gamemode-badge">
             {selectedGame && selectedGame.mode === "arcade"
               ? "CONTINUAR"

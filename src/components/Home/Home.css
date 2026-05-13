@@ -13,7 +13,6 @@
   align-items: center;
 }
 
-/* ── Tarjeta deshabilitada ── */
 .gamemode-card.disabled {
   opacity: 0.35;
   filter: grayscale(1);
@@ -73,7 +72,19 @@
 }
 
 .gamemode-card.arcade:hover {
-  box-shadow: 0 12px 36px rgba(39, 118, 245, 0.7);
+  box-shadow: 0 12px 36px rgba(5, 139, 144, 0.7);
+}
+
+.gamemode-card.resume {
+  background: linear-gradient(145deg, #03666a, #058b90, #26a69a);
+  box-shadow: 0 6px 24px rgba(5, 139, 144, 0.5);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.gamemode-card.resume:hover {
+  box-shadow: 0 12px 36px rgba(5, 139, 144, 0.7);
+  border-color: rgba(255, 255, 255, 0.6);
+  transform: translateY(-6px) scale(1.03);
 }
 
 .gamemode-glow {
@@ -211,7 +222,7 @@
 }
 
 .join-card {
-  grid-column: span 2; /* Ocupa toda la fila de abajo */
+  grid-column: span 2;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -228,35 +239,98 @@
   margin-bottom: 10px;
 }
 
-/* El contenedor oscuro que bloquea el fondo */
 .lobby-overlay {
-  position: fixed; /* Fijo para que no se mueva al hacer scroll */
+  position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.85); /* Fondo oscuro semi-transparente */
+  background: rgba(0, 0, 0, 0.85);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999; /* Valor muy alto para estar encima de todo */
-  backdrop-filter: blur(5px); /* Efecto de desenfoque opcional */
+  z-index: 9999;
+  backdrop-filter: blur(5px);
 }
 
-/* La caja del modal blanco o gris */
+/* Contenedor principal del modal (image_e87419.png) */
 .lobby-modal {
-  background: #1a1a1a;
-  padding: 40px;
-  border-radius: 24px;
-  border: 2px solid #4caf50;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-  max-width: 500px;
-  width: 90%;
-  position: relative; /* Para el botón de cerrar */
-  animation: modal-appear 0.3s ease-out;
+  background: #121212; /* Fondo casi negro */
+  padding: 30px;
+  border-radius: 28px;
+  border: 2px solid #4caf50; /* El borde verde de la imagen */
+  width: 600px;
+  max-width: 95%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* Animación de entrada */
+.lobby-slots-container {
+  display: flex;
+  gap: 12px;
+  border: 2px solid #4caf50;
+  padding: 10px 25px;
+  border-radius: 40px;
+  margin-bottom: 25px;
+}
+
+.player-slot {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  border: 2px solid #4caf50;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.lobby-friends-section {
+  width: 80%;
+  background: transparent;
+  border: 2px solid #4caf50;
+  border-radius: 20px;
+  padding: 15px;
+  margin-bottom: 25px;
+}
+
+.friend-invite-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  color: white;
+}
+
+.retar-btn {
+  background: #2a2a2a;
+  color: white;
+  border: none;
+  padding: 5px 15px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: "Arial Black", sans-serif;
+  font-size: 0.8rem;
+}
+
+.start-game-btn {
+  background: #222;
+  color: #e0e0e0;
+  border: none;
+  padding: 15px 60px;
+  border-radius: 18px;
+  font-size: 2rem;
+  font-family: "Arial", sans-serif;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.start-game-btn:active {
+  transform: scale(0.95);
+}
+
 @keyframes modal-appear {
   from {
     transform: translateY(20px);
@@ -268,7 +342,6 @@
   }
 }
 
-/* Estilo para los inputs dentro del modal para que no se vean pegados */
 .join-input-wrapper input {
   padding: 12px;
   border-radius: 8px;
@@ -277,6 +350,11 @@
   color: white;
   font-size: 1.1rem;
   width: 150px;
+}
+
+.tile-play {
+  fill: #00ff37;
+  font-size: 52px;
 }
 
 @media (max-width: 1070px) {
