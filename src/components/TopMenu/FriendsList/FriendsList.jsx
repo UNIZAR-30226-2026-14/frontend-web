@@ -179,11 +179,6 @@ function FriendsList({ onClose, onOpenProfile, userId }) {
                           className="friend-profile-hit"
                           onClick={() => onOpenProfile?.(friend.id)}
                         >
-                          <img
-                            src={getAvatarDisplay(friend.avatar)}
-                            alt=""
-                            className="friend-avatar"
-                          />
                           <div className="friend-info">
                             <span className="friend-name">{friend.name}</span>
                             <span
@@ -247,10 +242,10 @@ function FriendsList({ onClose, onOpenProfile, userId }) {
                   {sentRequests.length > 0 ? (
                     sentRequests.map((req) => (
                       <div
-                        key={`sent-${req.jugador2}`}
+                        key={`sent-${req.amigoNombre}`}
                         className="request-card sent-card"
                       >
-                        <span>Usuario {req.jugador2}</span>
+                        <span>{req.amigoNombre}</span>
                         <span
                           className={`status-tag ${req.estado.toLowerCase()}`}
                         >

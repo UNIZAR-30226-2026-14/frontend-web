@@ -195,8 +195,8 @@ export const friendService = {
       headers: getHeaders(),
     });
     if (!res.ok) throw new Error("Error al cargar solicitudes pendientes.");
-
     const data = await res.json();
+    
     // Solicitudes donde soy el receptor y está PENDIENTE
     return data.filter(
       (rel) => rel.jugador2Id === userId && rel.estado === "PENDIENTE",
@@ -212,6 +212,8 @@ export const friendService = {
       throw new Error("Error al cargar solicitudes enviadas pendientes.");
 
     const data = await res.json();
+    console.log("Solicitudes enviadas:", data);
+
     // Solicitudes donde soy el emisor y está PENDIENTE
     return data.filter(
       (rel) => rel.jugador1Id === userId && rel.estado === "PENDIENTE",
