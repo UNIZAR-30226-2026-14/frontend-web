@@ -233,14 +233,6 @@ export const friendService = {
         );
         return res.ok;
       } else {
-        const res = await apiFetch(
-          `amigos/${jugador1Id}/${jugador2Id}/estado`,
-          {
-            method: "PATCH",
-            headers: getHeaders(),
-            body: JSON.stringify({ estado: "RECHAZADA" }),
-          },
-        );
         const res = await apiFetch(`amigos/${jugador1Id}/${jugador2Id}`, {
           method: "DELETE",
           headers: getHeaders(),
