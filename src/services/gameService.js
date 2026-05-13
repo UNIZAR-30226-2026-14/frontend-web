@@ -321,6 +321,18 @@ export const gameService = {
     return res.ok;
   },
 
+  drawTile_NOPASS: async (userId, gameId) => {
+    const res = await apiFetch(`partidas/${gameId}/solo-robar`, {
+      method: "POST",
+      headers: getHeaders(),
+      body: JSON.stringify({
+        idJugador: userId,
+      }),
+    });
+    if (!res.ok) throw new Error("Error al robar ficha.");
+    return await res.json();
+  },
+
   // Robar ficha
   drawTile: async (userId, gameId) => {
     const res = await apiFetch(`partidas/${gameId}/robar`, {

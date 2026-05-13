@@ -11,6 +11,7 @@ function Profile({
   currentAvatar,
   setUserAvatar,
   avatarList,
+  myId,
   userId,
   user,
   coins,
@@ -85,8 +86,9 @@ function Profile({
         <div className="profile-card">
           <div className="profile-header">
             <h1>Perfil de jugador</h1>
+
             <button className="logout-button" onClick={onLogout} title="Cerrar sesión">
-              <LogOut size={25} color="#ff4444" />
+              { (myId===userId) && (<LogOut size={25} color="#ff4444" />)}
             </button>
           </div>
 
@@ -133,10 +135,6 @@ function Profile({
             <div className="data-row">
               <span className="data-label">Monedas</span>
               <span className="data-value">{coins}</span>
-            </div>
-            <div className="data-row">
-              <span className="data-label">Nivel</span>
-              <span className="data-value">{level}</span>
             </div>
           </div>
 

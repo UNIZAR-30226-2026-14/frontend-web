@@ -282,6 +282,7 @@ function Home({
           currentAvatar={selectedFriendProfile?.avatar || userAvatar}
           setUserAvatar={selectedFriendProfile ? null : setUserAvatar}
           avatarList={selectedFriendProfile ? [] : AVATAR_LIST}
+          myId={user.id}
           userId={selectedFriendProfile?.userId || user.id}
           user={selectedFriendProfile ? selectedFriendProfile.user : user}
           coins={selectedFriendProfile?.coins ?? coins}

@@ -63,6 +63,9 @@ function Board({
 
   const [points, setPoints] = useState(0);
 
+  //Pal evento del 50%
+  const [discount, setDiscount] = useState(false); 
+
   // Dentro de la función Board
   const [activeEffects, setActiveEffects] = useState({
     isBlind: false, // Bomba de humo
@@ -73,7 +76,7 @@ function Board({
 
   // Función para conseguir puntos para comprar power-ups
   const sumarPuntosPorJugada = (fichasColocadas) => {
-    const puntosGanados = fichasColocadas.length * 10;
+    const puntosGanados = fichasColocadas.length;
     setMatchPoints((prev) => prev + puntosGanados);
   };
 
@@ -113,31 +116,26 @@ function Board({
     setTimeout(() => setActiveEvent(null), 5000);
   };
 
+
   useEffect(() => {
     if (miTurno && !processing) {
       // Verificar si hay un evento de inicio de turno
       switch (activeEvent?.id) {
         case "AUTO_DRAW":
-          drawTile();
+          setDiscount(false);
+          drawTile_NOPASS();
           break;
 
         case "NO_SPECIFIC_COLOR":
+          setDiscount(false); //sómo se indica que no se puede un color concreto?????
           // Cosas
           break;
 
         case "50%_DISCOUNT":
-          // Cosas
+          setDiscount(true);// Cosas
           break;
-
-        case "HALF_PLAYTIME":
-          // Cosas
-          break;
-
-        case "DOUBLE_PLAYTIME":
-          // Cosas
-          break;
-
         default:
+          setDiscount(false);
           break;
       }
     }
@@ -201,7 +199,7 @@ function Board({
 
     setJoinedSlots(newJoined);
   }, [boardPositions]); // Se ejecuta cada vez que el tablero cambie
-  // ESTO LUEGO TENDRÍA QUE IR EN OTRO LAO PERO COMO FALTA POR IMPLEMENTAR EL ACTUALIZAR BOARD
+
 
   const actualizarManoVisual = (fichas) => {
     if (!fichas) return;
@@ -326,6 +324,14 @@ function Board({
           actualizarTableroVisual(partida.conjuntoMesa);
           setStartTurnHand(handPositions);
           setMiTurno(true);
+
+          // PARA EL TIME OUT EN UN PRINCIPIO SOLO TENEMOS QUE PONER ESTO  C R E O
+          await delay(30000); //30 segundos pa maniobrar
+          setMiTurno(false);
+          setProcessing(true);
+          gameService.passTurn();
+
+
         } else if (!esMiTurnoAhora) {
           // Si no es mi turno, solo actualizamos tablero
           actualizarTableroVisual(partida.conjuntoMesa);
@@ -411,6 +417,23 @@ function Board({
     setHeJugado(false);
     setHandPositions(startTurnHand);
     setBoardPositions(startTurnBoard);
+  };
+
+  const drawTile_NOPASS = async () => {
+    try {
+      setProcessing(true);
+      const data = await gameService.drawTile_NOPASS(user.id, idPartida);
+      const fichasNuevas = parsearFichas(data.fichaRobada);
+
+      if (fichasNuevas.length > 0) {
+        añadirFichaALaMano(fichasNuevas[0]);
+        setDeckSize((prev) => prev - 1);
+      }
+    } catch (error) {
+      console.error("Error al robar:", error);
+    } finally {
+      setProcessing(false);
+    }
   };
 
   const drawTile = async () => {
