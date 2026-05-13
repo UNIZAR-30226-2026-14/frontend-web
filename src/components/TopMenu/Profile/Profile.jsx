@@ -197,7 +197,12 @@ function Profile({
                 ) : (
                   <div
                     className="value-with-pencil"
-                    onClick={() => setIsEditingName(true)}
+                    onClick={() => {
+                      if (myId === userId) {
+                        setIsEditingName(true);
+                      }
+                    }}
+                    style={{ cursor: myId === userId ? "pointer" : "default" }}
                   >
                     <div />
                     <span className="data-value">{displayName}</span>{" "}
@@ -211,57 +216,59 @@ function Profile({
               </div>
             </div>
 
-           { myId === userId && <div className="data-row">
-              <span className="data-label">Contraseña</span>
-              <div className="password-edit-container">
-                {isChangingPass ? (
-                  <div className="pass-input-group stack">
-                    <input
-                      type="password"
-                      className="name-input"
-                      placeholder="Contraseña actual"
-                      value={oldPass}
-                      onChange={(e) => setOldPass(e.target.value)}
-                      autoFocus
-                    />
-                    <input
-                      type="password"
-                      className="name-input"
-                      placeholder="Nueva contraseña"
-                      value={newPass}
-                      onChange={(e) => setNewPass(e.target.value)}
-                    />
-                    <div className="pass-actions">
-                      <button
-                        className="btn-save-small"
-                        onClick={handlePasswordChange}
-                      >
-                        OK
-                      </button>
-                      <button
-                        className="btn-cancel-small"
-                        onClick={() => {
-                          setIsChangingPass(false);
-                          setOldPass("");
-                          setNewPass("");
-                        }}
-                      >
-                        X
-                      </button>
+            {myId === userId && (
+              <div className="data-row">
+                <span className="data-label">Contraseña</span>
+                <div className="password-edit-container">
+                  {isChangingPass ? (
+                    <div className="pass-input-group stack">
+                      <input
+                        type="password"
+                        className="name-input"
+                        placeholder="Contraseña actual"
+                        value={oldPass}
+                        onChange={(e) => setOldPass(e.target.value)}
+                        autoFocus
+                      />
+                      <input
+                        type="password"
+                        className="name-input"
+                        placeholder="Nueva contraseña"
+                        value={newPass}
+                        onChange={(e) => setNewPass(e.target.value)}
+                      />
+                      <div className="pass-actions">
+                        <button
+                          className="btn-save-small"
+                          onClick={handlePasswordChange}
+                        >
+                          OK
+                        </button>
+                        <button
+                          className="btn-cancel-small"
+                          onClick={() => {
+                            setIsChangingPass(false);
+                            setOldPass("");
+                            setNewPass("");
+                          }}
+                        >
+                          X
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <button
-                    className="change-pass-link"
-                    onClick={() => setIsChangingPass(true)}
-                  >
-                    <div />
-                    <span className="data-value">********</span>
-                    <span className="edit-pencil-small">✎</span>
-                  </button>
-                )}
+                  ) : (
+                    <button
+                      className="change-pass-link"
+                      onClick={() => setIsChangingPass(true)}
+                    >
+                      <div />
+                      <span className="data-value">********</span>
+                      <span className="edit-pencil-small">✎</span>
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>}
+            )}
 
             <div className="data-row">
               <span className="data-label">ID</span>
