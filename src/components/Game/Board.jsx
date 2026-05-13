@@ -61,7 +61,6 @@ function Board({
 
   const [inventory, setInventory] = useState([]);
 
-  const [points, setPoints] = useState(0);
   const [myTime, setMyTime] = useState(30);
 
 
@@ -122,6 +121,7 @@ function Board({
 
   useEffect(() => {
     if (miTurno && !processing) {
+
       // Verificar si hay un evento de inicio de turno
       switch (activeEvent?.id) {
         case "AUTO_DRAW":
@@ -233,7 +233,6 @@ function Board({
       for (let i = 0; i < slotsNecesarios; i++) {
         newPositions[`hand-slot-${i}`] = fichasParaPintar[i] || "";
       }
-      console.log("Manopla: ",newPositions);
       return newPositions;
       
     });
@@ -331,6 +330,7 @@ function Board({
         // Si acaba de empezar mi turno, sincronizamos frontend y backend
         if (esMiTurnoAhora && !miTurno) {
           const resU = await gameService.getParticipation(user.id, idPartida);
+          setMyTime(30);
           actualizarTableroVisual(partida.conjuntoMesa);
           setStartTurnHand(handPositions);
           setMiTurno(true);
@@ -585,7 +585,7 @@ function Board({
         </div>
 
         <div className="puntos">
-          <div>Puntos: {points}</div>
+          <div>Puntos: {matchPoints}</div>
         </div>
 
         <div className="tiempo">
