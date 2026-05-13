@@ -1,50 +1,10 @@
 import { isMoveValid } from "../hooks/deckFactory.js";
 
-/*export const parsearFichas = (stringFichas) => {
-  if (!stringFichas) return [];
-
-  const coloresMap = {
-    R: "red",
-    B: "blue",
-    O: "orange",
-    K: "black",
-  };
-
-  return stringFichas.split(",").map((f, index) => {
-    if (f === "J*") {
-      return {
-        id: `J-${index}`,
-        color: "black",
-        number: "J",
-        placed: false,
-        habilidad: "joker",
-      };
-    }
-
-    const color = f[0];
-    const numero = parseInt(f.substring(1, 3));
-    const habilidad = f[3];
-    const habilidadesMap = {
-      D: "dorada",
-      A: "arcoiris",
-      N: "negativa",
-    };
-
-    return {
-      id: `${color}-${numero}-${index}`,
-      color: coloresMap[color] || "black",
-      number: numero,
-      placed: false,
-      habilidad: habilidadesMap[habilidad] || null,
-    };
-  });
-};*/
-
 export const parsearFichas = (datosFichas, esMesa = false) => {
   if (!datosFichas) return [];
 
   const coloresMap = { R: "red", B: "blue", O: "orange", K: "black" };
-  const habilidadesMap = { D: "dorada", A: "arcoiris", N: "negativa" };
+  const habilidadesMap = { D: "dorada", A: "arcoiris"};
 
   // Si nos llega un string (mazo: "R1,B10D"), lo convertimos a array.
   // Si ya es un array (tablero: ["R1", "R2"]), lo usamos tal cual.
@@ -88,7 +48,7 @@ export const parsearFichas = (datosFichas, esMesa = false) => {
 export const monoFicha = (datosFichas, esMesa = false) => {
   if (!datosFichas) return "";
   const coloresMap = { R: "red", B: "blue", O: "orange", K: "black" };
-  const habilidadesMap = { D: "dorada", A: "arcoiris", N: "negativa" };
+  const habilidadesMap = { D: "dorada", A: "arcoiris"};
 
   // Si nos llega un string (mazo: "R1,B10D"), lo convertimos a array.
   // Si ya es un array (tablero: ["R1", "R2"]), lo usamos tal cua
@@ -134,8 +94,7 @@ const aux = (tile) => {
   };
   const habilidadesMap = {
     dorada: "D",
-    arcoiris: "A",
-    negativa: "N",
+    arcoiris: "A"
   };
   const color = coloresMap[tile.color] || "K";
   const numStr = String(tile.number);

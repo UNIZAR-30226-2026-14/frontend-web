@@ -233,8 +233,9 @@ function Board({
       for (let i = 0; i < slotsNecesarios; i++) {
         newPositions[`hand-slot-${i}`] = fichasParaPintar[i] || "";
       }
-      return newPositions;
       console.log("Manopla: ",newPositions);
+      return newPositions;
+      
     });
   };
 

@@ -28,7 +28,7 @@ function comodin(number, color) {
 
 const Tile = ({ number, color, placed, habilidad }) => {
   const isRainbow = habilidad === "arcoiris";
-  const isNegative = habilidad === "negativa";
+  const isgold = habilidad === "dorada";
 
   //console.log(`Pintando ficha: ${number} ${color}`);
   return (
@@ -38,7 +38,6 @@ const Tile = ({ number, color, placed, habilidad }) => {
     >
       <span>{comodin(number, color)}</span>
       {sign(number, color)}
-      {isNegative && <div className="negative-sign">-</div>}
     </div>
   );
 };

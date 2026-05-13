@@ -41,9 +41,9 @@
 }
 
 /* Dorado */
-.tile.tile-gold {
+.tile.tile-dorada {
   border: 2px solid #d4af37;
-  background-color: #fffdf2;
+  background-color: #c39c00;
   box-shadow: 0 0 8px rgba(212, 175, 55, 0.6), inset 0 0 5px rgba(212, 175, 55, 0.3);
 }
 
@@ -62,21 +62,6 @@
 @keyframes rainbow-move {
   0% { background-position: 0% 50%; }
   100% { background-position: 100% 50%; }
-}
-
-/* Negativo */
-.tile.tile-negative {
-  border: 2px solid #ff4d4d;
-  background-color: #fff5f5;
-}
-
-/* Símbolo negativo */
-.negative-mark {
-  position: absolute;
-  top: 2px;
-  right: 4px;
-  font-size: 14px;
-  color: #ff4d4d;
 }
 
 /* Estado para las fichas colocadas */
