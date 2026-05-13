@@ -102,6 +102,73 @@ const aux = (tile) => {
   return `${color}${numStr}${habilidad}`;
 };
 
+
+/**
+ * Calcula el valor de un grupo de fichas para la apertura. El valor se basa en la suma de los números de las fichas,
+ * donde los Jokers toman el valor del número que le correspondería si no fueran Jokers. Para grupos del mismo número,
+ * el valor es el número multiplicado por la cantidad de fichas. Para escaleras, el valor es la suma de los números en la escalera.
+ * @param {Array} tiles - Array de fichas a evaluar.
+ * @returns {number} - El valor total del grupo de fichas.
+ */
+export const groupValue = (tiles) => {
+  const firstRealIndex = tiles.findIndex((t) => t.number !== "J");
+  const firstRealTile = tiles[firstRealIndex];
+
+  //Grupos del mismo número
+  const sameNumber = tiles.every(
+    (t) => t.number === "J" || t.number === firstRealTile.number,
+  );
+  if (sameNumber) return firstRealTile.number * tiles.length;
+
+  //Escalera
+  let startingValue = firstRealTile.number - firstRealIndex;
+  let total = 0;
+  for (let i = 0; i < tiles.length; i++) {
+    total += startingValue + i;
+  }
+  return total;
+};
+
+export const isMovePure = (conjTiles) => {
+  const pure = conjTiles.every(
+      (ficha) => ficha.placed === false,
+    );
+  return pure;  
+}
+
+export const validarInicial = (boardPositions) => {
+  let totalPoints = 0;
+  for (let row = 0; row < 8; row++) {
+    let conjTiles = [];
+
+    for (let col = 0; col < 25; col++) {
+      const index = row * 25 + col;
+      const tile = boardPositions[`board-slot-${index}`];
+
+      if (tile && tile !== "") {
+        conjTiles.push(tile);
+      } else {
+        if (conjTiles.length > 0) {
+          if (isMoveValid(conjTiles) && isMovePure(conjTiles)) {
+            totalPoints += groupValue(conjTiles);
+            conjTiles = [];
+          }
+        }
+      }
+    }
+
+    // Si la fila termina y hay un grupo, lo cerramos
+   /* if (conjuntoActual.length > 0) {
+      if (isMoveValid(conjTiles) && isMovePure(conjTiles)) {
+        conjuntos.push(conjuntoActual);
+      } else {
+        return [];
+      } // esto mira si hay alguna ficha o pareja de fichas flotando, eso es un gran nono
+    }*/
+  }
+  return totalPoints >= 30;
+};
+
 export const obtenerConjuntosDelTablero = (boardPositions) => {
   const conjuntos = [];
   for (let row = 0; row < 8; row++) {

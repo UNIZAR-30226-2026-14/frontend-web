@@ -158,31 +158,6 @@ export const areCompatible = (tiles) => {
   return isValidSameNumber(tiles) || isValidLadder(tiles);
 };
 
-/**
- * Calcula el valor de un grupo de fichas para la apertura. El valor se basa en la suma de los números de las fichas,
- * donde los Jokers toman el valor del número que le correspondería si no fueran Jokers. Para grupos del mismo número,
- * el valor es el número multiplicado por la cantidad de fichas. Para escaleras, el valor es la suma de los números en la escalera.
- * @param {Array} tiles - Array de fichas a evaluar.
- * @returns {number} - El valor total del grupo de fichas.
- */
-export const groupValue = (tiles) => {
-  const firstRealIndex = tiles.findIndex((t) => t.number !== "J");
-  const firstRealTile = tiles[firstRealIndex];
-
-  //Grupos del mismo número
-  const sameNumber = tiles.every(
-    (t) => t.number === "J" || t.number === firstRealTile.number,
-  );
-  if (sameNumber) return firstRealTile.number * tiles.length;
-
-  //Escalera
-  let startingValue = firstRealTile.number - firstRealIndex;
-  let total = 0;
-  for (let i = 0; i < tiles.length; i++) {
-    total += startingValue + i;
-  }
-  return total;
-};
 
 /**
  * Valida si el jugador puede abrir con los grupos seleccionados. Para abrir, el jugador debe colocar grupos válidos

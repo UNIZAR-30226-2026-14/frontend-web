@@ -23,6 +23,7 @@ import PowerUpSlots from "../Arcade/PowerUpSlots/PowerUpSlots.jsx"
 import {
   parsearFichas,
   obtenerConjuntosDelTablero,
+  validarInicial,
 } from "../../services/gameUtils.js";
 import { gameService } from "../../services/gameService.js";
 
@@ -507,12 +508,15 @@ function Board({
       setProcessing(true);
       const conjuntos = obtenerConjuntosDelTablero(boardPositions);
 
-      if (conjuntos.length === 0) {
+      if (conjuntos.length === 0 || (primeraJugada && !validarInicial(boardPositions))) {
         undoMove();
         setProcessing(false);
         return;
       }
       sumarPuntosPorJugada();
+      if (primeraJugada) {
+        setPrimeraJugada(false);
+      }
 
       await gameService.playAdvanced(
         user.id,
