@@ -357,6 +357,29 @@
   font-size: 52px;
 }
 
+.challenge-button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 5px 12px;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(52, 152, 219, 0.2);
+}
+
+.challenge-button:hover:not(:disabled) {
+  background-color: #2980b9;
+  transform: scale(1.05);
+}
+
+.challenge-button:disabled {
+  background-color: #7f8c8d;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 @media (max-width: 1070px) {
   .gamemode-card {
     flex: 0 1 260px;

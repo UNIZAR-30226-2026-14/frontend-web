@@ -69,8 +69,6 @@ function Profile({
   }, [user.nombre]);
 
   const handleChangeUsername = async (newUsername) => {
-    if (myId !== userId) return;
-
     if (!newUsername || newUsername === user.nombre) {
       setIsEditingName(false);
       return;

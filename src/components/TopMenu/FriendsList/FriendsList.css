@@ -142,29 +142,6 @@
   box-shadow: 0 0 0 2px #3498db;
 }
 
-.challenge-button {
-  background-color: #3498db;
-  color: white;
-  border: none;
-  padding: 5px 12px;
-  font-weight: 600;
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  box-shadow: 0 2px 4px rgba(52, 152, 219, 0.2);
-}
-
-.challenge-button:hover:not(:disabled) {
-  background-color: #2980b9;
-  transform: scale(1.05);
-}
-
-.challenge-button:disabled {
-  background-color: #7f8c8d;
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
 .request-card {
   display: flex;
   justify-content: space-between;
@@ -191,7 +168,8 @@
   align-items: center;
 }
 
-.accept-mini-btn, .reject-mini-btn {
+.accept-mini-btn,
+.reject-mini-btn {
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -229,7 +207,8 @@
   box-shadow: 0 4px 8px rgba(231, 76, 60, 0.4);
 }
 
-.accept-mini-btn:active, .reject-mini-btn:active {
+.accept-mini-btn:active,
+.reject-mini-btn:active {
   transform: scale(0.9);
 }
 

@@ -197,15 +197,6 @@ function FriendsList({ onClose, onOpenProfile, userId }) {
                             ></span>
                           </div>
                         </div>
-                        {friend.status === "online" && (
-                          <button
-                            className="challenge-button"
-                            onClick={() => handleChallenge(friend.id)}
-                            disabled={challengeId === friend.id}
-                          >
-                            {challengeId === friend.id ? "..." : "Retar"}
-                          </button>
-                        )}
                       </div>
                     ))
                   ) : (

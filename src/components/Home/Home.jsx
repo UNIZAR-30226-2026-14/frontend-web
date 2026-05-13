@@ -482,10 +482,25 @@ function Home({
                   userId={user.id}
                   userAvatar={userAvatar}
                   selectedGame={selectedGame}
-                  setSelectedGame={(game) => {
-                    setSelectedGame(game);
-                    onStart(game.idPartida);
-                    setShowResumeModal(false);
+                  setSelectedGame={async (game) => {
+                    try {
+                      const exito = await gameService.resumeGame(
+                        game.idPartida,
+                      );
+
+                      if (exito) {
+                        setSelectedGame(game);
+                        onStart(game.idPartida);
+                        setShowResumeModal(false);
+                      } else {
+                        alert(
+                          "No se pudo reanudar la partida.",
+                        );
+                      }
+                    } catch (error) {
+                      console.error("Error al reanudar:", error);
+                      alert("Error de conexión al intentar reanudar.");
+                    }
                   }}
                   pendingDropdownOpen={true}
                   setPendingDropdownOpen={() => {}}

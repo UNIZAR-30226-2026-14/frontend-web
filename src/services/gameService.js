@@ -353,6 +353,7 @@ export const gameService = {
     return res.ok;
   },
 
+  // RObar ficha sin pasar de turno
   drawTile_NOPASS: async (userId, gameId) => {
     const res = await apiFetch(`partidas/${gameId}/solo-robar`, {
       method: "POST",
@@ -441,8 +442,7 @@ export const gameService = {
     if (moveType === "replace_board") {
       body.newBoard = board;
     } else if (moveType === "extend_meld") {
-      // body.extendedIndex = ...
-      // body.extensionTiles = ...
+      //
     }
     const res = await apiFetch(`partidas/${gameId}/jugar-avanzado`, {
       method: "POST",
@@ -465,6 +465,14 @@ export const gameService = {
       body: JSON.stringify({ idJugador: userId }),
     });
     return res.ok;
+  },
+
+  resumeGame: async (gameId) => {
+    const response = await apiFetch(`partidas/${gameId}/reanudar`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
+    return response.ok;
   },
 };
 
