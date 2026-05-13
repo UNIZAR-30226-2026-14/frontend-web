@@ -148,12 +148,6 @@
   width: 100%;
 }
 
-.profile-main-data .data-row:last-child {
-  grid-column: span 2;
-  display: flex;
-  justify-content: space-between;
-}
-
 .data-row {
   background: rgba(4, 15, 6, 0.62);
   border: 1px solid rgba(171, 255, 166, 0.3);
@@ -343,25 +337,45 @@
   color: #fff;
 }
 
-.name-edit-container {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
+.data-value, .change-pass-link span:first-child {
+  grid-column: 2;
+  text-align: center;
 }
 
 .edit-pencil-small {
   background: none;
+  margin-left: auto;
   border: none;
   color: #aaa;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 1.5rem;
   padding: 0;
   transition: color 0.2s;
+  justify-self: end;
 }
 
 .edit-pencil-small:hover {
   color: #fff;
+}
+
+.name-edit-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+  gap: 8px;
+}
+
+.value-with-pencil, .change-pass-link {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  width: 100%;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
 }
 
 .name-input {
@@ -371,7 +385,45 @@
   border-radius: 4px;
   padding: 2px 6px;
   font-size: 1rem;
-  width: 100px; /* Ajusta según necesites */
+  width: 100px;
+}
+
+.password-edit-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.pass-input-group {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  justify-content: center;
+}
+
+.pass-input-group .name-input {
+  flex: 1;
+  max-width: 250px;
+  text-align: center;
+}
+
+.change-pass-link:hover {
+  color: #fff;
+}
+
+.btn-save-small,
+.btn-cancel-small {
+  background: #4caf50;
+  border: none;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-cancel-small {
+  background: #f44336;
 }
 
 @media (max-width: 1024px) {

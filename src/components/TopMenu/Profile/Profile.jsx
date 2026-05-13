@@ -89,6 +89,39 @@ function Profile({
     }
   };
 
+  const [isChangingPass, setIsChangingPass] = useState(false);
+  const [newPass, setNewPass] = useState("");
+  const [oldPass, setOldPass] = useState("");
+
+  const handlePasswordChange = async () => {
+    if (newPass.length < 6) {
+      sileo.error({
+        title: "Error",
+        description: "La nueva contraseña debe tener al menos 6 caracteres.",
+      });
+      return;
+    }
+
+    const success = await profileService.updatePassword(
+      userId,
+      oldPass,
+      newPass,
+    );
+
+    if (success) {
+      sileo.success({ title: "Contraseña actualizada" });
+      setIsChangingPass(false);
+      setOldPass("");
+      setNewPass("");
+    } else {
+      sileo.error({
+        title: "Error",
+        description:
+          "La contraseña actual es incorrecta o hubo un error de red.",
+      });
+    }
+  };
+
   return (
     <div className="profile-stats">
       <button className="close-button" onClick={onClose}>
@@ -142,10 +175,6 @@ function Profile({
 
           <div className="profile-main-data">
             <div className="data-row">
-              <span className="data-label">ID</span>
-              <span className="data-value">#{userId}</span>
-            </div>
-            <div className="data-row">
               <span className="data-label">Nombre</span>
               <div className="name-edit-container">
                 {isEditingName ? (
@@ -166,20 +195,79 @@ function Profile({
                     autoFocus
                   />
                 ) : (
-                  <>
-                    <span className="data-value">{displayName}</span>
-                    {canEditAvatar && (
-                      <button
-                        className="edit-pencil-small"
-                        onClick={() => setIsEditingName(true)}
-                      >
-                        ✎
-                      </button>
+                  <div
+                    className="value-with-pencil"
+                    onClick={() => setIsEditingName(true)}
+                  >
+                    <div />
+                    <span className="data-value">{displayName}</span>{" "}
+                    {canEditAvatar ? (
+                      <span className="edit-pencil-small">✎</span>
+                    ) : (
+                      <div />
                     )}
-                  </>
+                  </div>
                 )}
               </div>
             </div>
+
+            <div className="data-row">
+              <span className="data-label">Contraseña</span>
+              <div className="password-edit-container">
+                {isChangingPass ? (
+                  <div className="pass-input-group stack">
+                    <input
+                      type="password"
+                      className="name-input"
+                      placeholder="Contraseña actual"
+                      value={oldPass}
+                      onChange={(e) => setOldPass(e.target.value)}
+                      autoFocus
+                    />
+                    <input
+                      type="password"
+                      className="name-input"
+                      placeholder="Nueva contraseña"
+                      value={newPass}
+                      onChange={(e) => setNewPass(e.target.value)}
+                    />
+                    <div className="pass-actions">
+                      <button
+                        className="btn-save-small"
+                        onClick={handlePasswordChange}
+                      >
+                        OK
+                      </button>
+                      <button
+                        className="btn-cancel-small"
+                        onClick={() => {
+                          setIsChangingPass(false);
+                          setOldPass("");
+                          setNewPass("");
+                        }}
+                      >
+                        X
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    className="change-pass-link"
+                    onClick={() => setIsChangingPass(true)}
+                  >
+                    <div />
+                    <span className="data-value">********</span>
+                    <span className="edit-pencil-small">✎</span>
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="data-row">
+              <span className="data-label">ID</span>
+              <span className="data-value">#{userId}</span>
+            </div>
+
             <div className="data-row">
               <span className="data-label">Monedas</span>
               <span className="data-value">{coins}</span>

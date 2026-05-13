@@ -62,7 +62,7 @@ export const authService = {
         contrasena: password,
       }),
     });
-    console.log("Respuesta: ", res)
+    console.log("Respuesta: ", res);
     if (!res.ok) {
       const fallback =
         res.status === 401 || res.status === 403
@@ -220,14 +220,11 @@ export const friendService = {
 
   // Aceptar o rechazar solicitud
   answerRequest: async (jugador1Id, jugador2Id, accept) => {
-    const res = await apiFetch(
-      `amigos/${jugador1Id}/${jugador2Id}/estado`,
-      {
-        method: "PATCH",
-        headers: getHeaders(),
-        body: JSON.stringify({ estado: accept ? "ACEPTADA" : "RECHAZADA" }),
-      },
-    );
+    const res = await apiFetch(`amigos/${jugador1Id}/${jugador2Id}/estado`, {
+      method: "PATCH",
+      headers: getHeaders(),
+      body: JSON.stringify({ estado: accept ? "ACEPTADA" : "RECHAZADA" }),
+    });
     return res.ok;
   },
 
@@ -374,9 +371,9 @@ export const gameService = {
     try {
       const res = await apiFetch("partidas", {
         headers: getHeaders(),
-          body: JSON.stringify({ //NO SE SI ASÍ ESTÁ BIEN LA VERDAD
+        body: JSON.stringify({
+          //NO SE SI ASÍ ESTÁ BIEN LA VERDAD
           modoArcade: esArcade,
-
         }),
       });
       if (!res.ok) {
@@ -418,9 +415,9 @@ export const gameService = {
       body: JSON.stringify(body),
     });
     if (!res.ok) {
-  const errorData = await res.json().catch(() => ({}));
-  throw new Error(errorData.message);
-}
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(errorData.message);
+    }
 
     return await res.json();
   },
@@ -451,5 +448,20 @@ export const profileService = {
       console.error("Error al actualizar el perfil:", error);
       return false;
     }
+  },
+  // Cambiar la contraseña
+  updatePassword: async (userId, oldPassword, newPassword) => {
+    const response = await apiFetch(`jugadores/${userId}/contrasena`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("rummi-token")}`,
+      },
+      body: JSON.stringify({
+        contrasenaActual: oldPassword,
+        contrasenaNueva: newPassword,
+      }),
+    });
+    return response.ok;
   },
 };
