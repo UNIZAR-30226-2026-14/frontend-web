@@ -32,6 +32,7 @@ function DraggableTile({ tile }) {
         number={tile.number}
         color={tile.color}
         placed={tile.placed}
+        habilidad={tile.habilidad}
       />
     </div>
   );
