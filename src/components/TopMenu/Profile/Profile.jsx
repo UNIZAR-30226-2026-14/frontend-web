@@ -211,7 +211,7 @@ function Profile({
               </div>
             </div>
 
-            <div className="data-row">
+           { myId === userId && <div className="data-row">
               <span className="data-label">Contraseña</span>
               <div className="password-edit-container">
                 {isChangingPass ? (
@@ -261,7 +261,7 @@ function Profile({
                   </button>
                 )}
               </div>
-            </div>
+            </div>}
 
             <div className="data-row">
               <span className="data-label">ID</span>
