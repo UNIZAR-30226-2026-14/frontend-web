@@ -62,6 +62,9 @@ function Board({
   const [inventory, setInventory] = useState([]);
 
   const [points, setPoints] = useState(0);
+  const [myTime, setMyTime] = useState(30);
+
+
 
   //Pal evento del 50%
   const [discount, setDiscount] = useState(false); 
@@ -199,7 +202,12 @@ function Board({
 
     setJoinedSlots(newJoined);
   }, [boardPositions]); // Se ejecuta cada vez que el tablero cambie
-
+  
+  const undoMove = () => {
+    setHeJugado(false);
+    setHandPositions(startTurnHand);
+    setBoardPositions(startTurnBoard);
+  };
 
   const actualizarManoVisual = (fichas) => {
     if (!fichas) return;
@@ -326,13 +334,6 @@ function Board({
           setStartTurnHand(handPositions);
           setMiTurno(true);
 
-          // PARA EL TIME OUT EN UN PRINCIPIO SOLO TENEMOS QUE PONER ESTO  C R E O
-          await delay(30000); //30 segundos pa maniobrar
-          setMiTurno(false);
-          setProcessing(true);
-          gameService.passTurn(user.id, idPartida);
-
-
         } else if (!esMiTurnoAhora) {
           // Si no es mi turno, solo actualizamos tablero
           actualizarTableroVisual(partida.conjuntoMesa);
@@ -384,6 +385,35 @@ function Board({
     handleDragLogic(event, states);
   }
 
+  const finalizarTurnoPorTimeout = () => {
+    setMiTurno(false);
+
+            setProcessing(true);
+
+            undoMove();
+
+            drawTile_NOPASS();
+
+            setMyTime(30);
+
+            gameService.passTurn(user.id, idPartida);
+  }
+
+
+  useEffect(() => {
+    let timer;
+    if (miTurno && myTime > 0 && !processing) {
+      timer = setInterval(() => {
+        setMyTime((prev) => prev - 1);
+      }, 1000);
+    } else if (myTime === 0 && miTurno) {
+      // Aquí ejecutas la lógica de "se acabó el tiempo"
+      finalizarTurnoPorTimeout();
+    }
+
+    return () => clearInterval(timer); // Limpieza vital
+  }, [miTurno, myTime, processing]);
+
   const activeTile =
     Object.values(handPositions).find((t) => t?.id === activeId) ||
     Object.values(boardPositions).find((t) => t?.id === activeId);
@@ -414,11 +444,7 @@ function Board({
     setHandPositions(newPositions);
   };
 
-  const undoMove = () => {
-    setHeJugado(false);
-    setHandPositions(startTurnHand);
-    setBoardPositions(startTurnBoard);
-  };
+ 
 
   const drawTile_NOPASS = async () => {
     try {
@@ -559,6 +585,10 @@ function Board({
 
         <div className="puntos">
           <div>Puntos: {points}</div>
+        </div>
+
+        <div className="tiempo">
+          <div>⏳ {myTime}</div>
         </div>
 
         <GameControls onSortColor={sortByColor} onSortNum={sortByNumber} />

@@ -63,8 +63,21 @@
 
 .puntos {
   font-size: 2rem;
-  margin-left: -70vw;
-  position: relative;
+  right: 90%;
+  bottom: 5vw;
+   position: fixed;
+   display: flex;
+  flex-direction: column;
+}
+
+.tiempo {
+  font-size: 2rem;
+  bottom: 2vw;
+  right: 90%;
+   position: fixed;
+   display: flex;
+  flex-direction: column;
+  
 }
 
 img {
