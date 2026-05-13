@@ -202,3 +202,5 @@ export const canPlayerOpen = (groups) => {
 
   return areAllValid && totalPoints >= 30;
 };
+
+
