@@ -138,7 +138,10 @@ function Shop({
                     key={skin.id}
                     className={`item-card ${isEquipped ? "active" : ""}`}
                   >
-                    <div className={`item-preview tile-box ${skin.value}`}>
+                    <div
+                      className={`item-preview tile-box`}
+                      style={{ background: skin.value }}
+                    >
                       7
                     </div>
                     <span className="item-name">{skin.name}</span>

@@ -196,7 +196,7 @@ export const friendService = {
     });
     if (!res.ok) throw new Error("Error al cargar solicitudes pendientes.");
     const data = await res.json();
-    
+
     // Solicitudes donde soy el receptor y está PENDIENTE
     return data.filter(
       (rel) => rel.jugador2Id === userId && rel.estado === "PENDIENTE",
@@ -212,7 +212,6 @@ export const friendService = {
       throw new Error("Error al cargar solicitudes enviadas pendientes.");
 
     const data = await res.json();
-    console.log("Solicitudes enviadas:", data);
 
     // Solicitudes donde soy el emisor y está PENDIENTE
     return data.filter(
@@ -222,12 +221,36 @@ export const friendService = {
 
   // Aceptar o rechazar solicitud
   answerRequest: async (jugador1Id, jugador2Id, accept) => {
-    const res = await apiFetch(`amigos/${jugador1Id}/${jugador2Id}/estado`, {
-      method: "PATCH",
-      headers: getHeaders(),
-      body: JSON.stringify({ estado: accept ? "ACEPTADA" : "RECHAZADA" }),
-    });
-    return res.ok;
+    try {
+      if (accept) {
+        const res = await apiFetch(
+          `amigos/${jugador1Id}/${jugador2Id}/estado`,
+          {
+            method: "PATCH",
+            headers: getHeaders(),
+            body: JSON.stringify({ estado: "ACEPTADA" }),
+          },
+        );
+        return res.ok;
+      } else {
+        const res = await apiFetch(
+          `amigos/${jugador1Id}/${jugador2Id}/estado`,
+          {
+            method: "PATCH",
+            headers: getHeaders(),
+            body: JSON.stringify({ estado: "RECHAZADA" }),
+          },
+        );
+        const res = await apiFetch(`amigos/${jugador1Id}/${jugador2Id}`, {
+          method: "DELETE",
+          headers: getHeaders(),
+        });
+        return res.ok;
+      }
+    } catch (error) {
+      console.error("Error al responder a la solicitud:", error);
+      return false;
+    }
   },
 
   // Obtener perfil de un amigo
@@ -258,6 +281,24 @@ export const friendService = {
 
       const data = await res.json();
       return data.filter((p) => p.estado !== "FINISHED");
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
+  },
+
+  // Obtener invitaciones a partidas
+  getGameInvitations: async (userId) => {
+    try {
+      const res = await apiFetch(`invitaciones?idInvitado=${userId}`, {
+        headers: getHeaders(),
+      });
+      if (!res.ok)
+        throw new Error("Error al obtener las invitaciones del usuario");
+
+      const data = await res.json();
+      console.log("Invitaciones:", data);
+      return data;
     } catch (error) {
       console.error(error);
       return [];

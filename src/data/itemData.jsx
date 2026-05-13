@@ -34,9 +34,9 @@ export const BACKGROUNDS = [
 ];
 
 export const TILE_SKINS = [
-  { id: "default", name: "Original", price: 0, value: "skin-default" },
-  { id: "neon", name: "Cibernético", price: 800, value: "skin-neon" },
-  { id: "marble", name: "Mármol Real", price: 2000, value: "skin-marble" },
+  { id: "default", name: "Original", price: 0, value: "#d1d1d1" },
+  { id: "oficina", name: "Gris oficina", price: 800, value: "#454545" },
+  { id: "divina", name: "Divina de la Muerte", price: 2000, value: "#ca2897" },
 ];
 
 export const POWER_UPS = [
@@ -104,9 +104,21 @@ export const AVATAR_LIST = [
   { id: 1, url: `${DICEBEAR}?seed=Alex&backgroundColor=b6e3f4`, name: "Alex" },
   { id: 2, url: `${DICEBEAR}?seed=Dani&backgroundColor=c0aede`, name: "Dani" },
   { id: 3, url: `${DICEBEAR}?seed=Dian&backgroundColor=d1d4f9`, name: "Dian" },
-  { id: 4, url: `${DICEBEAR}?seed=Fernando&backgroundColor=ffd5dc`, name: "Fernando" },
-  { id: 5, url: `${DICEBEAR}?seed=Gonzalo&backgroundColor=ffdfbf`, name: "Gonzalo" },
-  { id: 6, url: `${DICEBEAR}?seed=Miguel&backgroundColor=c0aede`, name: "Miguel" },
+  {
+    id: 4,
+    url: `${DICEBEAR}?seed=Fernando&backgroundColor=ffd5dc`,
+    name: "Fernando",
+  },
+  {
+    id: 5,
+    url: `${DICEBEAR}?seed=Gonzalo&backgroundColor=ffdfbf`,
+    name: "Gonzalo",
+  },
+  {
+    id: 6,
+    url: `${DICEBEAR}?seed=Miguel&backgroundColor=c0aede`,
+    name: "Miguel",
+  },
 ];
 
 /** Claves habituales en JSON (Spring / front) para la foto o id de preset.
@@ -169,9 +181,7 @@ export const getAvatarDisplay = (avatarRef) => {
   }
   const ref = String(avatarRef).trim();
   const found = AVATAR_LIST.find(
-    (a) =>
-      String(a.id) === ref ||
-      a.name.toLowerCase() === ref.toLowerCase(),
+    (a) => String(a.id) === ref || a.name.toLowerCase() === ref.toLowerCase(),
   );
   return found ? found.url : defaultAvatarUrl;
 };

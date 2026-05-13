@@ -7,26 +7,31 @@ import { getAvatarDisplay } from "../../../data/itemData.jsx";
 function FriendsList({ onClose, onOpenProfile, userId }) {
   const [challengeId, setChallengeId] = useState(null);
   const [search, setSearch] = useState("");
-  const [friends, setFriends] = useState([]);
-  const [receivedRequests, setReceivedRequests] = useState([]);
-  const [sentRequests, setSentRequests] = useState([]);
   const [newFriendId, setNewFriendId] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const [error, setError] = useState("");
 
   const [activeTab, setActiveTab] = useState("amigos");
 
+  const [friends, setFriends] = useState([]);
+  const [receivedRequests, setReceivedRequests] = useState([]);
+  const [sentRequests, setSentRequests] = useState([]);
+  const [invitations, setInvitations] = useState([]);
+
   const loadFriendData = async () => {
     try {
-      const [listaAmigos, listaRecibidas, listaEnviadas] = await Promise.all([
-        friendService.getFriends(userId),
-        friendService.getPendingRequests(userId),
-        friendService.getSentRequests(userId),
-      ]);
+      const [listaAmigos, listaRecibidas, listaEnviadas, listaInvitaciones] =
+        await Promise.all([
+          friendService.getFriends(userId),
+          friendService.getPendingRequests(userId),
+          friendService.getSentRequests(userId),
+          friendService.getGameInvitations(userId),
+        ]);
 
       setFriends(listaAmigos);
       setReceivedRequests(listaRecibidas);
       setSentRequests(listaEnviadas);
+      setInvitations(listaInvitaciones);
     } catch (err) {
       sileo.error({
         title: "Error de conexión.",
@@ -158,6 +163,12 @@ function FriendsList({ onClose, onOpenProfile, userId }) {
               >
                 Enviadas ({sentRequests.length})
               </button>
+              <button
+                className={`tab-btn ${activeTab === "invitaciones" ? "active" : ""}`}
+                onClick={() => setActiveTab("invitaciones")}
+              >
+                Invitaciones ({invitations.length})
+              </button>
             </div>
 
             <div className="tab-content">
@@ -257,6 +268,39 @@ function FriendsList({ onClose, onOpenProfile, userId }) {
                     <p className="empty-msg">
                       No has enviado ninguna solicitud
                     </p>
+                  )}
+                </div>
+              )}
+
+              {activeTab === "invitaciones" && (
+                <div className="requests-list">
+                  {invitations.length > 0 ? (
+                    invitations.map((inv) => (
+                      <div key={`inv-${inv.id}`} className="request-card">
+                        <div className="invitation-info">
+                          <span className="friend-name">{inv.hostName}</span>
+                          <span className="invitation-type">
+                            Te invita a jugar
+                          </span>
+                        </div>
+                        <div className="request-buttons">
+                          <button
+                            className="accept-mini-btn"
+                            onClick={() => handleAcceptGame(inv.id)}
+                          >
+                            ✓
+                          </button>
+                          <button
+                            className="reject-mini-btn"
+                            onClick={() => handleRejectGame(inv.id)}
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="empty-msg">No tienes invitaciones de juego</p>
                   )}
                 </div>
               )}
