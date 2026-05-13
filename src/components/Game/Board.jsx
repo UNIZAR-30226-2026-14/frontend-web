@@ -226,6 +226,7 @@ function Board({
         newPositions[`hand-slot-${i}`] = fichasParaPintar[i] || "";
       }
       return newPositions;
+      console.log("Manopla: ",newPositions);
     });
   };
 
@@ -329,7 +330,7 @@ function Board({
           await delay(30000); //30 segundos pa maniobrar
           setMiTurno(false);
           setProcessing(true);
-          gameService.passTurn();
+          gameService.passTurn(user.id, idPartida);
 
 
         } else if (!esMiTurnoAhora) {
