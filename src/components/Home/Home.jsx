@@ -28,7 +28,6 @@ function Home({
   const [selectedGame, setSelectedGame] = useState(null);
   const [pendingDropdownOpen, setPendingDropdownOpen] = useState(false);
   const [selectedFriendProfile, setSelectedFriendProfile] = useState(null);
-  
 
   // Monedas
   const [coins, setCoins] = useState(user?.monedas);
@@ -37,18 +36,6 @@ function Home({
   const [currentBackground, setCurrentBackground] = useState(() => {
     const saved = localStorage.getItem("rummi-bg");
     return saved ? saved : "#2e7d32";
-  });
-
-  // Nivel
-  const [level, setLevel] = useState(() => {
-    const saved = localStorage.getItem("rummi-lvl");
-    return saved ? parseInt(saved) : 1;
-  });
-
-  // Experiencia del nivel actual
-  const [xp, setXp] = useState(() => {
-    const saved = localStorage.getItem("rummi-xp");
-    return saved ? parseInt(saved) : 0;
   });
 
   const [matchStats] = useState(() => {
@@ -72,8 +59,11 @@ function Home({
   const [isHost, setIsHost] = useState(false);
   const [showCodeModal, setShowCodeModal] = useState(false);
 
-  // Experiencia para subir al siguiente nivel
-  const xpToNextLevel = (level - 1) ** 2 * 50 + 100;
+  const [userName, setUserName] = useState(user?.nombre || "Invitado");
+
+  const handleNameChange = (newName) => {
+    setUserName(newName);
+  };
 
   /**
    * Alterna la visibilidad de los popups. Si el popup ya está abierto,
@@ -101,7 +91,6 @@ function Home({
       user: profile,
       avatar: getAvatarDisplay(getProfileImageRaw(profile)),
       coins: profile.monedas || 0,
-      level: 1,
       stats: {
         wins: profile.partidasGanadas || 0,
         losses: profile.partidasPerdidas || 0,
@@ -132,7 +121,7 @@ function Home({
 
   const handleCreatePrivateGame = async (mode) => {
     try {
-      const nuevaPartida = await gameService.createGame((mode==="arcade"));
+      const nuevaPartida = await gameService.createGame(mode === "arcade");
       const idNuevaPartida = nuevaPartida.idPartida;
       const unido = await gameService.joinGame(user.id, idNuevaPartida);
       setShowPlayOptions(false);
@@ -150,7 +139,7 @@ function Home({
 
   const handleQuickMatch = async (mode) => {
     try {
-      const partidas = await gameService.getAllGames((mode==="arcade"));
+      const partidas = await gameService.getAllGames(mode === "arcade");
       const partidaDisponible = partidas.find(
         (p) => p.estado === "WAITING" || !p.corriendo,
       );
@@ -262,10 +251,7 @@ function Home({
       {/* Barra superior */}
       <TopMenu
         userAvatar={userAvatar}
-        user={user}
-        xp={xp}
-        xpToNextLevel={xpToNextLevel}
-        level={level}
+        user={{ ...user, nombre: userName }}
         togglePopup={togglePopup}
         openOwnProfile={openOwnProfile}
         setActivePopup={setActivePopup}
@@ -284,9 +270,13 @@ function Home({
           avatarList={selectedFriendProfile ? [] : AVATAR_LIST}
           myId={user.id}
           userId={selectedFriendProfile?.userId || user.id}
-          user={selectedFriendProfile ? selectedFriendProfile.user : user}
+          user={
+            selectedFriendProfile
+              ? selectedFriendProfile.user
+              : { ...user, nombre: userName }
+          }
+          onNameChange={handleNameChange}
           coins={selectedFriendProfile?.coins ?? coins}
-          level={selectedFriendProfile?.level ?? level}
           stats={
             selectedFriendProfile?.stats || {
               wins: matchStats.wins,
@@ -318,7 +308,6 @@ function Home({
           setCoins={setCoins}
           currentBackground={currentBackground}
           setCurrentBackground={setCurrentBackground}
-          addXp={addXp}
           ownedBgs={ownedBgs}
           setOwnedBgs={setOwnedBgs}
         />
@@ -354,18 +343,26 @@ function Home({
               X
             </button>
 
-            <h2 className="selection-title">{modeChosen=== "classic" ? "MODO CLÁSICO" : "MODO ARCADE"}</h2>
+            <h2 className="selection-title">
+              {modeChosen === "classic" ? "MODO CLÁSICO" : "MODO ARCADE"}
+            </h2>
 
             <div className="selection-options-container">
               {/* Buscar partida (Matchmaking) */}
-              <div className="selection-card" onClick={() => handleQuickMatch(modeChosen)}>
+              <div
+                className="selection-card"
+                onClick={() => handleQuickMatch(modeChosen)}
+              >
                 <div className="selection-icon">🌍</div>
                 <h3>Partida Pública</h3>
                 <p>Buscar una mesa libre para jugar ahora</p>
               </div>
 
               {/* Crear partida privada */}
-              <div className="selection-card" onClick={() => handleCreatePrivateGame(modeChosen)}>
+              <div
+                className="selection-card"
+                onClick={() => handleCreatePrivateGame(modeChosen)}
+              >
                 <div className="selection-icon">🔑</div>
                 <h3>Crear Partida Privada</h3>
                 <p>Genera un código para invitar a un amigo</p>
@@ -394,7 +391,10 @@ function Home({
       <div className="gamemodes">
         <div
           className={`gamemode-card classic ${selectedGame ? "" : ""} ${selectedGame && selectedGame.mode !== "classic" ? "disabled" : ""}`}
-          onClick={() => {setModeChosen("classic"); setShowPlayOptions(true);}}
+          onClick={() => {
+            setModeChosen("classic");
+            setShowPlayOptions(true);
+          }}
         >
           <div className="gamemode-glow" />
           <div className="gamemode-icon">
@@ -431,7 +431,10 @@ function Home({
 
         <div
           className={`gamemode-card arcade ${selectedGame && selectedGame.mode !== "arcade" ? "disabled" : ""}`}
-          onClick={() => {setModeChosen("arcade"); setShowPlayOptions(true);}}
+          onClick={() => {
+            setModeChosen("arcade");
+            setShowPlayOptions(true);
+          }}
         >
           <div className="gamemode-glow" />
           <div className="gamemode-icon">

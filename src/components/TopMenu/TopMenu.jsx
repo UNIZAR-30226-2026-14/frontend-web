@@ -4,9 +4,6 @@ import { getAvatarDisplay } from "../../data/itemData";
 function TopMenu({
   userAvatar,
   user,
-  xp,
-  xpToNextLevel,
-  level,
   togglePopup,
   openOwnProfile,
   setActivePopup,
@@ -30,24 +27,8 @@ function TopMenu({
             />
           </button>
 
-          {/* Info: nombre + barra XP + nivel 
-          <div className="xp-row">
-              <div className="xp-bar-container">
-                <div
-                  className="xp-fill"
-                  style={{ width: `${(xp / xpToNextLevel) * 100}%` }}
-                />
-                <span className="xp-text">
-                  {xp}/{xpToNextLevel}xp
-                </span>
-              </div>
-              <span className="xp-level">Nivel {level}</span>
-            </div>*/}
           <div className="profile-info">
             <h1 className="profile-username">{user.nombre || "Invitado"}</h1>
-
-            
-
           </div>
         </div>
       </div>

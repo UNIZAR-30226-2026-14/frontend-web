@@ -151,7 +151,7 @@
 .profile-main-data .data-row:last-child {
   grid-column: span 2;
   display: flex;
-  justify-content: space-between; 
+  justify-content: space-between;
 }
 
 .data-row {
@@ -341,6 +341,37 @@
 .confirm-delete {
   background: #dc3545;
   color: #fff;
+}
+
+.name-edit-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.edit-pencil-small {
+  background: none;
+  border: none;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.edit-pencil-small:hover {
+  color: #fff;
+}
+
+.name-input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid #555;
+  color: white;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 1rem;
+  width: 100px; /* Ajusta según necesites */
 }
 
 @media (max-width: 1024px) {

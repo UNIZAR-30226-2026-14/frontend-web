@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./Profile.css";
 import { getAvatarDisplay } from "../../../data/itemData";
 import { profileService } from "../../../services/gameService";
@@ -14,12 +14,16 @@ function Profile({
   myId,
   userId,
   user,
+  onNameChange,
   coins,
-  level,
   stats,
   onRemoveFriend,
 }) {
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditingAvatar, setIsEditingAvatar] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [tempName, setTempName] = useState(user.nombre || "");
+  const [displayName, setDisplayName] = useState(user.nombre || "Invitado");
+
   const [isHoveringRemove, setIsHoveringRemove] = useState(false);
   const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
 
@@ -38,7 +42,7 @@ function Profile({
     reader.onload = (event) => {
       const imageUrl = event.target.result;
       setUserAvatar(imageUrl);
-      setIsEditing(false);
+      setIsEditingAvatar(false);
     };
 
     reader.readAsDataURL(file);
@@ -51,7 +55,7 @@ function Profile({
 
     if (succes) {
       setUserAvatar(getAvatarDisplay(avatarId));
-      setIsEditing(false);
+      setIsEditingAvatar(false);
     } else {
       sileo.error({
         title: "Error de conexión.",
@@ -60,19 +64,28 @@ function Profile({
     }
   };
 
-  const handleChangeUsername = async (username) => {
-    const succes = await profileService.updateProfile(userId, {
-      nombre: username,
+  useEffect(() => {
+    setDisplayName(user.nombre);
+  }, [user.nombre]);
+
+  const handleChangeUsername = async (newUsername) => {
+    if (!newUsername || newUsername === user.nombre) {
+      setIsEditingName(false);
+      return;
+    }
+
+    const success = await profileService.updateProfile(userId, {
+      nombre: newUsername,
     });
 
-    if (succes) {
-      setIsEditing(false);
+    if (success) {
+      onNameChange(newUsername);
+      setIsEditingName(false);
+
+      sileo.success({ title: "Nombre actualizado" });
     } else {
-      sileo.error({
-        title: "Error de conexión.",
-        description:
-          "No se pudo actualizar el nombre de usuario en el servidor.",
-      });
+      setTempName(user.nombre);
+      alert("El nombre ya existe o no se pudo actualizar.");
     }
   };
 
@@ -82,13 +95,17 @@ function Profile({
         X
       </button>
 
-      {!isEditing ? (
+      {!isEditingAvatar ? (
         <div className="profile-card">
           <div className="profile-header">
             <h1>Perfil de jugador</h1>
 
-            <button className="logout-button" onClick={onLogout} title="Cerrar sesión">
-              { (myId===userId) && (<LogOut size={25} color="#ff4444" />)}
+            <button
+              className="logout-button"
+              onClick={onLogout}
+              title="Cerrar sesión"
+            >
+              {myId === userId && <LogOut size={25} color="#ff4444" />}
             </button>
           </div>
 
@@ -115,7 +132,7 @@ function Profile({
             {canEditAvatar && (
               <button
                 className="edit-pencil"
-                onClick={() => setIsEditing(true)}
+                onClick={() => setIsEditingAvatar(true)}
                 title="Cambiar avatar"
               >
                 ✎
@@ -130,7 +147,38 @@ function Profile({
             </div>
             <div className="data-row">
               <span className="data-label">Nombre</span>
-              <span className="data-value">{user.nombre || "Invitado"}</span>
+              <div className="name-edit-container">
+                {isEditingName ? (
+                  <input
+                    className="name-input"
+                    value={tempName}
+                    onChange={(e) => setTempName(e.target.value)}
+                    onBlur={() => {
+                      handleChangeUsername(tempName);
+                      setIsEditingName(false);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleChangeUsername(tempName);
+                        setIsEditingName(false);
+                      }
+                    }}
+                    autoFocus
+                  />
+                ) : (
+                  <>
+                    <span className="data-value">{displayName}</span>
+                    {canEditAvatar && (
+                      <button
+                        className="edit-pencil-small"
+                        onClick={() => setIsEditingName(true)}
+                      >
+                        ✎
+                      </button>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
             <div className="data-row">
               <span className="data-label">Monedas</span>
@@ -196,7 +244,10 @@ function Profile({
         <div className="avatar-selector">
           <div className="selector-header">
             <h3>Elige tu avatar</h3>
-            <button className="back-button" onClick={() => setIsEditing(false)}>
+            <button
+              className="back-button"
+              onClick={() => setIsEditingAvatar(false)}
+            >
               ← Volver
             </button>
           </div>
