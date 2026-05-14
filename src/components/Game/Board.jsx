@@ -46,7 +46,7 @@ function Board({
   const [ordenTurno, setOrdenTurno] = useState(null);
 
   const [matchPoints, setMatchPoints] = useState(0);
-  const [primeraJugada, setPrimeraJugada] = useState(true);
+  const [primeraJugada, setPrimeraJugada] = useState(false);
   const [activeEvent, setActiveEvent] = useState(null);
   const [deckSize, setDeckSize] = useState(0);
 
@@ -57,6 +57,7 @@ function Board({
   const [slotsTablero, setSlotsTablero] = useState(200);
 
   const [currentSort, setCurrentSort] = useState(null);
+  const [ilegalColor, setIlegalColor] = useState(null);
 
   //para guardar el estado de tablero y mano na mas empezar turno por si cancelas
   const [startTurnHand, setStartTurnHand] = useState(null);
@@ -89,16 +90,13 @@ function Board({
           if (tile !== "" && tile.placed === false) {
             if (tile.habilidad === "dorada") {
               puntosGanados = puntosGanados + 2;
-              console.log(" DORADA Pontos: ", puntosGanados);
             }
             else {
               puntosGanados++;
-              console.log("NORMAL Pontos: ", puntosGanados);
             }
           } 
         }
       }
-      console.log("Pontos: ", puntosGanados);
 
     setMatchPoints((prev) => prev + puntosGanados);
   };
@@ -141,29 +139,52 @@ function Board({
 
 
   useEffect(() => {
-    if (miTurno && !processing) {
+    
 
       // Verificar si hay un evento de inicio de turno
+      console.log("EVENTO AHORA ES: ", activeEvent);
       switch (activeEvent) {
-        case "AUTO_DRAW":
+         
+        case "+pieza":
           setDiscount(false);
+          setIlegalColor(null);
           drawTile_NOPASS();
           break;
 
-        case "NO_SPECIFIC_COLOR":
-          setDiscount(false); //sómo se indica que no se puede un color concreto?????
-          // Cosas
+        case "prohibido_rojo":
+          setDiscount(false); 
+          setIlegalColor("red");
           break;
 
-        case "50%_DISCOUNT":
+        case "prohibido_azul":
+          setDiscount(false); 
+          setIlegalColor("blue");
+          break;
+
+        case "prohibido_naranja":
+          setDiscount(false); 
+          setIlegalColor("orange");
+          break;
+
+        case "prohibido_negro":
+          setDiscount(false);
+          setIlegalColor("black");
+          break;
+
+        case "50porcien":
           setDiscount(true);// Cosas
+          setIlegalColor(null);
           break;
         default:
           setDiscount(false);
+          setIlegalColor(null);
           break;
       }
-    }
-  }, [miTurno]); // Se dispara cada vez que te toca
+    
+  }, [activeEvent]); // Se dispara cada vez que te toca
+
+
+
 
   const delay = (ms) => new Promise((res) => setTimeout(res, ms)); // pa pruebas
 
@@ -277,6 +298,7 @@ function Board({
         setSlotsNecesarios(nuevoIndice + 1); // Expandimos el rack
         next[`hand-slot-${nuevoIndice}`] = nuevaFicha;
       }
+      setStartTurnHand(next);
 
       return next;
     });
@@ -348,7 +370,7 @@ function Board({
         // Si acaba de empezar mi turno, sincronizamos frontend y backend
         if (esMiTurnoAhora && !miTurno) {
           if (isArcade) {
-            ;
+            setActiveEvent(partida.eventoActual);
           }
           const resU = await gameService.getParticipation(user.id, idPartida);
           setMyTime(30);
@@ -506,7 +528,8 @@ function Board({
   const cambiarTurno = async () => {
     try {
       setProcessing(true);
-      const conjuntos = obtenerConjuntosDelTablero(boardPositions);
+      const conjuntos = obtenerConjuntosDelTablero(boardPositions, ilegalColor);
+
 
       if (conjuntos.length === 0 || (primeraJugada && !validarInicial(boardPositions))) {
         undoMove();

@@ -136,6 +136,13 @@ export const isMovePure = (conjTiles) => {
   return pure;  
 }
 
+export const BadColor = (conjTiles, Color) => {
+  const pure = conjTiles.some(
+      (ficha) => (ficha.color === Color) && (ficha.placed === false),
+    );
+  return pure;  
+}
+
 export const validarInicial = (boardPositions) => {
   let totalPoints = 0;
   for (let row = 0; row < 8; row++) {
@@ -156,24 +163,18 @@ export const validarInicial = (boardPositions) => {
         }
       }
     }
-
-    // Si la fila termina y hay un grupo, lo cerramos
-   /* if (conjuntoActual.length > 0) {
-      if (isMoveValid(conjTiles) && isMovePure(conjTiles)) {
-        conjuntos.push(conjuntoActual);
-      } else {
-        return [];
-      } // esto mira si hay alguna ficha o pareja de fichas flotando, eso es un gran nono
-    }*/
   }
   return totalPoints >= 30;
 };
 
-export const obtenerConjuntosDelTablero = (boardPositions) => {
+
+
+export const obtenerConjuntosDelTablero = (boardPositions, notColor) => {
   const conjuntos = [];
   for (let row = 0; row < 8; row++) {
     let conjuntoActual = [];
     let conjTiles = [];
+    console.log("COLOR PROHIBIDO :", notColor);
 
     for (let col = 0; col < 25; col++) {
       const index = row * 25 + col;
@@ -183,6 +184,9 @@ export const obtenerConjuntosDelTablero = (boardPositions) => {
         conjuntoActual.push(aux(tile));
         conjTiles.push(tile);
       } else {
+        if (BadColor(conjTiles, notColor)) {
+          return [];
+        }
         if (conjuntoActual.length > 0) {
           if (isMoveValid(conjTiles)) {
             conjuntos.push([...conjuntoActual]);
@@ -197,6 +201,9 @@ export const obtenerConjuntosDelTablero = (boardPositions) => {
 
     // Si la fila termina y hay un grupo, lo cerramos
     if (conjuntoActual.length > 0) {
+      if (BadColor(conjTiles, notColor)) {
+          return [];
+        }
       if (isMoveValid(conjTiles)) {
         conjuntos.push(conjuntoActual);
       } else {
