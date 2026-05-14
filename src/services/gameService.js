@@ -407,16 +407,13 @@ export const gameService = {
     try {
       const res = await apiFetch("partidas", {
         headers: getHeaders(),
-        body: JSON.stringify({
-          //NO SE SI ASÍ ESTÁ BIEN LA VERDAD
-          modoArcade: esArcade,
-        }),
       });
       if (!res.ok) {
         throw new Error("Error al obtener la lista de partidas");
       }
 
-      return await res.json();
+      const games = await res.json();
+      return esArcade ? games.filter((game) => game.modoArcade) : games.filter((game) => !game.modoArcade);
     } catch (error) {
       console.error("Error en getAllGames:", error);
       return [];
@@ -492,6 +489,7 @@ export const profileService = {
       return false;
     }
   },
+
   // Cambiar la contraseña
   updatePassword: async (userId, oldPassword, newPassword) => {
     const response = await apiFetch(`jugadores/${userId}/contrasena`, {

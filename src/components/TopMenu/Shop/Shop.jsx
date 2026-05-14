@@ -10,7 +10,6 @@ function Shop({
   setCoins,
   currentBackground,
   setCurrentBackground,
-  addXp,
   ownedBgs,
   setOwnedBgs,
   currentSkin,
@@ -23,54 +22,41 @@ function Shop({
     const ownedList = isBg ? ownedBgs : ownedSkins;
     const setOwnedList = isBg ? setOwnedBgs : setOwnedSkins;
     const setCurrent = isBg ? setCurrentBackground : setCurrentSkin;
+    const isNewPurchase = !ownedList.includes(item.id);
 
-    let updatedOwned = [...(ownedList || [])];
-
-    if (!updatedOwned.includes(item.id)) {
-      if (coins >= item.price) {
-        updatedOwned.push(item.id);
-      } else {
-        sileo.error({
-          title: "Fondos insuficientes",
-          description: "No tienes suficientes monedas.",
-        });
-        return;
-      }
+    if (isNewPurchase && coins < item.price) {
+      sileo.error({ title: "Fondos insuficientes" });
+      return;
     }
 
-    const formatted = updatedOwned.map((id) =>
-      id === item.id ? `*${id}` : id,
-    );
+    const updatedOwned = isNewPurchase
+      ? [...ownedList, item.id]
+      : [...ownedList];
+    const formattedString = updatedOwned
+      .map((id) => (id === item.id ? `*${id}` : id.replace("*", "")))
+      .join(",");
+
+    const newCoins = isNewPurchase ? coins - item.price : coins;
+
+    const purchaseData = {
+      monedas: newCoins,
+      [isBg ? "skinTablero" : "skinFichas"]: formattedString,
+    };
 
     try {
-      const isNewPurchase = !ownedList.includes(item.id);
-      const newCoins = isNewPurchase ? coins - item.price : coins;
-
-      const purchaseData = {
-        monedas: newCoins,
-        [isBg ? "skinTablero" : "skinFichas"]: formattedForBackend,
-      };
-
       const success = await profileService.updateProfile(userId, purchaseData);
 
       if (success) {
         if (isNewPurchase) {
           setCoins(newCoins);
-          addXp(50);
-          sileo.success({
-            title: "¡Compra realizada!",
-            description: `Has desbloqueado ${item.name}`,
-          });
+          sileo.success({ title: "¡Compra realizada!" });
         }
 
         setOwnedList(updatedOwned);
         setCurrent(item.value);
       }
     } catch (error) {
-      sileo.error({
-        title: "Error",
-        description: "No se pudo conectar con el servidor.",
-      });
+      sileo.error({ title: "Error de conexión con el servidor" });
     }
   };
 
@@ -132,19 +118,22 @@ function Shop({
             <div className="items-grid">
               {TILE_SKINS.map((skin) => {
                 const isEquipped = currentSkin === skin.value;
-                const isOwned = ownedSkins?.includes(skin.id);
+
+                const isOwned = (ownedSkins ?? []).includes(skin.id);
+
                 return (
                   <div
                     key={skin.id}
                     className={`item-card ${isEquipped ? "active" : ""}`}
                   >
                     <div
-                      className={`item-preview tile-box`}
+                      className="item-preview tile-box"
                       style={{ background: skin.value }}
                     >
                       7
                     </div>
                     <span className="item-name">{skin.name}</span>
+
                     <button
                       className={`shop-btn ${isOwned ? "owned" : "buy"}`}
                       onClick={() => handlePurchase(skin, "skin")}

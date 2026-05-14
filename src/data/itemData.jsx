@@ -13,7 +13,7 @@ export const BACKGROUNDS = [
   {
     id: "midnight",
     name: "Azul Nocturno",
-    price: 500,
+    price: 0,
     value: "#1a237e",
     owned: false,
   },

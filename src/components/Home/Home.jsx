@@ -32,12 +32,6 @@ function Home({
   // Monedas
   const [coins, setCoins] = useState(user?.monedas);
 
-  // Fondo de la mesa de juego
-  const [currentBackground, setCurrentBackground] = useState(() => {
-    const saved = localStorage.getItem("rummi-bg");
-    return saved ? saved : "#2e7d32";
-  });
-
   const [matchStats] = useState(() => {
     const wins = user.partidasGanadas;
     const losses = user.partidasPerdidas;
@@ -46,10 +40,48 @@ function Home({
     return { wins, losses, draws };
   });
 
+  const [currentBackground, setCurrentBackground] = useState(() => {
+    const saved = localStorage.getItem("rummi-bg");
+    return saved ? saved : "#2e7d32";
+  });
+
+
   const [ownedBgs, setOwnedBgs] = useState(() => {
+    if (user?.skinTablero) {
+      return user.skinTablero.split(",").map((id) => id.replace("*", ""));
+    }
     const saved = localStorage.getItem("rummi-bgs");
     return saved ? JSON.parse(saved) : ["classic"];
   });
+
+  const [currentSkin, setCurrentSkin] = useState(() => {
+    const saved = localStorage.getItem("rummi-skin");
+    return saved ? saved : "#d1d1d1";
+  });
+
+  const [ownedSkins, setOwnedSkins] = useState(() => {
+    if (user?.skinFichas) {
+      return user.skinFichas.split(",").map((id) => id.replace("*", ""));
+    }
+    const saved = localStorage.getItem("rummi-skins");
+    return saved ? JSON.parse(saved) : ["default"];
+  });
+
+  useEffect(() => {
+    localStorage.setItem("rummi-bg", currentBackground);
+  }, [currentBackground]);
+
+  useEffect(() => {
+    localStorage.setItem("rummi-bgs", JSON.stringify(ownedBgs));
+  }, [ownedBgs]);
+
+  useEffect(() => {
+    localStorage.setItem("rummi-skin", currentSkin);
+  }, [currentSkin]);
+
+  useEffect(() => {
+    localStorage.setItem("rummi-skins", JSON.stringify(ownedSkins));
+  }, [ownedSkins]);
 
   const [roomCode, setRoomCode] = useState("");
   const [joinCode, setJoinCode] = useState("");
@@ -338,6 +370,10 @@ function Home({
           setCurrentBackground={setCurrentBackground}
           ownedBgs={ownedBgs}
           setOwnedBgs={setOwnedBgs}
+          currentSkin={currentSkin}
+          setCurrentSkin={setCurrentSkin}
+          ownedSkins={ownedSkins}
+          setOwnedSkins={setOwnedSkins}
         />
       )}
 
@@ -493,9 +529,7 @@ function Home({
                         onStart(game.idPartida);
                         setShowResumeModal(false);
                       } else {
-                        alert(
-                          "No se pudo reanudar la partida.",
-                        );
+                        alert("No se pudo reanudar la partida.");
                       }
                     } catch (error) {
                       console.error("Error al reanudar:", error);
