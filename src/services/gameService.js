@@ -494,23 +494,15 @@ export const gameService = {
 
   answerChallenge: async (idEmisor, idInvitado, idPartida, accept) => {
     try {
+      const url = `invitaciones/${idEmisor}/${idInvitado}/${idPartida}`;
       if (accept) {
-        const res = await apiFetch(
-          `invitaciones/${idEmisor}/${idInvitado}/estado`,
-          {
-            method: "PATCH",
-            headers: getHeaders(),
-            body: JSON.stringify({ estado: "ACEPTADA" }),
-          },
-        );
-        return res.ok;
-      } else {
-        const res = await apiFetch(`invitaciones/${idEmisor}/${idInvitado}/${idPartida}`, {
-          method: "DELETE",
-          headers: getHeaders(),
-        });
-        return res.ok;
+        await gameService.joinGame(idInvitado, idPartida);
       }
+      const res = await apiFetch(url, {
+        method: "DELETE",
+        headers: getHeaders(),
+      });
+      return res.ok;
     } catch (error) {
       console.error("Error al responder a la solicitud:", error);
       return false;

@@ -60,27 +60,15 @@ function FriendsList({ onClose, onOpenProfile, userId, onAnswerChallenge }) {
     }
   };
 
-  const handleAcceptGame = async (invitation) => {
+  const handleAnswerGame = async (invitation, accept) => {
     const gameId = invitation.idPartida;
     const hostId = invitation.idEmisor;
 
     try {
-      await onAnswerChallenge(hostId, gameId, true);
+      await onAnswerChallenge(hostId, gameId, accept);
       onClose();
     } catch (error) {
-      console.error("Error al aceptar reto:", error);
-    }
-  };
-
-  const handleRejectGame = async (invitation) => {
-    const gameId = invitation.idPartida;
-    const hostId = invitation.idEmisor;
-
-    try {
-      await onAnswerChallenge(hostId, gameId, false);
-      loadFriendData();
-    } catch (error) {
-      console.error("Error al rechazar reto:", error);
+      console.error("Error al responder al reto:", error);
     }
   };
 
@@ -298,13 +286,13 @@ function FriendsList({ onClose, onOpenProfile, userId, onAnswerChallenge }) {
                         <div className="request-buttons">
                           <button
                             className="accept-mini-btn"
-                            onClick={() => handleAcceptGame(inv)}
+                            onClick={() => handleAnswerGame(inv, true)}
                           >
                             ✓
                           </button>
                           <button
                             className="reject-mini-btn"
-                            onClick={() => handleRejectGame(inv)}
+                            onClick={() => handleAnswerGame(inv, false)}
                           >
                             ✕
                           </button>

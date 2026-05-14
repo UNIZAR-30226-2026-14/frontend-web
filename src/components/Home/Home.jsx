@@ -60,6 +60,29 @@ function Home({
 
   const [friends, setFriends] = useState([]);
 
+  const [opponents, setOpponents] = useState([]);
+
+  const refreshLobbyParticipants = async () => {
+    if (!roomCode) return;
+    const idPartida = roomCode.replace("RUM-", "");
+    try {
+      const lista = await gameService.getParticipationByGame(idPartida);
+      const otros = lista.filter((p) => p.idJugador !== user.id);
+      setOpponents(otros);
+    } catch (error) {
+      console.error("Error al actualizar participantes:", error);
+    }
+  };
+
+  useEffect(() => {
+    let interval;
+    if (showCodeModal && roomCode) {
+      refreshLobbyParticipants();
+      interval = setInterval(refreshLobbyParticipants, 3000);
+    }
+    return () => clearInterval(interval);
+  }, [showCodeModal, roomCode]);
+
   const handleNameChange = (newName) => {
     setUserName(newName);
   };
@@ -424,16 +447,37 @@ function Home({
             </button>
 
             <div className="lobby-slots-container">
-              {[1, 2, 3, 4].map((slot, index) => (
-                <div key={index} className="player-slot">
-                  {/* Aquí podrías mapear los jugadores reales de la sala */}
-                  {index === 0 ? (
-                    <div className="slot-avatar">{userAvatar}</div> // El host
-                  ) : (
-                    <div className="slot-empty" />
-                  )}
-                </div>
-              ))}
+              {[0, 1, 2, 3].map((index) => {
+                if (index === 0) {
+                  return (
+                    <div key="slot-me" className="player-slot">
+                      <div className="slot-avatar">{userAvatar}</div>
+                      <span className="slot-name">{userName} (Tú)</span>
+                    </div>
+                  );
+                }
+
+                const opponent = opponents[index - 1];
+                return (
+                  <div key={`slot-${index}`} className="player-slot">
+                    {opponent ? (
+                      <>
+                        <div className="slot-avatar">
+                          {getAvatarDisplay(opponent.avatar || "default")}
+                        </div>
+                        <span className="slot-name">
+                          {opponent.nombreJugador}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <div className="slot-empty" />
+                        <span className="slot-name empty">Esperando...</span>
+                      </>
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
             <div className="lobby-friends-section">
