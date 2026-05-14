@@ -609,7 +609,9 @@ function Board({
     try {
       setProcessing(true);
       const ok = await gameService.pauseGame(idPartida);
-      if 
+      if (ok) {
+        
+      }
     } catch (error) {
       console.error("Error al pausar:", error);
     } finally {
