@@ -72,9 +72,13 @@ function Board({
   const [inventory, setInventory] = useState([]);
 
   const [myTime, setMyTime] = useState(30);
+  
+
+
 
   //Pal evento del 50%
   const [discount, setDiscount] = useState(false); 
+  const [protected, setProtected] = useState(false); 
 
   // Dentro de la función Board
   const [activeEffects, setActiveEffects] = useState({
@@ -107,10 +111,55 @@ function Board({
     setMatchPoints((prev) => prev + puntosGanados);
   };
 
+    const recibirPowerup = (powerup) => {
+    //esto mejor será ponerlo aparte
+    switch (powerup.id) {
+
+      case "GUARDIAN_ANGEL":
+        setProtected(true);
+
+      case "PLUS_FOUR":
+        if (protected) {
+          setProtected(false); //Indicar que lo hemos usao
+        } else drawFour();
+
+      case "SMOKE_BOMB":
+        if (protected) {
+          setProtected(false); //Indicar que lo hemos usao
+        } else drawFour();
+
+      /*case "midasTouch":
+        setHandPositions((prev) => {
+          const next = { ...prev };
+          const slotsConFichas = Object.keys(next).filter(
+            (key) => next[key] !== "",
+          );
+          const seleccionadas = slotsConFichas
+            .sort(() => 0.5 - Math.random())
+            .slice(0, 3);
+
+          seleccionadas.forEach((slot) => {
+            next[slot] = { ...next[slot], habilidad: "dorada" };
+          });
+
+          return next;
+        });
+        break;*/
+
+      case 1:
+
+      default:
+        break;
+    }
+
+    // Quitar del inventario una vez usado
+    setInventory((prev) => prev.filter((item) => item.id !== powerup.id));
+  };
+
   const ejecutarPowerup = (powerup) => {
     //esto mejor será ponerlo aparte
     switch (powerup.id) {
-      case "plus4":
+
 
       case "midasTouch":
         setHandPositions((prev) => {
@@ -513,6 +562,25 @@ function Board({
       if (fichasNuevas.length > 0) {
         añadirFichaALaMano(fichasNuevas[0]);
         setDeckSize((prev) => prev - 1);
+      }
+    } catch (error) {
+      console.error("Error al robar:", error);
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const drawFour = async () => {
+    try {
+      setProcessing(true);
+      const data = await gameService.drawTile_NOPASS(user.id, idPartida, 4);
+      const fichasNuevas = parsearFichas(data.fichaRobada);
+      if (fichasNuevas.length > 0) {
+      for (let i = 0; i < fichasNuevas.length; i++) {
+        añadirFichaALaMano(fichasNuevas[i]);
+        
+      }
+        setDeckSize((prev) => prev - 4);
       }
     } catch (error) {
       console.error("Error al robar:", error);
