@@ -48,13 +48,13 @@ function Profile({
     reader.readAsDataURL(file);
   };
 
-  const handleChangeAvatar = async (avatarId) => {
+  const handleChangeAvatar = async (avatarName) => {
     const succes = await profileService.updateProfile(userId, {
-      urlImgPerfil: avatarId,
+      urlImgPerfil: avatarName,
     });
 
     if (succes) {
-      setUserAvatar(getAvatarDisplay(avatarId));
+      setUserAvatar(avatarName);
       setIsEditingAvatar(false);
     } else {
       sileo.error({
@@ -360,7 +360,7 @@ function Profile({
                     ? "avatar-item active"
                     : "avatar-item"
                 }
-                onClick={() => handleChangeAvatar(avatar.id)}
+                onClick={() => handleChangeAvatar(avatar.name)}
               />
             ))}
 

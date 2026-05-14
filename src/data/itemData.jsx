@@ -101,23 +101,23 @@ export const POWER_UPS = [
 ];
 
 export const AVATAR_LIST = [
-  { id: 1, url: `${DICEBEAR}?seed=Alex&backgroundColor=b6e3f4`, name: "Alex" },
-  { id: 2, url: `${DICEBEAR}?seed=Dani&backgroundColor=c0aede`, name: "Dani" },
-  { id: 3, url: `${DICEBEAR}?seed=Dian&backgroundColor=d1d4f9`, name: "Dian" },
+  { id: 1, url: `${DICEBEAR}?seed=Alex&backgroundColor=b6e3f4`, name: "alex" },
+  { id: 2, url: `${DICEBEAR}?seed=Dani&backgroundColor=c0aede`, name: "dani" },
+  { id: 3, url: `${DICEBEAR}?seed=Dian&backgroundColor=d1d4f9`, name: "dian" },
   {
     id: 4,
     url: `${DICEBEAR}?seed=Fernando&backgroundColor=ffd5dc`,
-    name: "Fernando",
+    name: "fernando",
   },
   {
     id: 5,
     url: `${DICEBEAR}?seed=Gonzalo&backgroundColor=ffdfbf`,
-    name: "Gonzalo",
+    name: "gonzalo",
   },
   {
     id: 6,
     url: `${DICEBEAR}?seed=Miguel&backgroundColor=c0aede`,
-    name: "Miguel",
+    name: "miguel",
   },
 ];
 

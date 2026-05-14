@@ -253,12 +253,12 @@
   backdrop-filter: blur(5px);
 }
 
-/* Contenedor principal del modal (image_e87419.png) */
 .lobby-modal {
-  background: #121212; /* Fondo casi negro */
+  position: relative;
+  background: #121212;
   padding: 30px;
   border-radius: 28px;
-  border: 2px solid #4caf50; /* El borde verde de la imagen */
+  border: 2px solid #4caf50;
   width: 600px;
   max-width: 95%;
   display: flex;
@@ -285,6 +285,25 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
+}
+
+.slot-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #4caf50;
+  background-color: #eee;
+}
+
+.slot-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .lobby-friends-section {

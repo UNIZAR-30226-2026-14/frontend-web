@@ -182,7 +182,7 @@ function Home({
     setSelectedFriendProfile({
       userId: profile.id,
       user: profile,
-      avatar: getAvatarDisplay(getProfileImageRaw(profile)),
+      avatar: getAvatarDisplay(profile.urlImgPerfil),
       coins: profile.monedas || 0,
       stats: {
         wins: profile.partidasGanadas || 0,
@@ -440,7 +440,7 @@ function Home({
         <div className="lobby-overlay">
           <div className="lobby-modal custom-lobby">
             <button
-              className="close-button-top"
+              className="close-button"
               onClick={() => setShowCodeModal(false)}
             >
               ✕
@@ -451,8 +451,17 @@ function Home({
                 if (index === 0) {
                   return (
                     <div key="slot-me" className="player-slot">
-                      <div className="slot-avatar">{userAvatar}</div>
-                      <span className="slot-name">{userName} (Tú)</span>
+                      <div className="slot-avatar">
+                        <img
+                          src={getAvatarDisplay(userAvatar)}
+                          alt="Avatar"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            borderRadius: "50%",
+                          }}
+                        />
+                      </div>
                     </div>
                   );
                 }
@@ -463,16 +472,20 @@ function Home({
                     {opponent ? (
                       <>
                         <div className="slot-avatar">
-                          {getAvatarDisplay(opponent.avatar || "default")}
+                          <img
+                            src={getAvatarDisplay(getProfileImageRaw(opponent))}
+                            alt="Avatar"
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              borderRadius: "50%",
+                            }}
+                          />
                         </div>
-                        <span className="slot-name">
-                          {opponent.nombreJugador}
-                        </span>
                       </>
                     ) : (
                       <>
                         <div className="slot-empty" />
-                        <span className="slot-name empty">Esperando...</span>
                       </>
                     )}
                   </div>
@@ -596,7 +609,7 @@ function Home({
               {user.partidasPendientes > 0 ? (
                 <PendingGames
                   userId={user.id}
-                  userAvatar={userAvatar}
+                  userAvatar={getAvatarDisplay(userAvatar)}
                   selectedGame={selectedGame}
                   setSelectedGame={async (game) => {
                     try {
