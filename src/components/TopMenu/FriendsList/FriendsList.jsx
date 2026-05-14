@@ -120,6 +120,8 @@ function FriendsList({ onClose, onOpenProfile, userId, onAnswerChallenge }) {
   const filteredFriends = friends
     .filter((f) => f.name.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => (a.status === "online" ? -1 : 1));
+    
+  console.log("Amigos:", filteredFriends);
 
   return (
     <>
