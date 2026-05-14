@@ -76,6 +76,8 @@ function App() {
 
   const [modeChosen, setModeChosen] = useState("");
 
+  const [isHost, setIsHost] = useState(false);
+
   /** Sincroniza estado React con un jugador devuelto por la API (login, getMe, etc.). */
   const applySessionUser = (u) => {
     setUser(u);
@@ -153,6 +155,8 @@ function App() {
           setOwnedSkins={setOwnedSkins}
           modeChosen={modeChosen}
           setModeChosen={setModeChosen}
+          isHost={isHost}
+          setIsHost={setIsHost}
         />
       )}
 
@@ -184,6 +188,11 @@ function App() {
             }, 4000);
           }}
           isArcade={modeChosen === "arcade"}
+          onLeave={() => {
+            setActiveGameId(null);
+            setScreen("home");
+          }}
+          isHost={isHost}
         />
       )}
 

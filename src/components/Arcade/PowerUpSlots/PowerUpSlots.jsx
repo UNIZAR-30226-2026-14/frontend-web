@@ -30,7 +30,7 @@ function PowerUpSlots({ inventory, onActivate, shop, disabled }) {
             // disabled={algunCondicionalExtra} 
           >
             {item ? (
-              <ItemIcon id={item.id} color={item.color} size={item.size} />
+              <div>{item.icon}</div>
             ) : (
               <span className="empty-slot">+</span>
             )}

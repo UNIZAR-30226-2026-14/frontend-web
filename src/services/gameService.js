@@ -462,11 +462,20 @@ export const gameService = {
     return res.ok;
   },
 
+  // Pausar una partida
+  pauseGame: async (gameId) => {
+    const response = await apiFetch(`partidas/${gameId}/pausar`, {
+      method: "POST",
+      headers: getHeaders(),
+    });
+    return response.ok;
+  },
+
   // Reanudar una partida
   resumeGame: async (gameId) => {
     const response = await apiFetch(`partidas/${gameId}/reanudar`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: getHeaders(),
     });
     return response.ok;
   },

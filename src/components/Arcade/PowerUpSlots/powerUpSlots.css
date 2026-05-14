@@ -31,7 +31,7 @@
 }
 
 .slot {
-    background-color: #555; /* Un gris más visible */
+    background-color: #ececec62; /* Un gris más visible */
     border: 2px dashed #ccc;
     color: white;
 }

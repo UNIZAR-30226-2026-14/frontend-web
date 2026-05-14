@@ -33,6 +33,8 @@ function Home({
   setOwnedSkins,
   modeChosen,
   setModeChosen,
+  isHost,
+  setIsHost,
 }) {
   const [activePopup, setActivePopup] = useState(null);
   const [selectedGame, setSelectedGame] = useState(null);
@@ -51,7 +53,6 @@ function Home({
   const [isWaitingForStart, setIsWaitingForStart] = useState(false);
 
   const [showPlayOptions, setShowPlayOptions] = useState(false);
-  const [isHost, setIsHost] = useState(false);
   const [showCodeModal, setShowCodeModal] = useState(false);
 
   const [userName, setUserName] = useState(user?.nombre || "Invitado");

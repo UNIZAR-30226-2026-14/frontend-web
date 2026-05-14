@@ -13,6 +13,7 @@ import {
   getAvatarDisplay,
   getProfileImageRaw,
 } from "../../data/itemData.jsx";
+import { LogOut, Pause } from "lucide-react";
 
 import PlayerRack from "./PlayerRack/PlayerRack.jsx";
 import BoardGrid from "./BoardGrid/BoardGrid.jsx";
@@ -37,6 +38,8 @@ function Board({
   currentSkin,
   onWin,
   isArcade,
+  onLeave,
+  isHost,
 }) {
   // Obtenemos el estado del juego y las funciones para manipularlo
   const { bag, playerHand, gameBoard, setGameBoard, setPlayerHand } = useGame();
@@ -175,7 +178,7 @@ function Board({
           break;
 
         case "50porcien":
-          setDiscount(true);// Cosas
+          setDiscount(true); // Cosas
           setIlegalColor(null);
           break;
         default:
@@ -586,6 +589,33 @@ function Board({
     return () => window.removeEventListener("keydown", handleDebugHumo);
   }, [activeEffects.isBlind]);
 
+  const abandonarPartida = async () => {
+    const confirmar = window.confirm("¿Estás seguro de que quieres abandonar?");
+    if (!confirmar) return;
+
+    try {
+      setProcessing(true);
+      await gameService.leaveGame(idPartida, user.id);
+      onLeave(); 
+    } catch (error) {
+      console.error("Error al abandonar:", error);
+      onLeave();
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handlePause = async () => {
+    try {
+      setProcessing(true);
+      const ok = await gameService.pauseGame(idPartida);
+      if 
+    } catch (error) {
+      console.error("Error al pausar:", error);
+    } finally {
+      setProcessing(false);
+    }
+  };
 
   return (
     <DndContext onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
@@ -594,6 +624,26 @@ function Board({
         style={{ backgroundColor: currentBackground }}
       >
         <div className="header">RUMMIPLUS TABLE</div>
+
+        <div className="EXIT-CONTROL" style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 100 }}>
+          {isHost && (
+            <button 
+              className="pause-button" 
+              onClick={handlePause}
+              disabled={processing}
+            >
+              <Pause size={25} />
+            </button>
+          )}
+
+          <button
+              className="logout-button"
+              onClick={abandonarPartida}
+              title="Cerrar sesión"
+            >
+              <LogOut size={25} color="#ff4444" />
+            </button>
+        </div>
 
         <div className={activeEffects.isBlind ? "blur-grid" : ""}>
           <BoardGrid

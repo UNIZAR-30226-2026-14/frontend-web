@@ -132,3 +132,22 @@ img {
   filter: blur(5px); 
   transition: filter 0.8s ease;
 }
+
+.EXIT-CONTROL {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  z-index: 100;  
+  display: flex; 
+  flex-direction: row; 
+  align-items: center;
+  gap: 10px;
+}
+
+.pause-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  outline: none;
+}
