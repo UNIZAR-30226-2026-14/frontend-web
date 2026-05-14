@@ -66,7 +66,11 @@ function FriendsList({ onClose, onOpenProfile, userId, onAnswerChallenge }) {
 
     try {
       await onAnswerChallenge(hostId, gameId, accept);
-      onClose();
+      if (accept) {
+        onClose();
+      } else {
+        loadFriendData();
+      }
     } catch (error) {
       console.error("Error al responder al reto:", error);
     }
@@ -187,25 +191,32 @@ function FriendsList({ onClose, onOpenProfile, userId, onAnswerChallenge }) {
                       onChange={(e) => setSearch(e.target.value)}
                     />
                   </div>
-                  {filteredFriends.length > 0 ? (
-                    filteredFriends.map((friend) => (
-                      <div key={`friend-${friend.id}`} className="friend-card">
-                        <div
-                          className="friend-profile-hit"
-                          onClick={() => onOpenProfile?.(friend.id)}
-                        >
-                          <div className="friend-info">
-                            <span className="friend-name">{friend.name}</span>
-                            <span
-                              className={`status-indicator ${friend.status}`}
-                            ></span>
-                          </div>
+                  {filteredFriends.map((friend) => (
+                    <div key={`friend-${friend.id}`} className="friend-card">
+                      <div
+                        className="friend-profile-hit"
+                        onClick={() => onOpenProfile?.(friend.id)}
+                      >
+                        <div className="friend-avatar">
+                          <img
+                            src={getAvatarDisplay(friend.avatar)}
+                            alt="avatar"
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              borderRadius: "50%",
+                            }}
+                          />
+                        </div>
+                        <div className="friend-info">
+                          <span className="friend-name">{friend.name}</span>
+                          <span
+                            className={`status-indicator ${friend.status}`}
+                          ></span>
                         </div>
                       </div>
-                    ))
-                  ) : (
-                    <p className="no-results">No se han encontrado amigos</p>
-                  )}
+                    </div>
+                  ))}
                 </div>
               )}
 
