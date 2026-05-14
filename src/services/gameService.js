@@ -300,18 +300,14 @@ export const friendService = {
 
 export const gameService = {
   // Crear nueva partida
-  createGame: async (esArcade) => {
+  createGame: async (esArcade, esPrivada) => {
     const res = await apiFetch("partidas", {
       method: "POST",
       headers: getHeaders(),
       body: JSON.stringify({
-        turno: 0,
         fecha: new Date().toISOString().split("T")[0],
-        corriendo: false,
-        mercado: "",
-        bolsa: "",
         modoArcade: esArcade,
-        conjuntoMesa: "",
+        privada: esPrivada,
       }),
     });
 
@@ -319,7 +315,7 @@ export const gameService = {
     return await res.json();
   },
 
-  // Obtener el estado de la partida
+  // Obtener el estado de una partida
   getGameStatus: async (gameId) => {
     const res = await apiFetch(`partidas/${gameId}`, {
       headers: getHeaders(),
@@ -329,7 +325,7 @@ export const gameService = {
     return await res.json();
   },
 
-  // Iniciar la partida
+  // Iniciar una partida
   startGame: async (gameId) => {
     const res = await apiFetch(`partidas/${gameId}/iniciar`, {
       method: "POST",
@@ -353,7 +349,7 @@ export const gameService = {
     return res.ok;
   },
 
-  // RObar ficha sin pasar de turno
+  // Robar ficha sin pasar de turno
   drawTile_NOPASS: async (userId, gameId) => {
     const res = await apiFetch(`partidas/${gameId}/solo-robar`, {
       method: "POST",
@@ -413,7 +409,9 @@ export const gameService = {
       }
 
       const games = await res.json();
-      return esArcade ? games.filter((game) => game.modoArcade) : games.filter((game) => !game.modoArcade);
+      return esArcade
+        ? games.filter((game) => game.modoArcade)
+        : games.filter((game) => !game.modoArcade);
     } catch (error) {
       console.error("Error en getAllGames:", error);
       return [];
@@ -454,7 +452,7 @@ export const gameService = {
     return await res.json();
   },
 
-  // Abandonar la partida
+  // Abandonar una partida
   leaveGame: async (gameId, userId) => {
     const res = await apiFetch(`partidas/${gameId}/salir`, {
       method: "POST",
@@ -464,12 +462,59 @@ export const gameService = {
     return res.ok;
   },
 
+  // Reanudar una partida
   resumeGame: async (gameId) => {
     const response = await apiFetch(`partidas/${gameId}/reanudar`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
     });
     return response.ok;
+  },
+
+  // Retar a un amigo
+  createInvitation: async (opponentId, gameId) => {
+    try {
+      const response = await apiFetch("invitaciones", {
+        method: "POST",
+        headers: getHeaders(),
+        body: JSON.stringify({
+          idInvitado: opponentId,
+          idPartida: gameId,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Error al enviar invitación");
+
+      return await response.json();
+    } catch (error) {
+      console.error("Error en createInvitation:", error);
+      throw error;
+    }
+  },
+
+  answerChallenge: async (idEmisor, idInvitado, idPartida, accept) => {
+    try {
+      if (accept) {
+        const res = await apiFetch(
+          `invitaciones/${idEmisor}/${idInvitado}/estado`,
+          {
+            method: "PATCH",
+            headers: getHeaders(),
+            body: JSON.stringify({ estado: "ACEPTADA" }),
+          },
+        );
+        return res.ok;
+      } else {
+        const res = await apiFetch(`invitaciones/${idEmisor}/${idInvitado}/${idPartida}`, {
+          method: "DELETE",
+          headers: getHeaders(),
+        });
+        return res.ok;
+      }
+    } catch (error) {
+      console.error("Error al responder a la solicitud:", error);
+      return false;
+    }
   },
 };
 

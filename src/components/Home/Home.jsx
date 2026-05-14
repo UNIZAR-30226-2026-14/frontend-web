@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { sileo } from "sileo";
 import "./Home.css";
 import FriendsList from "../TopMenu/FriendsList/FriendsList.jsx";
 import Shop from "../TopMenu/Shop/Shop.jsx";
@@ -35,7 +36,6 @@ function Home({
 }) {
   const [activePopup, setActivePopup] = useState(null);
   const [selectedGame, setSelectedGame] = useState(null);
-  const [pendingDropdownOpen, setPendingDropdownOpen] = useState(false);
   const [selectedFriendProfile, setSelectedFriendProfile] = useState(null);
 
   const [matchStats] = useState(() => {
@@ -66,10 +66,73 @@ function Home({
 
   const [challengeId, setChallengeId] = useState(null);
 
-  const handleChallenge = (id) => {
-    setChallengeId(id);
-    // Aquí deberías llamar al servicio para enviar la invitación real
-    setTimeout(() => setChallengeId(null), 2000);
+  const handleChallenge = async (opponentId) => {
+    try {
+      const idPartida = roomCode.replace("RUM-", "");
+      const invitation = await gameService.createInvitation(
+        opponentId,
+        idPartida,
+      );
+
+      if (invitation) {
+        sileo.success({
+          title: "Invitación enviada",
+          description: "Esperando respuesta del oponente...",
+        });
+      }
+    } catch (error) {
+      sileo.error({
+        title: "Error",
+        description: "No se pudo completar el desafío.",
+      });
+    }
+  };
+
+  const handleAnswerChallenge = async (friendId, gameId, accept) => {
+    try {
+      console.log("Datos enviados:", {
+        myId: user?.id,
+        friendId,
+        gameId,
+        accept,
+      });
+
+      if (!user?.id) throw new Error("El ID de usuario no existe");
+
+      const ok = await gameService.answerChallenge(
+        friendId,
+        user.id,
+        gameId,
+        accept,
+      );
+
+      if (ok) {
+        if (accept) {
+          sileo.success({
+            title: "¡Reto aceptado!",
+            description: "Entrando...",
+          });
+          setRoomCode(`RUM-${gameId}`);
+          setIsHost(false);
+          setIsWaitingForStart(true);
+          onStart(gameId);
+        } else {
+          sileo.info({
+            title: "Reto rechazado",
+            description: "La invitación ha sido eliminada.",
+          });
+          loadFriendList();
+        }
+      }
+    } catch (error) {
+      console.error("Error capturado en handleAnswerChallenge:", error);
+
+      sileo.error({
+        title: "Error de ejecución",
+        description: error.message || "No se pudo procesar la respuesta.",
+      });
+      console.log(error.message);
+    }
   };
 
   /**
@@ -128,7 +191,10 @@ function Home({
 
   const handleCreatePrivateGame = async (mode) => {
     try {
-      const nuevaPartida = await gameService.createGame(mode === "arcade");
+      const nuevaPartida = await gameService.createGame(
+        mode === "arcade",
+        true,
+      );
       const idNuevaPartida = nuevaPartida.idPartida;
       const unido = await gameService.joinGame(user.id, idNuevaPartida);
       setShowPlayOptions(false);
@@ -182,11 +248,17 @@ function Home({
 
       if (iniciada) {
         onStart(idPartida);
-      } else {
-        alert("No se pudo iniciar la partida.");
       }
     } catch (error) {
-      alert("Error al iniciar la partida.");
+      if (error.response?.status === 409) {
+        console.warn("La partida ya está en curso, intentando entrar...");
+        onStart(idPartida);
+      } else {
+        sileo.error({
+          title: "Error al iniciar",
+          description: "Asegúrate de que haya suficientes jugadores.",
+        });
+      }
     }
   };
 
@@ -319,6 +391,7 @@ function Home({
           onClose={() => togglePopup("friends")}
           onOpenProfile={openFriendProfile}
           userId={user.id}
+          onAnswerChallenge={handleAnswerChallenge}
         />
       )}
 
@@ -499,8 +572,6 @@ function Home({
                       alert("Error de conexión al intentar reanudar.");
                     }
                   }}
-                  pendingDropdownOpen={true}
-                  setPendingDropdownOpen={() => {}}
                   onInvite={() => setActivePopup("friends")}
                 />
               ) : (

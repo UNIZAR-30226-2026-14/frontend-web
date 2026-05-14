@@ -4,7 +4,7 @@ import { friendService } from "../../../services/gameService";
 import { sileo, Toaster } from "sileo";
 import { getAvatarDisplay } from "../../../data/itemData.jsx";
 
-function FriendsList({ onClose, onOpenProfile, userId }) {
+function FriendsList({ onClose, onOpenProfile, userId, onAnswerChallenge }) {
   const [challengeId, setChallengeId] = useState(null);
   const [search, setSearch] = useState("");
   const [newFriendId, setNewFriendId] = useState("");
@@ -60,12 +60,28 @@ function FriendsList({ onClose, onOpenProfile, userId }) {
     }
   };
 
-  // Simula el proceso de retar a un amigo (aquí irá la lógica de enviar la solicitud al Backend)
-  const handleChallenge = (id) => {
-    setChallengeId(id);
-    setTimeout(() => {
-      setChallengeId(null);
-    }, 2000);
+  const handleAcceptGame = async (invitation) => {
+    const gameId = invitation.idPartida;
+    const hostId = invitation.idEmisor;
+
+    try {
+      await onAnswerChallenge(hostId, gameId, true);
+      onClose();
+    } catch (error) {
+      console.error("Error al aceptar reto:", error);
+    }
+  };
+
+  const handleRejectGame = async (invitation) => {
+    const gameId = invitation.idPartida;
+    const hostId = invitation.idEmisor;
+
+    try {
+      await onAnswerChallenge(hostId, gameId, false);
+      loadFriendData();
+    } catch (error) {
+      console.error("Error al rechazar reto:", error);
+    }
   };
 
   // Cierre con escape
@@ -85,7 +101,7 @@ function FriendsList({ onClose, onOpenProfile, userId }) {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose, isAdding, search]);
+  }, [isAdding, search]);
 
   const handleAddFriend = async (e) => {
     e.preventDefault();
@@ -167,7 +183,7 @@ function FriendsList({ onClose, onOpenProfile, userId }) {
                 className={`tab-btn ${activeTab === "invitaciones" ? "active" : ""}`}
                 onClick={() => setActiveTab("invitaciones")}
               >
-                Invitaciones ({invitations.length})
+                Retos ({invitations.length})
               </button>
             </div>
 
@@ -267,23 +283,28 @@ function FriendsList({ onClose, onOpenProfile, userId }) {
                 <div className="requests-list">
                   {invitations.length > 0 ? (
                     invitations.map((inv) => (
-                      <div key={`inv-${inv.id}`} className="request-card">
+                      <div
+                        key={`inv-${inv.id || inv.idPartida}`}
+                        className="request-card"
+                      >
                         <div className="invitation-info">
-                          <span className="friend-name">{inv.hostName}</span>
+                          <span className="friend-name">
+                            {inv.hostName || "Un amigo"}
+                          </span>
                           <span className="invitation-type">
-                            Te invita a jugar
+                            Te invita a jugar (Sala #{inv.idPartida})
                           </span>
                         </div>
                         <div className="request-buttons">
                           <button
                             className="accept-mini-btn"
-                            onClick={() => handleAcceptGame(inv.id)}
+                            onClick={() => handleAcceptGame(inv)}
                           >
                             ✓
                           </button>
                           <button
                             className="reject-mini-btn"
-                            onClick={() => handleRejectGame(inv.id)}
+                            onClick={() => handleRejectGame(inv)}
                           >
                             ✕
                           </button>
