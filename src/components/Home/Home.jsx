@@ -528,7 +528,7 @@ function Home({
               className="close-button"
               onClick={() => setShowPlayOptions(false)}
             >
-              X
+              ✕
             </button>
 
             <h2 className="selection-title">
@@ -577,33 +577,65 @@ function Home({
 
       {showResumeModal && (
         <div className="lobby-overlay">
-          <div className="lobby-modal custom-lobby hybrid-lobby">
-            <button className="close-button" onClick={() => setShowResumeModal(false)}>✕</button>
-            <div className="lobby-header-slots">
-              <div className="slots-capsule">
-                {[0, 1, 2, 3].map((index) => {
-                  const isMe = index === 0;
-                  const opponent = isMe ? null : opponents[index - 1];
+          <div className="lobby-modal custom-lobby">
+            <button
+              className="close-button"
+              onClick={() => setShowResumeModal(false)}
+            >
+              ✕
+            </button>
+
+            <div className="lobby-slots-container">
+              {[0, 1, 2, 3].map((index) => {
+                if (index === 0) {
                   return (
-                    <div key={index} className="slot-circle">
-                      {isMe ? (
-                        <img src={getAvatarDisplay(userAvatar)} alt="Me" />
-                      ) : opponent ? (
-                        <img src={getAvatarDisplay(getProfileImageRaw(opponent))} alt="Opp" />
-                      ) : (
-                        <div className="empty-dot" />
-                      )}
+                    <div key="slot-me" className="player-slot">
+                      <div className="slot-avatar">
+                        <img
+                          src={getAvatarDisplay(userAvatar)}
+                          alt="Avatar"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            borderRadius: "50%",
+                          }}
+                        />
+                      </div>
                     </div>
                   );
-                })}
-              </div>
-            </div>
+                }
 
-            <div className="lobby-columns-container">
-              <div className="lobby-column-box highlight-border">
-                <div className="column-content scrollable">
-                  <PendingGames 
-                    userId={user.id} 
+                const opponent = opponents[index - 1];
+                return (
+                  <div key={`slot-${index}`} className="player-slot">
+                    {opponent ? (
+                      <>
+                        <div className="slot-avatar">
+                          <img
+                            src={getAvatarDisplay(getProfileImageRaw(opponent))}
+                            alt="Avatar"
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              borderRadius: "50%",
+                            }}
+                          />
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="slot-empty" />
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            <div className="lobby-code-display">
+              <div className="lobby-pending-games-section">
+                <div className="pending-games-list">
+                  <PendingGames
+                    userId={user.id}
                     userAvatar={getAvatarDisplay(userAvatar)}
                     setSelectedGame={async (game) => {
                       const exito = await gameService.resumeGame(game.idPartida);
@@ -613,45 +645,42 @@ function Home({
                         setShowResumeModal(false);
                       }
                     }}
-                    renderMode="compact"
                   />
                 </div>
               </div>
 
-              <div className="lobby-column-box">
-                <h3 className="column-title" style={{color: '#55d6be'}}>RETAR AMIGOS</h3>
-                <div className="column-content scrollable">
-                  {friends.map((friend) => (
-                    <div key={friend.id} className="mini-challenge-row">
-                      <div className="friend-mini-info">
-                        <div className="mini-avatar-circle">
-                          <img src={getAvatarDisplay(friend.urlImgPerfil)} alt="av" />
+              <div className="lobby-friends-section">
+                <div className="friends-invite-list">
+                  {friends.length > 0 ? (
+                    friends.map((friend) => (
+                      <div key={`friend-${friend.id}`} className="friend-card">
+                        <div
+                          className="friend-profile-hit"
+                          onClick={() => onOpenProfile?.(friend.id)}
+                        >
+                          <div className="friend-info">
+                            <span className="friend-name">{friend.name}</span>
+                            <span
+                              className={`status-indicator ${friend.status}`}
+                            ></span>
+                          </div>
                         </div>
-                        <span>{friend.name}</span>
+                        {friend.status === "online" && (
+                          <button
+                            className="challenge-button"
+                            onClick={() => handleChallenge(friend.id)}
+                            disabled={challengeId === friend.id}
+                          >
+                            {challengeId === friend.id ? "..." : "Retar"}
+                          </button>
+                        )}
                       </div>
-                      <button 
-                        className="btn-retar-green"
-                        onClick={() => handleChallenge(friend.id)}
-                      >
-                        Retar
-                      </button>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <p className="no-results">No se han encontrado amigos</p>
+                  )}
                 </div>
               </div>
-            </div>
-
-            <div className="lobby-footer">
-              <button 
-                className="start-game-btn-flat" 
-                onClick={() => selectedGame && onStart(selectedGame.idPartida)}
-                disabled={!selectedGame}
-              >
-                Empezar
-              </button>
-              {selectedGame && (
-                <div className="room-code-tag">REANUDANDO: RUM-{selectedGame.idPartida}</div>
-              )}
             </div>
           </div>
         </div>

@@ -306,7 +306,8 @@
   display: block;
 }
 
-.lobby-friends-section {
+.lobby-friends-section,
+.lobby-pending-games-section {
   width: 80%;
   background: transparent;
   border: 2px solid #4caf50;
@@ -397,6 +398,68 @@
   background-color: #7f8c8d;
   cursor: not-allowed;
   opacity: 0.6;
+}
+
+.pending-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 10px;
+}
+
+.pending-game-item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 15px;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.pending-game-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.pending-game-item.selected {
+  background: rgba(74, 214, 184, 0.1);
+  border-color: #4caf50;
+}
+
+.game-date-label {
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.game-players-preview {
+  display: flex;
+  gap: 8px;
+}
+
+.mini-avatar-wrapper {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  border: 2px solid #4caf50; /* El borde verde de tu dibujo */
+  overflow: hidden;
+  background: #000;
+}
+
+.mini-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lobby-code-display {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+  width: 100%;
+  margin: 20px 0;
+  align-items: start;
 }
 
 @media (max-width: 1070px) {

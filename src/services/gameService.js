@@ -272,7 +272,7 @@ export const friendService = {
         throw new Error("Error al obtener las partidas pendientes del usuario");
 
       const data = await res.json();
-      return data.filter((p) => p.estado !== "FINISHED");
+      return data.filter((p) => p.estado === "PAUSED");
     } catch (error) {
       console.error(error);
       return [];
