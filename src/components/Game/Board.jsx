@@ -368,9 +368,10 @@ function Board({
         }
 
         if (isArcade) {
+          console.log
           const mercado = await gameService.getMercado(idPartida);
-          console.log("Monedas: ", mercado.monedasJugador);
-          console.log("Objetos en venta: ", mercado.objetosMercado);
+         // console.log("Monedas: ", mercado.monedasJugador);
+         // console.log("Objetos en venta: ", mercado.objetosMercado);
         }
 
         const turnoDeLaPartida = Number(partida.turno);
@@ -657,7 +658,7 @@ function Board({
             </button>
         </div>
 
-        {/*{isPaused && (
+        {isPaused && (
           <div className="pause-overlay">
             <div className="pause-modal">
               <h2>LA PARTIDA SE HA PAUSADO</h2>              
@@ -670,7 +671,7 @@ function Board({
               </button>
             </div>
           </div>
-        )}*/}
+        )}
 
         <div className={activeEffects.isBlind ? "blur-grid" : ""}>
           <BoardGrid

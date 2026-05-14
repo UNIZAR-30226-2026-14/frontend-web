@@ -577,65 +577,82 @@ function Home({
 
       {showResumeModal && (
         <div className="lobby-overlay">
-          <div className="lobby-modal resume-modal">
-            <button
-              className="close-button"
-              onClick={() => setShowResumeModal(false)}
-            >
-              X
-            </button>
+          <div className="lobby-modal custom-lobby hybrid-lobby">
+            <button className="close-button" onClick={() => setShowResumeModal(false)}>✕</button>
+            <div className="lobby-header-slots">
+              <div className="slots-capsule">
+                {[0, 1, 2, 3].map((index) => {
+                  const isMe = index === 0;
+                  const opponent = isMe ? null : opponents[index - 1];
+                  return (
+                    <div key={index} className="slot-circle">
+                      {isMe ? (
+                        <img src={getAvatarDisplay(userAvatar)} alt="Me" />
+                      ) : opponent ? (
+                        <img src={getAvatarDisplay(getProfileImageRaw(opponent))} alt="Opp" />
+                      ) : (
+                        <div className="empty-dot" />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
 
-            <h2 className="selection-title" style={{ color: "#058b90" }}>
-              PARTIDAS PAUSADAS
-            </h2>
-
-            <div className="resume-list-container">
-              {user.partidasPendientes > 0 ? (
-                <PendingGames
-                  userId={user.id}
-                  userAvatar={getAvatarDisplay(userAvatar)}
-                  selectedGame={selectedGame}
-                  setSelectedGame={async (game) => {
-                    try {
-                      const exito = await gameService.resumeGame(
-                        game.idPartida,
-                      );
-
+            <div className="lobby-columns-container">
+              <div className="lobby-column-box highlight-border">
+                <div className="column-content scrollable">
+                  <PendingGames 
+                    userId={user.id} 
+                    userAvatar={getAvatarDisplay(userAvatar)}
+                    setSelectedGame={async (game) => {
+                      const exito = await gameService.resumeGame(game.idPartida);
                       if (exito) {
                         setSelectedGame(game);
                         onStart(game.idPartida);
                         setShowResumeModal(false);
-                      } else {
-                        alert("No se pudo reanudar la partida.");
                       }
-                    } catch (error) {
-                      console.error("Error al reanudar:", error);
-                      alert("Error de conexión al intentar reanudar.");
-                    }
-                  }}
-                  onInvite={() => setActivePopup("friends")}
-                />
-              ) : (
-                <p
-                  style={{
-                    color: "white",
-                    textAlign: "center",
-                    marginTop: "20px",
-                  }}
-                >
-                  No tienes partidas pendientes en este momento.
-                </p>
-              )}
+                    }}
+                    renderMode="compact"
+                  />
+                </div>
+              </div>
+
+              <div className="lobby-column-box">
+                <h3 className="column-title" style={{color: '#55d6be'}}>RETAR AMIGOS</h3>
+                <div className="column-content scrollable">
+                  {friends.map((friend) => (
+                    <div key={friend.id} className="mini-challenge-row">
+                      <div className="friend-mini-info">
+                        <div className="mini-avatar-circle">
+                          <img src={getAvatarDisplay(friend.urlImgPerfil)} alt="av" />
+                        </div>
+                        <span>{friend.name}</span>
+                      </div>
+                      <button 
+                        className="btn-retar-green"
+                        onClick={() => handleChallenge(friend.id)}
+                      >
+                        Retar
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
-            {selectedGame && (
-              <button
-                className="resume-confirm-btn"
-                onClick={() => onStart(selectedGame.idPartida)}
+            <div className="lobby-footer">
+              <button 
+                className="start-game-btn-flat" 
+                onClick={() => selectedGame && onStart(selectedGame.idPartida)}
+                disabled={!selectedGame}
               >
-                REANUDAR PARTIDA #{selectedGame.idPartida}
+                Empezar
               </button>
-            )}
+              {selectedGame && (
+                <div className="room-code-tag">REANUDANDO: RUM-{selectedGame.idPartida}</div>
+              )}
+            </div>
           </div>
         </div>
       )}
