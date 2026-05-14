@@ -20,7 +20,7 @@ function App() {
   // Fondo del tablero actual
   const [currentBackground, setCurrentBackground] = useState(() => {
     const saved = localStorage.getItem("rummi-bg");
-    return saved ? saved : "#2e7d32";
+    return saved ? saved : "#1a5e20";
   });
 
   // Fondos de tablero comprados
@@ -173,6 +173,7 @@ function App() {
           user={user}
           userPic={userAvatar}
           currentBackground={currentBackground}
+          currentSkin={currentSkin}
           onWin={() => {
             setCoins((prev) => prev + 50);
             setShowConfetti(true);

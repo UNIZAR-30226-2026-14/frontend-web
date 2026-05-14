@@ -18,7 +18,8 @@ import PlayerRack from "./PlayerRack/PlayerRack.jsx";
 import BoardGrid from "./BoardGrid/BoardGrid.jsx";
 import GameControls from "./GameControls/GameControls.jsx";
 import Deck from "./Deck/Deck.jsx";
-import PowerUpSlots from "../Arcade/PowerUpSlots/PowerUpSlots.jsx"
+import PowerUpSlots from "../Arcade/PowerUpSlots/PowerUpSlots.jsx";
+import PowerUpsShop from "../Arcade/PowerUpsShop/PowerUpsShop.jsx";
 
 import {
   parsearFichas,
@@ -33,6 +34,7 @@ function Board({
   user,
   userPic,
   currentBackground,
+  currentSkin,
   onWin,
   isArcade,
 }) {
@@ -50,6 +52,8 @@ function Board({
   const [activeEvent, setActiveEvent] = useState(null);
   const [deckSize, setDeckSize] = useState(0);
 
+  const [isShopOpen, setIsShopOpen] = useState(false);
+
   // Datos de los oponentes (participaciones del juego, cargadas al inicio)
   const [opponents, setOpponents] = useState([]);
 
@@ -66,8 +70,6 @@ function Board({
 
   const [myTime, setMyTime] = useState(30);
 
-
-
   //Pal evento del 50%
   const [discount, setDiscount] = useState(false); 
 
@@ -78,6 +80,7 @@ function Board({
     mustScore30: false, // Techo de cristal
     isProtected: false, // Ángel de la guarda
   });
+
 
   // Función para conseguir puntos para comprar power-ups
   const sumarPuntosPorJugada = () => {
@@ -104,7 +107,9 @@ function Board({
   const ejecutarPowerup = (powerup) => {
     //esto mejor será ponerlo aparte
     switch (powerup.id) {
-      case "toque de midas":
+      case "plus4":
+
+      case "midasTouch":
         setHandPositions((prev) => {
           const next = { ...prev };
           const slotsConFichas = Object.keys(next).filter(
@@ -137,10 +142,8 @@ function Board({
     setTimeout(() => setActiveEvent(null), 5000);
   };
 
-
+  // EVENTOS RANDOM
   useEffect(() => {
-    
-
       // Verificar si hay un evento de inicio de turno
       console.log("EVENTO AHORA ES: ", activeEvent);
       switch (activeEvent) {
@@ -451,11 +454,10 @@ function Board({
         setMyTime((prev) => prev - 1);
       }, 1000);
     } else if (myTime === 0 && miTurno) {
-      // Aquí ejecutas la lógica de "se acabó el tiempo"
       finalizarTurnoPorTimeout();
     }
 
-    return () => clearInterval(timer); // Limpieza vital
+    return () => clearInterval(timer);
   }, [miTurno, myTime, processing]);
 
   const activeTile =
@@ -487,8 +489,6 @@ function Board({
     }
     setHandPositions(newPositions);
   };
-
- 
 
   const drawTile_NOPASS = async () => {
     try {
@@ -530,7 +530,6 @@ function Board({
       setProcessing(true);
       const conjuntos = obtenerConjuntosDelTablero(boardPositions, ilegalColor);
 
-
       if (conjuntos.length === 0 || (primeraJugada && !validarInicial(boardPositions))) {
         undoMove();
         setProcessing(false);
@@ -548,7 +547,6 @@ function Board({
         conjuntos,
       );
       
-
       setMiTurno(false);
       setHeJugado(false);
     } catch (error) {
@@ -560,12 +558,16 @@ function Board({
     }
   };
 
+  const shop = () => {
+    console.log("Click");
+    setIsShopOpen(true);
+  };
+
   const drawTileButton = () => {
     undoMove();
     drawTile();
   };
 
-  // Dentro de tu componente Board, antes del return
   useEffect(() => {
     const handleDebugHumo = (e) => {
       // Si pulsas la tecla 'b' (de Bomba de humo)
@@ -575,32 +577,29 @@ function Board({
           isBlind: !prev.isBlind,
         }));
 
-        // Opcional: Mostrar un mensaje en consola para confirmar
         console.log("Estado Bomba de Humo:", !activeEffects.isBlind);
       }
     };
 
-    // Escuchamos el teclado
     window.addEventListener("keydown", handleDebugHumo);
 
-    // Limpiamos el evento al desmontar el componente
     return () => window.removeEventListener("keydown", handleDebugHumo);
-  }, [activeEffects.isBlind]); // Dependencia para que use el valor actualizado
+  }, [activeEffects.isBlind]);
 
 
   return (
     <DndContext onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
       <div
         className={`game-container ${activeEffects.isBlind ? "smoke-screen" : ""}`}
-        style={{ backgroundcolor: currentBackground }}
+        style={{ backgroundColor: currentBackground }}
       >
-        {/* HEADER: Información del mazo y botón de robar */}
         <div className="header">RUMMIPLUS TABLE</div>
 
         <div className={activeEffects.isBlind ? "blur-grid" : ""}>
           <BoardGrid
             boardPositions={boardPositions}
             joinedSlots={joinedSlots}
+            currentSkin={currentSkin}
           />
         </div>
 
@@ -620,7 +619,16 @@ function Board({
           </button>
         </div>
 
-        {/*<PowerUpSlots inventory={inventory}/> */}
+        { isArcade && (<PowerUpSlots inventory={inventory} onActivate={ejecutarPowerup} shop={shop} disabled={processing || !miTurno}/>)} 
+        {isShopOpen && (
+            <PowerUpsShop 
+              matchPoints={matchPoints}
+              setMatchPoints={setMatchPoints}
+              inventory={inventory}
+              setInventory={setInventory}
+              onClose={() => setIsShopOpen(false)} 
+            />
+          )}
 
         <div className="FINISH">
           <button
@@ -634,7 +642,7 @@ function Board({
         </div>
 
         <div className="puntos">
-          <div>Puntos: {matchPoints}</div>
+          <div>🪙 {matchPoints}</div>
         </div>
 
         <div className="tiempo">
@@ -669,6 +677,7 @@ function Board({
         <PlayerRack
           handPositions={handPositions}
           slotsNecesarios={slotsNecesarios}
+          currentSkin={currentSkin}
         />
       </div>
 
@@ -680,6 +689,7 @@ function Board({
             color={activeTile.color}
             placed={activeTile.placed}
             habilidad={activeTile.habilidad}
+            skinColor={currentSkin}
           />
         ) : null}
       </DragOverlay>

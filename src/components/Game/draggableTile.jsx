@@ -2,7 +2,7 @@ import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import Tile from "./Tile.jsx";
 
-function DraggableTile({ tile }) {
+function DraggableTile({ tile, currentSkin }) {
   // Versión de ficha ya draggeable
   const {
     attributes,
@@ -33,6 +33,7 @@ function DraggableTile({ tile }) {
         color={tile.color}
         placed={tile.placed}
         habilidad={tile.habilidad}
+        skinColor={currentSkin}
       />
     </div>
   );

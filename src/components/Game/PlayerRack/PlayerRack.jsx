@@ -2,7 +2,7 @@ import "./playerRack.css"
 import Hand from "../Hand.jsx";
 import DraggableTile from "../draggableTile.jsx";
 
-const PlayerRack = ({ handPositions, slotsNecesarios }) => {
+const PlayerRack = ({ handPositions, slotsNecesarios, currentSkin }) => {
   return (
     <div className="player-rack" style={{ "--slots": slotsNecesarios }}>
       <svg
@@ -36,7 +36,7 @@ const PlayerRack = ({ handPositions, slotsNecesarios }) => {
         {Object.keys(handPositions).map((slotId) => (
           <Hand key={slotId} id={slotId}>
             {handPositions[slotId] && (
-              <DraggableTile tile={handPositions[slotId]} />
+              <DraggableTile tile={handPositions[slotId]} currentSkin={currentSkin} />
             )}
           </Hand>
         ))}

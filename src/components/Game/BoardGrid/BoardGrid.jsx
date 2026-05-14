@@ -3,17 +3,13 @@ import Hand from "../Hand.jsx";
 import DraggableTile from "../draggableTile.jsx";
 import "./boardGrid.css";
 
-const BoardGrid = ({ boardPositions, joinedSlots }) => {
+const BoardGrid = ({ boardPositions, joinedSlots, currentSkin }) => {
   const slots = Object.keys(boardPositions);
   let groupCounter = 0;
 
   return (
     <main className="board-area">
       {/* El SVG de fondo se queda aquí, es parte del tablero */}
-      <svg width="1360" height="560" className="board-svg">
-        <rect width="1360" height="700" fill="#154a19"/>
-      </svg>
-
       <div className="board-grid">
         {slots.map((slotId, index) => {
           const isJoined = joinedSlots.includes(slotId);
@@ -33,7 +29,7 @@ const BoardGrid = ({ boardPositions, joinedSlots }) => {
               className={isJoined ? "tile-joined" : ""}
             >
               {boardPositions[slotId] && (
-                <DraggableTile tile={boardPositions[slotId]} />
+                <DraggableTile tile={boardPositions[slotId]} currentSkin={currentSkin} />
               )}
             </Hand>
           );

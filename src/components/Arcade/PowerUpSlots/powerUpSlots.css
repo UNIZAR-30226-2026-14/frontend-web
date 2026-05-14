@@ -1,5 +1,12 @@
+
 .powerup-inventory {
-    position: relative;
+    font-size: 2rem;
+  bottom: 2vw;
+  right: 73%;
+   position: fixed;
+   display: flex;
+  flex-direction: column;
+  
 }
 
 .slots-grid {
@@ -7,19 +14,43 @@
     gap: 10px;
 }
 
+/* Aplicamos estilos comunes a .slot y .slot-selected */
+.slot, .slot-selected {
+    width: 60px;          /* Ajusta al tamaño de tus iconos */
+    height: 60px;         /* Ajusta al tamaño de tus iconos */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+    
+    /* Reset de estilos de botón */
+    padding: 0;
+    outline: none;
+    font-size: 1.5rem;
+}
+
 .slot {
-    background-color: gray;
-    border: 2px dashed;
+    background-color: #555; /* Un gris más visible */
+    border: 2px dashed #ccc;
+    color: white;
 }
 
 .slot-selected {
-    border: 2px dashed;
+    background-color: #777;
+    border: 2px solid gold; /* Cambiamos a sólido y color para diferenciarlo */
+    transform: scale(1.05);
 }
 
-.slot-selected:hover {
+.slot:hover, .slot-selected:hover {
     transform: scale(1.1);
+    background-color: #666;
 }
 
-.confirmation-popup {
-display: flex;
+.empty-slot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
 }

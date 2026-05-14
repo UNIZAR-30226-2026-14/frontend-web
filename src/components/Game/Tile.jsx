@@ -26,15 +26,22 @@ function comodin(number, color) {
   return number;
 }
 
-const Tile = ({ number, color, placed, habilidad }) => {
+const Tile = ({ number, color, placed, habilidad, skinColor }) => {
   const isRainbow = habilidad === "arcoiris";
-  const isgold = habilidad === "dorada";
+  const isGold = habilidad === "dorada";
 
-  //console.log(`Pintando ficha: ${number} ${color}`);
+  // Si tiene una habilidad especial o está colocada, manda el CSS.
+  // Si es una ficha normal, usamos skinColor.
+  const dynamicBackgroundColor = (isGold || isRainbow || placed) 
+    ? null : skinColor;
+
   return (
     <div
       className={`tile ${placed ? "tile-placed" : ""} ${habilidad ? `tile-${habilidad}` : ""}`}
-      style={{ color: isRainbow ? "transparent" : color }}
+      style={{ 
+        color: isRainbow ? "transparent" : color,
+        backgroundColor: dynamicBackgroundColor,
+      }}
     >
       <span>{comodin(number, color)}</span>
       {sign(number, color)}
