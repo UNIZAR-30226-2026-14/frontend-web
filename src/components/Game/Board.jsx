@@ -217,6 +217,8 @@ function Board({
     return initial;
   });
 
+  const [isPaused, setIsPaused] = useState(false);
+
   useEffect(() => {
     const newJoined = [];
 
@@ -352,6 +354,8 @@ function Board({
         const partida = await gameService.getGameStatus(idPartida);
         if (!partida) return;
 
+        setIsPaused(partida.estado === "PAUSED");
+
         let miPosicion = ordenTurno;
         if (miPosicion === null) {
           const participacion = await gameService.getParticipation(
@@ -452,7 +456,7 @@ function Board({
 
   useEffect(() => {
     let timer;
-    if (miTurno && myTime > 0 && !processing) {
+    if (miTurno && myTime > 0 && !processing && !isPaused) {
       timer = setInterval(() => {
         setMyTime((prev) => prev - 1);
       }, 1000);
@@ -609,8 +613,8 @@ function Board({
     try {
       setProcessing(true);
       const ok = await gameService.pauseGame(idPartida);
-      if (ok) {
-        
+      if (ok && isHost) {
+        onLeave();
       }
     } catch (error) {
       console.error("Error al pausar:", error);
@@ -646,6 +650,21 @@ function Board({
               <LogOut size={25} color="#ff4444" />
             </button>
         </div>
+
+        {/*{isPaused && (
+          <div className="pause-overlay">
+            <div className="pause-modal">
+              <h2>LA PARTIDA SE HA PAUSADO</h2>              
+              <button 
+                onClick={onLeave} 
+                className="leave-button"
+                style={{ marginTop: '20px' }}
+              >
+                Volver
+              </button>
+            </div>
+          </div>
+        )}*/}
 
         <div className={activeEffects.isBlind ? "blur-grid" : ""}>
           <BoardGrid
