@@ -350,12 +350,13 @@ export const gameService = {
   },
 
   // Robar ficha sin pasar de turno
-  drawTile_NOPASS: async (userId, gameId) => {
+  drawTile_NOPASS: async (userId, gameId, cantidad = 1) => {
     const res = await apiFetch(`partidas/${gameId}/solo-robar`, {
       method: "POST",
       headers: getHeaders(),
       body: JSON.stringify({
         idJugador: userId,
+        cantidadRobar: cantidad,
       }),
     });
     if (!res.ok) throw new Error("Error al robar ficha.");
