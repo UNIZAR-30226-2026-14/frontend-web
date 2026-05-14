@@ -78,7 +78,7 @@ function Board({
 
   //Pal evento del 50%
   const [discount, setDiscount] = useState(false); 
-  const [protected, setProtected] = useState(false); 
+  const [angel, setAngel] = useState(false); 
 
   // Dentro de la función Board
   const [activeEffects, setActiveEffects] = useState({
@@ -116,16 +116,16 @@ function Board({
     switch (powerup.id) {
 
       case "GUARDIAN_ANGEL":
-        setProtected(true);
+        setAngel(true);
 
       case "PLUS_FOUR":
-        if (protected) {
-          setProtected(false); //Indicar que lo hemos usao
+        if (angel) {
+          setAngel(false); //Indicar que lo hemos usao
         } else drawFour();
 
       case "SMOKE_BOMB":
-        if (protected) {
-          setProtected(false); //Indicar que lo hemos usao
+        if (angel) {
+          setAngel(false); //Indicar que lo hemos usao
         } else drawFour();
 
       /*case "midasTouch":
