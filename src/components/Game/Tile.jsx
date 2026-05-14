@@ -26,7 +26,7 @@ function comodin(number, color) {
   return number;
 }
 
-const Tile = ({ number, color, placed, habilidad, skinColor }) => {
+const Tile = ({ number, color, placed, habilidad, skinColor, blured }) => {
   const isRainbow = habilidad === "arcoiris";
   const isGold = habilidad === "dorada";
 
@@ -37,14 +37,14 @@ const Tile = ({ number, color, placed, habilidad, skinColor }) => {
 
   return (
     <div
-      className={`tile ${placed ? "tile-placed" : ""} ${habilidad ? `tile-${habilidad}` : ""}`}
+      className={`tile ${blured ? "tile-blured": "" }${placed ? "tile-placed" : ""} ${habilidad ? `tile-${habilidad}` : ""}`}
       style={{ 
         color: isRainbow ? "transparent" : color,
         backgroundColor: dynamicBackgroundColor,
       }}
     >
-      <span>{comodin(number, color)}</span>
-      {sign(number, color)}
+      <span>{blured ? "" : comodin(number, color)}</span>
+      {blured ? "" : sign(number, color)}
     </div>
   );
 };

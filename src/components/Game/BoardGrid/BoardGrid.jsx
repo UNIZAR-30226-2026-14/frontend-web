@@ -3,7 +3,7 @@ import Hand from "../Hand.jsx";
 import DraggableTile from "../draggableTile.jsx";
 import "./boardGrid.css";
 
-const BoardGrid = ({ boardPositions, joinedSlots, currentSkin }) => {
+const BoardGrid = ({ boardPositions, joinedSlots, currentSkin, blured }) => {
   const slots = Object.keys(boardPositions);
   let groupCounter = 0;
 
@@ -29,7 +29,7 @@ const BoardGrid = ({ boardPositions, joinedSlots, currentSkin }) => {
               className={isJoined ? "tile-joined" : ""}
             >
               {boardPositions[slotId] && (
-                <DraggableTile tile={boardPositions[slotId]} currentSkin={currentSkin} />
+                <DraggableTile tile={boardPositions[slotId]} currentSkin={currentSkin} blured={blured}/>
               )}
             </Hand>
           );

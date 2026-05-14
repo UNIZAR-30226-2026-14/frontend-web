@@ -126,7 +126,12 @@ function Board({
       case "SMOKE_BOMB":
         if (angel) {
           setAngel(false); //Indicar que lo hemos usao
-        } else drawFour();
+        } else {
+          setActiveEffects((prev) => ({
+          ...prev,
+          isBlind: true,
+        }));
+        }
 
       /*case "midasTouch":
         setHandPositions((prev) => {
@@ -417,8 +422,8 @@ function Board({
         }
 
         if (isArcade) {
-          console.log
-          const mercado = await gameService.getMercado(idPartida);
+          
+          //const mercado = await gameService.getMercado(idPartida);
          // console.log("Monedas: ", mercado.monedasJugador);
          // console.log("Objetos en venta: ", mercado.objetosMercado);
         }
@@ -501,6 +506,11 @@ function Board({
             setProcessing(true);
 
             undoMove();
+
+            setActiveEffects((prev) => ({
+          ...prev,
+          isBlind: false,
+        }));
 
             drawTile_NOPASS();
 
@@ -599,6 +609,10 @@ function Board({
         añadirFichaALaMano(fichasNuevas[0]);
         setDeckSize((prev) => prev - 1);
       }
+      setActiveEffects((prev) => ({
+          ...prev,
+          isBlind: false,
+        }));
       setMiTurno(false);
     } catch (error) {
       console.error("Error al robar:", error);
@@ -628,6 +642,10 @@ function Board({
         "replace_board",
         conjuntos,
       );
+      setActiveEffects((prev) => ({
+          ...prev,
+          isBlind: false,
+        }));
       
       setMiTurno(false);
       setHeJugado(false);
@@ -746,6 +764,7 @@ function Board({
             boardPositions={boardPositions}
             joinedSlots={joinedSlots}
             currentSkin={currentSkin}
+            blured={activeEffects.isBlind}
           />
         </div>
 
@@ -836,6 +855,7 @@ function Board({
             placed={activeTile.placed}
             habilidad={activeTile.habilidad}
             skinColor={currentSkin}
+            blured={activeEffects.isBlind}
           />
         ) : null}
       </DragOverlay>

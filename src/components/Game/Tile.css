@@ -40,6 +40,14 @@
   transition: transform 0.2s ease;
 }
 
+
+
+/* Ocultamos absolutamente todo el contenido interno */
+.tile.tile-blured * {
+  opacity: 0 !important;
+  display: none !important; /* O visibility: hidden */
+}
+
 /* Dorado */
 .tile.tile-dorada {
   border: 2px solid #d4af37 !important;
