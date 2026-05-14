@@ -367,6 +367,12 @@ function Board({
           actualizarManoVisual(parsearFichas(participacion.manoActual));
         }
 
+        if (isArcade) {
+          const mercado = await gameService.getMercado(idPartida);
+          console.log("Monedas: ", mercado.monedasJugador);
+          console.log("Objetos en venta: ", mercado.objetosMercado);
+        }
+
         const turnoDeLaPartida = Number(partida.turno);
         const esMiTurnoAhora = turnoDeLaPartida === ordenTurno;
 

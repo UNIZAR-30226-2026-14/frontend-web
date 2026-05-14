@@ -237,26 +237,10 @@ function Home({
   const handleQuickMatch = async (mode) => {
     try {
       const partidas = await gameService.getAllGames(mode === "arcade");
-      const partidaDisponible = partidas.find(
-        (p) => p.estado === "WAITING" || !p.corriendo,
-      );
-      let idDisponible;
-
-      if (partidaDisponible) {
-        idDisponible = partidaDisponible.idPartida;
-      } else {
-        const nuevaPartida = await gameService.createGame();
-        idDisponible = nuevaPartida.idPartida;
-      }
-
-      const unido = await gameService.joinGame(user.id, idDisponible);
-
-      if (unido) {
-        setRoomCode(`RUM-${idDisponible}`);
-        setIsHost(false);
-        setIsWaitingForStart(true);
-        onStart(idDisponible);
-      }
+      setRoomCode(`RUM-${partidas.idPartida}`);
+      setIsHost(partidas.creadaNuevaPartida);
+      setIsWaitingForStart(!partidas.creadaNuevaPartida);
+      onStart(partidas.idPartida);
     } catch (error) {
       console.error("Error en matchmaking:", error);
       alert("No se pudo encontrar partida.");
@@ -266,7 +250,6 @@ function Home({
 
   const handleStartLobbyGame = async () => {
     const idPartida = roomCode.replace("RUM-", "");
-
     try {
       const iniciada = await gameService.startGame(idPartida);
 

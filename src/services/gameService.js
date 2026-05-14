@@ -362,6 +362,26 @@ export const gameService = {
     return await res.json();
   },
 
+   // Obtener partida
+  getAllGames: async (esArcade) => {
+    try {
+      const res = await apiFetch("partidas/matchmaking", {
+        method: "POST",
+        headers: getHeaders(),
+        body: JSON.stringify({
+          modoArcade: esArcade,
+        }),
+      });
+      if (!res.ok) {
+        throw new Error("Error al obtener la lista de partidas");
+      }
+      return await res.json();
+    } catch (error) {
+      console.error("Error en getAllGames:", error);
+      return [];
+    }
+  },
+
   // Robar ficha
   drawTile: async (userId, gameId) => {
     const res = await apiFetch(`partidas/${gameId}/robar`, {
@@ -398,25 +418,16 @@ export const gameService = {
     return await res.json();
   },
 
-  // Obtener todas las partidas
-  getAllGames: async (esArcade) => {
-    try {
-      const res = await apiFetch("partidas", {
-        headers: getHeaders(),
-      });
-      if (!res.ok) {
-        throw new Error("Error al obtener la lista de partidas");
-      }
-
-      const games = await res.json();
-      return esArcade
-        ? games.filter((game) => game.modoArcade)
-        : games.filter((game) => !game.modoArcade);
-    } catch (error) {
-      console.error("Error en getAllGames:", error);
-      return [];
-    }
+  getMercado: async (gameId) => {
+    const res = await apiFetch(`partida/${gameId}/mercado`, {
+      headers: getHeaders(),
+    });
+    if (!res.ok)
+      throw new Error("Error al obtener el mercado.");
+    return await res.json();
   },
+
+ 
 
   // Obtener participaciones de una partida
   getParticipationByGame: async (gameId) => {
