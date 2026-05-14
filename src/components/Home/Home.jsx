@@ -18,9 +18,18 @@ function Home({
   onStart,
   user,
   onLogout,
-  addXp,
+  coins,
+  setCoins,
   userAvatar,
   setUserAvatar,
+  currentBackground,
+  setCurrentBackground,
+  ownedBgs,
+  setOwnedBgs,
+  currentSkin,
+  setCurrentSkin,
+  ownedSkins,
+  setOwnedSkins,
   modeChosen,
   setModeChosen,
 }) {
@@ -29,9 +38,6 @@ function Home({
   const [pendingDropdownOpen, setPendingDropdownOpen] = useState(false);
   const [selectedFriendProfile, setSelectedFriendProfile] = useState(null);
 
-  // Monedas
-  const [coins, setCoins] = useState(user?.monedas);
-
   const [matchStats] = useState(() => {
     const wins = user.partidasGanadas;
     const losses = user.partidasPerdidas;
@@ -39,49 +45,6 @@ function Home({
 
     return { wins, losses, draws };
   });
-
-  const [currentBackground, setCurrentBackground] = useState(() => {
-    const saved = localStorage.getItem("rummi-bg");
-    return saved ? saved : "#2e7d32";
-  });
-
-
-  const [ownedBgs, setOwnedBgs] = useState(() => {
-    if (user?.skinTablero) {
-      return user.skinTablero.split(",").map((id) => id.replace("*", ""));
-    }
-    const saved = localStorage.getItem("rummi-bgs");
-    return saved ? JSON.parse(saved) : ["classic"];
-  });
-
-  const [currentSkin, setCurrentSkin] = useState(() => {
-    const saved = localStorage.getItem("rummi-skin");
-    return saved ? saved : "#d1d1d1";
-  });
-
-  const [ownedSkins, setOwnedSkins] = useState(() => {
-    if (user?.skinFichas) {
-      return user.skinFichas.split(",").map((id) => id.replace("*", ""));
-    }
-    const saved = localStorage.getItem("rummi-skins");
-    return saved ? JSON.parse(saved) : ["default"];
-  });
-
-  useEffect(() => {
-    localStorage.setItem("rummi-bg", currentBackground);
-  }, [currentBackground]);
-
-  useEffect(() => {
-    localStorage.setItem("rummi-bgs", JSON.stringify(ownedBgs));
-  }, [ownedBgs]);
-
-  useEffect(() => {
-    localStorage.setItem("rummi-skin", currentSkin);
-  }, [currentSkin]);
-
-  useEffect(() => {
-    localStorage.setItem("rummi-skins", JSON.stringify(ownedSkins));
-  }, [ownedSkins]);
 
   const [roomCode, setRoomCode] = useState("");
   const [joinCode, setJoinCode] = useState("");

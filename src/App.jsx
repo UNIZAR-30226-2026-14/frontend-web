@@ -15,8 +15,6 @@ import {
 function App() {
   const [user, setUser] = useState(null);
   const [coins, setCoins] = useState(0);
-  const [level, setLevel] = useState(1);
-  const [xp, setXp] = useState(0);
   const [screen, setScreen] = useState("login");
 
   // Fondo del tablero actual
@@ -27,6 +25,9 @@ function App() {
 
   // Fondos de tablero comprados
   const [ownedBgs, setOwnedBgs] = useState(() => {
+    if (user?.skinTablero) {
+      return user.skinTablero.split(",").map((id) => id.replace("*", ""));
+    }
     const saved = localStorage.getItem("rummi-bgs");
     return saved ? JSON.parse(saved) : ["classic"];
   });
@@ -34,16 +35,35 @@ function App() {
   // Skin de fichas actual
   const [currentSkin, setCurrentSkin] = useState(() => {
     const saved = localStorage.getItem("rummi-skin");
-    return saved ? saved : "";
+    return saved ? saved : "#d1d1d1";
   });
 
-  // Fondos de tablero comprados
+  //Skins de fichas compradas
   const [ownedSkins, setOwnedSkins] = useState(() => {
+    if (user?.skinFichas) {
+      return user.skinFichas.split(",").map((id) => id.replace("*", ""));
+    }
     const saved = localStorage.getItem("rummi-skins");
     return saved ? JSON.parse(saved) : ["default"];
   });
 
-  // Avatar: siempre URL lista para <img> (el back suele mandar id numérico, no una ruta)
+  useEffect(() => {
+    localStorage.setItem("rummi-bg", currentBackground);
+  }, [currentBackground]);
+
+  useEffect(() => {
+    localStorage.setItem("rummi-bgs", JSON.stringify(ownedBgs));
+  }, [ownedBgs]);
+
+  useEffect(() => {
+    localStorage.setItem("rummi-skin", currentSkin);
+  }, [currentSkin]);
+
+  useEffect(() => {
+    localStorage.setItem("rummi-skins", JSON.stringify(ownedSkins));
+  }, [ownedSkins]);
+
+  // Avatar
   const [userAvatar, setUserAvatar] = useState(() => {
     const saved = localStorage.getItem("rummi-avatar");
     if (!saved) return defaultAvatarUrl;
@@ -56,13 +76,6 @@ function App() {
 
   const [modeChosen, setModeChosen] = useState("");
 
-  // Experiencia para subir al siguiente nivel
-  const xpToNextLevel = (level - 1) ** 2 * 50 + 100;
-
-  /**
-   * Añade XP al jugador y gestiona la subida de nivel con efectos visuales.
-   * @param {number} ammount - Cantidad de XP ganada.
-   */
   /** Sincroniza estado React con un jugador devuelto por la API (login, getMe, etc.). */
   const applySessionUser = (u) => {
     setUser(u);
@@ -73,27 +86,6 @@ function App() {
     if (u.monedas != null) {
       setCoins(u.monedas);
     }
-  };
-
-  const addXp = (ammount) => {
-    let newXp = xp + ammount;
-    let newLevel = level;
-    let leveledUp = false;
-
-    while (newXp >= xpToNextLevel) {
-      newXp -= xpToNextLevel;
-      newLevel++;
-      setCoins((prevCoins) => prevCoins + 100);
-      leveledUp = true;
-    }
-
-    if (leveledUp) {
-      setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 3000);
-    }
-
-    setXp(newXp);
-    setLevel(newLevel);
   };
 
   useEffect(() => {
@@ -147,24 +139,18 @@ function App() {
           }}
           user={user}
           onLogout={handleLogout}
-          setCurrentBackground={setCurrentBackground}
-          currentBackground={currentBackground}
           coins={coins}
           setCoins={setCoins}
-          level={level}
-          xp={xp}
-          addXp={addXp}
-          xpToNextLevel={xpToNextLevel}
           userAvatar={userAvatar}
           setUserAvatar={setUserAvatar}
+          currentBackground={currentBackground}
+          setCurrentBackground={setCurrentBackground}
           ownedBgs={ownedBgs}
           setOwnedBgs={setOwnedBgs}
           currentSkin={currentSkin}
           setCurrentSkin={setCurrentSkin}
           ownedSkins={ownedSkins}
           setOwnedSkins={setOwnedSkins}
-          showConfetti={showConfetti}
-          setShowConfetti={setShowConfetti}
           modeChosen={modeChosen}
           setModeChosen={setModeChosen}
         />
@@ -172,7 +158,7 @@ function App() {
 
       {screen === "loading" && (
         <Loading
-        gameId={activeGameId}
+          gameId={activeGameId}
           onFinished={() => setScreen("game")}
           onCancel={() => {
             setActiveGameId(null);
@@ -187,8 +173,7 @@ function App() {
           user={user}
           userPic={userAvatar}
           currentBackground={currentBackground}
-          onWin={(puntosGanados) => {
-            addXp(puntosGanados);
+          onWin={() => {
             setCoins((prev) => prev + 50);
             setShowConfetti(true);
             setTimeout(() => {
