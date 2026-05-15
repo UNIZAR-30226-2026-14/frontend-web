@@ -174,7 +174,6 @@ export const obtenerConjuntosDelTablero = (boardPositions, notColor) => {
   for (let row = 0; row < 8; row++) {
     let conjuntoActual = [];
     let conjTiles = [];
-    console.log("COLOR PROHIBIDO :", notColor);
 
     for (let col = 0; col < 25; col++) {
       const index = row * 25 + col;

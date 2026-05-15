@@ -3,7 +3,7 @@ import "./powerUpsShop.css";
 import { POWER_UPS } from "../../../data/itemData";
 import { gameService } from "../../../services/gameService.js";
 
-function PowerUpsShop({ gallery, matchPoints, setMatchPoints, inventory, setInventory, onClose, gameId }) {
+function PowerUpsShop({ gallery, matchPoints, setMatchPoints, inventory, setInventory, onClose, gameId, discount }) {
   
   // 1. Filtramos los POWER_UPS para que solo aparezcan los que están en gallery
   // Usamos useMemo para que no se recalcule en cada render si no cambia gallery
@@ -23,8 +23,8 @@ function PowerUpsShop({ gallery, matchPoints, setMatchPoints, inventory, setInve
     }
 
     console.log(item.id);
-
-    if (gameService.buyItem(gameId, item.id) && (matchPoints >= item.price)) {
+    //(gameService.buyItem(gameId, item.id) && (matchPoints >= item.price))
+    if (gameService.buyItem(gameId, item.id)) {
       setMatchPoints((prev) => prev - item.price);
       
       const newItem = { 
@@ -32,7 +32,7 @@ function PowerUpsShop({ gallery, matchPoints, setMatchPoints, inventory, setInve
         instanceId: Date.now() // Usamos instanceId para la key de React si es necesario
       }; 
 
-      setInventory([...inventory, newItem]);
+      setInventory([...inventory, newItem]); onClose();
     } 
   };
 
@@ -68,7 +68,7 @@ function PowerUpsShop({ gallery, matchPoints, setMatchPoints, inventory, setInve
         
         {selectedItem && (
           <button className="buy-button" onClick={() => handleBuyPowerUp(selectedItem)}>
-            <span className="price">{selectedItem.price}</span>
+            <span className="price">{discount ? (Math.floor(selectedItem.price/2)) : (selectedItem.price)}</span>
             <span className="coin-emoji">🪙</span>
           </button>
         )}

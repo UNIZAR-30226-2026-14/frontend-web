@@ -1,13 +1,23 @@
 import { useState } from "react";
 import "./PowerUpSlots.css";
+import { POWER_UPS } from "../../../data/itemData";
 import ItemIcon from "../../UI/ItemIcon.jsx";
 
 function PowerUpSlots({ inventory, onActivate, shop, disabled }) {
   const [selectedSlot, setSelectedSlot] = useState(null);
+  
 
   
   // Creamos el array de 3 posiciones de forma más limpia
-  const displaySlots = Array.from({ length: 3 }, (_, i) => inventory[i] || null);
+  const displaySlots = Array.from({ length: 3 }, (_, i) => {
+  const itemId = inventory[i];
+  if (!itemId) return null;
+  
+  // Si inventory solo tiene strings, buscamos el objeto aquí
+  return typeof itemId === 'string' 
+    ? POWER_UPS.find(p => p.id === itemId) 
+    : itemId;
+});
 
   return (
     <div className="powerup-inventory">

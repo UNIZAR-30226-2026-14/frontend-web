@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Tile from "./Tile.jsx";
 import Hand from "./Hand.jsx";
 import DraggableTile from "./draggableTile.jsx";
@@ -51,19 +51,22 @@ function Board({
   const [ordenTurno, setOrdenTurno] = useState(null);
 
   const [matchPoints, setMatchPoints] = useState(0);
-  const [primeraJugada, setPrimeraJugada] = useState(true);
+  const [primeraJugada, setPrimeraJugada] = useState(false);
   const [activeEvent, setActiveEvent] = useState(null);
   const [deckSize, setDeckSize] = useState(0);
+  const resolveEleccion = useRef(null);
 
   const [isShopOpen, setIsShopOpen] = useState(false);
 
-  const [chooseTarget, setChooseTarget] = useState(true);
+  const [chooseTarget, setChooseTarget] = useState(false);
   const [userTarget, setUserTarget] = useState(null);
 
   const [itemPoll, setItemPoll] = useState([]);
 
   // Datos de los oponentes (participaciones del juego, cargadas al inicio)
   const [opponents, setOpponents] = useState([]);
+
+  const [finPartida, setFinPartida] = useState(false);
 
   const [slotsNecesarios, setSlotsNecesarios] = useState(20);
   const [slotsTablero, setSlotsTablero] = useState(200);
@@ -77,6 +80,10 @@ function Board({
   const [inventory, setInventory] = useState([]);
 
   const [myTime, setMyTime] = useState(30);
+  const [contadorOut, setContadorOut] = useState(0);
+
+  const [ganador, setGanador] = useState(null);
+  const [highscore, setHighscore] = useState(0);
   
 
 
@@ -101,7 +108,7 @@ function Board({
         for (let col = 0; col < 25; col++) {
           const index = row * 25 + col;
           const tile = boardPositions[`board-slot-${index}`];
-          console.log(tile);
+          
           if (tile !== "" && tile.placed === false) {
             if (tile.habilidad === "dorada") {
               puntosGanados = puntosGanados + 2;
@@ -116,35 +123,14 @@ function Board({
     setMatchPoints((prev) => prev + puntosGanados);
   };
 
-  // --------------------------------------------------------------------------------MIRAR LUEGO
-  const activarHabilidadConTarget = async (powerUp) => {
-  // 1. Abrimos el selector y esperamos
-    setChooseTarget(true);
-    
-    const idObjetivo = await new Promise((resolve) => {
-      // Guardamos el "resolve" en la referencia para usarlo fuera de aquí
-      resolveEleccion.current = resolve;
-    });
-  
-    // 2. Una vez que resolveEleccion.current() sea llamado, el código sigue aquí:
-    console.log("Objetivo elegido:", idObjetivo);
-    ejecutarAtaque(powerUp, idObjetivo);
-  };
-  
-  // Esta es la función que llamarás desde los botones del mapa de oponentes
-  const manejarSeleccionObjetivo = (idJugador) => {
-    setChooseTarget(false);
-    if (resolveEleccion.current) {
-      resolveEleccion.current(idJugador); // Esto desbloquea el 'await' anterior
-      resolveEleccion.current = null;
-    }
-  };
+ 
 
   
 
   const recibirEfecto = (powerup) => {
+    console.log("ESTOY AQUI: ",powerup);
     //esto mejor será ponerlo aparte
-    switch (powerup.id) {
+    switch (powerup) {
 
       case "GUARDIAN_ANGEL":
         setAngel(true);
@@ -153,7 +139,7 @@ function Board({
       case "PLUS_FOUR":
         if (angel) {
           setAngel(false); //Indicar que lo hemos usao
-        } else drawFour();
+        } else drawTile_NOPASS();drawTile_NOPASS();drawTile_NOPASS();drawTile_NOPASS();
         break;
 
       case "SMOKE_BOMB":
@@ -187,35 +173,136 @@ function Board({
     //setInventory((prev) => prev.filter((item) => item.id !== powerup.id));
   };
 
+   
+  const activarHabilidadConTarget = async (powerUp) => {
+  // 1. Abrimos el selector y esperamos
+    setChooseTarget(true);
+    
+    const idObjetivo = await new Promise((resolve) => {
+      // Guardamos el "resolve" en la referencia para usarlo fuera de aquí
+      resolveEleccion.current = resolve;
+    });
+  
+    // 2. Una vez que resolveEleccion.current() sea llamado, el código sigue aquí:
+    console.log("Objetivo elegido:", idObjetivo);
+    gameService.useItem(idPartida,powerUp,idObjetivo);
+  };
+  
+  // Esta es la función que llamarás desde los botones del mapa de oponentes
+  const manejarSeleccionObjetivo = (idJugador) => {
+    setChooseTarget(false);
+    if (resolveEleccion.current) {
+      resolveEleccion.current(idJugador); // Esto desbloquea el 'await' anterior
+      resolveEleccion.current = null;
+    }
+  };
+
+  const actualizarManoVisual = (fichas) => {
+    if (!fichas) return;
+
+    let fichasParaPintar = [...fichas];
+
+    if (currentSort === "num") {
+      fichasParaPintar.sort(sortNum);
+    } else if (currentSort === "color") {
+      fichasParaPintar.sort(sortColor);
+    }
+
+    setHandPositions((prev) => {
+      const n = fichas.length;
+
+      if (n <= 20) {
+        setSlotsNecesarios(20);
+      } else {
+        setSlotsNecesarios(n);
+      }
+
+      const newPositions = { ...prev };
+      for (let i = 0; i < slotsNecesarios; i++) {
+        newPositions[`hand-slot-${i}`] = fichasParaPintar[i] || "";
+      }
+      return newPositions;
+      
+    });
+  };
+
+
+ const manejarMidas = async (powerup) => {
+  try {
+    // 1. ESPERAR a la respuesta del servidor con 'await'
+    const data = await gameService.useItemSelf(idPartida, powerup.id);
+    
+    // 2. Extraer la propiedad específica del JSON resultante
+    const nuevaManoCifrada = data.manoActual; 
+    
+    console.log("Mano actualizada:", nuevaManoCifrada);
+
+    // 3. ACTUALIZAR el estado de React para que el jugador vea sus nuevas fichas
+    // Suponiendo que tienes un setMano o similar:
+    actualizarManoVisual(parsearFichas(nuevaManoCifrada));
+    
+
+  } catch (error) {
+    console.error("Falló el uso del objeto:", error.message);
+  }
+};
+
+const manejarBola = async (powerup) => {
+  try {
+    // 1. ESPERAR a la respuesta del servidor con 'await'
+    const data = await gameService.useItemSelf(idPartida, powerup.id);
+    
+    // 2. Extraer la propiedad específica del JSON resultante
+    const nuevaManoCifrada = data.manoActual; 
+    
+    console.log("Mano actualizada:", nuevaManoCifrada);
+
+    // 3. ACTUALIZAR el estado de React para que el jugador vea sus nuevas fichas
+    // Suponiendo que tienes un setMano o similar:
+    actualizarManoVisual(parsearFichas(nuevaManoCifrada));
+    
+
+  } catch (error) {
+    console.error("Falló el uso del objeto:", error.message);
+  }
+};
+
   const ejecutarPowerup = (powerup, victim) => {
     //esto mejor será ponerlo aparte
     switch (powerup.id) {
 
       case "GUARDIAN_ANGEL":
         gameService.useItemSelf(idPartida,powerup.id);
-        setAngel(true); //o aquí o en efectos
-        console.log("Protegido");
         break;
 
       case "PLUS_FOUR":
+        activarHabilidadConTarget(powerup.id);
         break;
 
       case "SMOKE_BOMB":
+        activarHabilidadConTarget(powerup.id);
         break;
         
       case "CHILI_PEPPER":
+        activarHabilidadConTarget(powerup.id);
         break;  
 
       case "GLASS_CEILING":
+        activarHabilidadConTarget(powerup.id);
         break;  
 
       case "WHITE_GLOVE":
+        //activarHabilidadConTarget(powerup.id);
+        //ALGO MÁS
         break;
 
       case "SWAP_ON_FAIL":
+        //activarHabilidadConTarget(powerup.id);
+        //ALGO MÁS
         break;  
 
       case "MIDAS_TOUCH":
+        manejarMidas(powerup);
         break;
       
       case "CRYSTAL_BALL":
@@ -354,34 +441,7 @@ function Board({
     setBoardPositions(startTurnBoard);
   };
 
-  const actualizarManoVisual = (fichas) => {
-    if (!fichas) return;
-
-    let fichasParaPintar = [...fichas];
-
-    if (currentSort === "num") {
-      fichasParaPintar.sort(sortNum);
-    } else if (currentSort === "color") {
-      fichasParaPintar.sort(sortColor);
-    }
-
-    setHandPositions((prev) => {
-      const n = fichas.length;
-
-      if (n <= 20) {
-        setSlotsNecesarios(20);
-      } else {
-        setSlotsNecesarios(n);
-      }
-
-      const newPositions = { ...prev };
-      for (let i = 0; i < slotsNecesarios; i++) {
-        newPositions[`hand-slot-${i}`] = fichasParaPintar[i] || "";
-      }
-      return newPositions;
-      
-    });
-  };
+  
 
   const añadirFichaALaMano = (nuevaFicha) => {
     if (!nuevaFicha) return;
@@ -448,6 +508,13 @@ function Board({
       try {
         const partida = await gameService.getGameStatus(idPartida);
         if (!partida) return;
+        if (partida.estado === "FINISHED") {
+          setFinPartida(true);
+          setGanador(partida.ganadorId);
+          setHighscore(partida.puntuacionFinal);
+        }
+
+
 
         setIsPaused(partida.estado === "PAUSED");
 
@@ -460,14 +527,8 @@ function Board({
           miPosicion = Number(participacion.ordenTurno);
           setOrdenTurno(miPosicion);
           actualizarManoVisual(parsearFichas(participacion.manoActual));
-          if (isArcade) {
-            const efectos = participacion.efectosActivos;
-            console.log("EFECTOS ACTIVOS: ");
-            for (let i = 0; i < participacion.length; i++) {
-              recibirEfecto(participacion[i]);
-              
-            }
-          }
+          console.log("HOLAS: ");
+          
         }
 
         const turnoDeLaPartida = Number(partida.turno);
@@ -482,19 +543,38 @@ function Board({
 
         // Si acaba de empezar mi turno, sincronizamos frontend y backend
         if (esMiTurnoAhora && !miTurno) {
+          setMyTime(30);
           if (isArcade) {
+
+            const participacion = await gameService.getParticipation(
+              user.id,
+              idPartida,
+            );
+             const efectos = participacion.efectosActivos;
+             console.log("EFECTOS ACTIVOS: ", efectos);
+             for (let i = 0; i < efectos.length; i++) {
+                console.log("EFECTO: ", efectos[i]);
+               recibirEfecto(efectos[i]);
+
+             }
             
             gameService.updateMoney(user.id,idPartida,matchPoints);
+            gameService.updateMoney(user.id,idPartida,100);
             const mercado = await gameService.getMercado(idPartida);
             console.log("DINERO: ", mercado.monedasJugador);
+            
+
+            console.log("MIS ITEMS: ", mercado.habilidadesCompradas);
 
 
             guardarMercado(mercado.objetosMercado);
-            console.log("items: ", itemPoll);
-            setActiveEvent(partida.eventoActual);
+            setInventory(mercado.habilidadesCompradas);
+
+            console.log("Evento: ",partida.eventoActual);
+            //setActiveEvent(partida.eventoActual);
           }
           const resU = await gameService.getParticipation(user.id, idPartida);
-          setMyTime(30);
+          
           actualizarTableroVisual(partida.conjuntoMesa);
           setStartTurnHand(handPositions);
           setMiTurno(true);
@@ -553,7 +633,14 @@ function Board({
   const finalizarTurnoPorTimeout = () => {
     setMiTurno(false);
 
+    setContadorOut(prev => prev + 1);
+            if (contadorOut>=1) {
+              salirPartida();
+            }
+
             setProcessing(true);
+            setChooseTarget(false);
+            setIsShopOpen(false);
 
             undoMove();
 
@@ -562,11 +649,15 @@ function Board({
           isBlind: false,
         }));
 
-            drawTile_NOPASS();
+        if (deckSize > 0) {
+          drawTile_NOPASS();
+        }    
+        
 
             setMyTime(30);
-
+            
             gameService.passTurn(user.id, idPartida);
+            
   }
 
 
@@ -598,6 +689,10 @@ function Board({
       newPositions[`hand-slot-${i}`] = sorted[i] || "";
     }
     setHandPositions(newPositions);
+
+    if (!heJugado) {
+      setStartTurnHand(newPositions);
+    }
   };
 
   const sortByColor = () => {
@@ -610,7 +705,11 @@ function Board({
     for (let i = 0; i < slotsNecesarios; i++) {
       newPositions[`hand-slot-${i}`] = sorted[i] || "";
     }
+    
     setHandPositions(newPositions);
+    if (!heJugado) {
+      setStartTurnHand(newPositions);
+    }
   };
 
   const drawTile_NOPASS = async () => {
@@ -701,6 +800,7 @@ function Board({
         }));
       
       setMiTurno(false);
+      setContadorOut(0);
       setHeJugado(false);
     } catch (error) {
       console.error("Error al terminar turno:", error);
@@ -712,14 +812,13 @@ function Board({
   };
 
   const shop = () => {
-    console.log("Click");
     setIsShopOpen(true);
   };
 
   const drawTileButton = () => {
+    setContadorOut(0);
     undoMove();
     drawTile();
-    console.log("Oponentes: ",opponents);
   };
 
   useEffect(() => {
@@ -744,6 +843,19 @@ function Board({
     const confirmar = window.confirm("¿Estás seguro de que quieres abandonar?");
     if (!confirmar) return;
 
+    try {
+      setProcessing(true);
+      await gameService.leaveGame(idPartida, user.id);
+      onLeave(); 
+    } catch (error) {
+      console.error("Error al abandonar:", error);
+      onLeave();
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const salirPartida = async () => {
     try {
       setProcessing(true);
       await gameService.leaveGame(idPartida, user.id);
@@ -864,8 +976,29 @@ function Board({
             })}
           </div>
         )}
+        {true && (
+  <div className="victory-overlay">
+    <div className="victory-modal">
+      {/* Texto simple en lugar de multicolor */}
+      <h1 className="victoria-titulo">¡VICTORIA!</h1>
+      
+      <h2 className="winner-name">{ganador ? ganador : "usr"}</h2>
+      
+      <div className="victory-footer">
+        <div className="reward-badge">
+          <span>{highscore}</span>
+          <span className="coin-icon">🪙</span>
+        </div>
+        <button className="continue-button" onClick={salirPartida}>
+          CONTINUAR
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
         { isArcade && (<PowerUpSlots inventory={inventory} onActivate={ejecutarPowerup} shop={shop} disabled={processing || !miTurno}/>)} 
+
         {isShopOpen && (
             <PowerUpsShop 
               gallery={itemPoll}
@@ -875,6 +1008,7 @@ function Board({
               setInventory={setInventory}
               onClose={() => setIsShopOpen(false)} 
               gameId={idPartida}
+              discount={discount}
             />
           )}
 
