@@ -62,6 +62,10 @@ function Home({
 
   const [opponents, setOpponents] = useState([]);
 
+  const [reto, setReto] = useState(null);
+  const [retador, setRetador] = useState(null);
+  const [activeInviteId, setActiveInviteId] = useState(null);
+
   const refreshLobbyParticipants = async () => {
     if (!roomCode) return;
     const idPartida = roomCode.replace("RUM-", "");
@@ -322,23 +326,19 @@ function Home({
     if (user.id) loadFriendList();
   }, [user.id]);
 
-  // --- 1. Añade este estado al principio de tu componente Home (con los demás useState) ---
-  const [activeInviteId, setActiveInviteId] = useState(null);
-
-  // --- 2. Sustituye los useEffect de polling (líneas 250-320 aprox) por este ---
   useEffect(() => {
     const checkGlobalStatus = async () => {
       if (!user?.id) return;
 
       try {
         const data = await gameService.getInvitesAndProgress(user.id);
-        const invitaciones = data?.invitaciones || [];
-        const partidasEnCurso = data?.partidasEnCurso || [];
+        const invitaciones = data?.invitaciones;
+        const partidasEnCurso = data?.partidasEnCurso;
 
         if (invitaciones.length > 0) {
-          const inv = invitaciones[0]; // Trabajamos con la primera invitación
-
-          // Si ya tenemos este modal abierto para esta partida, no hacemos nada
+          const inv = invitaciones[0];
+          setReto(inv.idPartida);
+          setRetador(inv.nombreEmisor);
           if (activeInviteId === inv.idPartida) return;
 
           // ¿Es una reanudación o un reto nuevo?
@@ -355,7 +355,6 @@ function Home({
               {
                 label: "Aceptar",
                 onClick: async () => {
-                  // Avisar conexión al backend
                   const ok = await gameService.joinResumeGame(
                     user.id,
                     inv.idPartida,
@@ -422,6 +421,8 @@ function Home({
     }
   };
 
+  console.log("Reto:", reto);
+
   return (
     <div className="home-screen">
       {/* Barra superior */}
@@ -473,6 +474,8 @@ function Home({
           onOpenProfile={openFriendProfile}
           userId={user.id}
           onAnswerChallenge={handleAnswerChallenge}
+          retador={retador}
+          reto={reto}
         />
       )}
 

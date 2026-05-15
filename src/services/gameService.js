@@ -45,6 +45,7 @@ async function readApiErrorMessage(res, fallback) {
 /** Cabeceras comunes: JSON y token JWT si existe en localStorage. */
 const getHeaders = () => {
   const token = localStorage.getItem("rummi-token");
+  if (!token) console.error("¡ALERTA: Petición sin token!");
   return {
     "Content-Type": "application/json",
     ...(token ? { Authorization: `Bearer ${token}` } : {}),

@@ -11,6 +11,7 @@ import {
   getProfileImageRaw,
   defaultAvatarUrl,
 } from "./data/itemData.jsx";
+import { Toaster } from "sileo";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -123,6 +124,20 @@ function App() {
 
   return (
     <>
+      <Toaster
+        position="top-center"
+        options={{
+          fill: "#171717",
+          roundness: 12,
+          styles: {
+            title: "text-green-500! font-bold",
+            description: "text-green-400/90!",
+            badge: "bg-white/10!",
+            button: "bg-white/10! hover:bg-green/15!",
+          },
+        }}
+      />
+
       <div className="orientation-warning">
         <div className="phone-icon">
           📱<span>🔄</span>

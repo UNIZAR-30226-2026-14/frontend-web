@@ -56,6 +56,7 @@ function Profile({
     if (succes) {
       setUserAvatar(avatarName);
       setIsEditingAvatar(false);
+      sileo.success({ title: "Avatar actualizado" });
     } else {
       sileo.error({
         title: "Error de conexión.",
@@ -81,11 +82,13 @@ function Profile({
     if (success) {
       onNameChange(newUsername);
       setIsEditingName(false);
-
       sileo.success({ title: "Nombre actualizado" });
     } else {
       setTempName(user.nombre);
-      alert("El nombre ya existe o no se pudo actualizar.");
+      sileo.error({
+        title: "Nombre no disponible",
+        description: "Ese nombre ya está en uso por otro jugador.",
+      });
     }
   };
 
@@ -327,6 +330,7 @@ function Profile({
                     className="confirm-delete"
                     onClick={() => {
                       onRemoveFriend?.(userId);
+                      sileo.success({ title: "Amigo eliminado exitosamente." });
                       setShowRemoveConfirm(false);
                     }}
                   >

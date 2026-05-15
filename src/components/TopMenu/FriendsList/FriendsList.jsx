@@ -4,7 +4,14 @@ import { friendService } from "../../../services/gameService";
 import { sileo, Toaster } from "sileo";
 import { getAvatarDisplay } from "../../../data/itemData.jsx";
 
-function FriendsList({ onClose, onOpenProfile, userId, onAnswerChallenge }) {
+function FriendsList({
+  onClose,
+  onOpenProfile,
+  userId,
+  onAnswerChallenge,
+  retador,
+  reto,
+}) {
   const [challengeId, setChallengeId] = useState(null);
   const [search, setSearch] = useState("");
   const [newFriendId, setNewFriendId] = useState("");
@@ -120,7 +127,7 @@ function FriendsList({ onClose, onOpenProfile, userId, onAnswerChallenge }) {
   const filteredFriends = friends
     .filter((f) => f.name.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => (a.status === "online" ? -1 : 1));
-    
+
   console.log("Amigos:", filteredFriends);
 
   return (
@@ -284,17 +291,10 @@ function FriendsList({ onClose, onOpenProfile, userId, onAnswerChallenge }) {
                 <div className="requests-list">
                   {invitations.length > 0 ? (
                     invitations.map((inv) => (
-                      <div
-                        key={`inv-${inv.id || inv.idPartida}`}
-                        className="request-card"
-                      >
+                      <div key={`inv-${reto}`} className="request-card">
                         <div className="invitation-info">
-                          <span className="friend-name">
-                            {inv.hostName || "Un amigo"}
-                          </span>
-                          <span className="invitation-type">
-                            Te invita a jugar (Sala #{inv.idPartida})
-                          </span>
+                          <span className="friend-name">{retador}</span>
+                          <span className="invitation-type"> (Sala {reto})</span>
                         </div>
                         <div className="request-buttons">
                           <button
