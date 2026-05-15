@@ -275,7 +275,7 @@ function Board({
         break;
 
       case "WHITE_GLOVE":
-        //activarHabilidadConTarget(powerup.id);
+        activarHabilidadConTarget(powerup.id);
         //ALGO MÁS
         break;
 
@@ -955,7 +955,7 @@ function Board({
             })}
           </div>
         )}
-        {true && (
+        {finPartida && (
           <div className="victory-overlay">
             <div className="victory-modal">
               {/* Texto simple en lugar de multicolor */}

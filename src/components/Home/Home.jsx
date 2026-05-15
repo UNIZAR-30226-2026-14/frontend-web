@@ -227,7 +227,7 @@ function Home({
     }
   };
 
-  const handleQuickMatch = async (mode) => {
+  /*const handleQuickMatch = async (mode) => {
     try {
       const partidas = await gameService.getAllGames(mode === "arcade");
       setRoomCode(`RUM-${partidas.idPartida}`);
@@ -239,9 +239,9 @@ function Home({
       alert("No se pudo encontrar partida.");
       setActivePopup(null);
     }
-  };
+  };*/
 
-  /*const handleQuickMatch = async (mode) => {
+  const handleQuickMatch = async (mode) => {
     try {
       const partidas = await gameService.getAllGames(mode === "arcade");
       const idPartida = partidas.partida.idPartida;
@@ -262,7 +262,7 @@ function Home({
         description: "No se pudo encontrar partida.",
       });
     }
-  };*/
+  };
 
   const handleStartLobbyGame = async () => {
     const idPartida = roomCode.replace("RUM-", "");
