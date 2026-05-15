@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./PowerUpSlots.css";
+import "./powerUpSlots.css";
 import { POWER_UPS } from "../../../data/itemData";
 import ItemIcon from "../../UI/ItemIcon.jsx";
 
