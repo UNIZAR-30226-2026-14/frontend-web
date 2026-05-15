@@ -137,10 +137,7 @@ function Home({
           setIsWaitingForStart(true);
           onStart(gameId);
         } else {
-          sileo.info({
-            title: "Reto rechazado",
-            description: "La invitación ha sido eliminada.",
-          });
+          sileo.info({ title: "Reto rechazado" });
           loadFriendList();
         }
       }
@@ -199,7 +196,7 @@ function Home({
       if (success) {
         setSelectedFriendProfile(null);
         setActivePopup("friends");
-        //sileo.success({ title: "Amigo eliminado" });
+        sileo.info({ title: "Amigo eliminado" });
       } else {
         alert("No se pudo eliminar al amigo del servidor.");
       }

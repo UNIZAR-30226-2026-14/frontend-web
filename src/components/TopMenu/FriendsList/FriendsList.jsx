@@ -1,7 +1,7 @@
 import "./FriendsList.css";
 import { useState, useEffect } from "react";
 import { friendService } from "../../../services/gameService";
-import { sileo, Toaster } from "sileo";
+import { sileo } from "sileo";
 import { getAvatarDisplay } from "../../../data/itemData.jsx";
 
 function FriendsList({
@@ -133,7 +133,6 @@ function FriendsList({
   return (
     <>
       <div className="friends-overlay" onClick={onClose}></div>
-      <Toaster position="top-center" />
       <div className="friends-sidebar">
         <button className="add-friend" onClick={() => setIsAdding(true)}>
           +
@@ -206,17 +205,6 @@ function FriendsList({
                         className="friend-profile-hit"
                         onClick={() => onOpenProfile?.(friend.id)}
                       >
-                        <div className="friend-avatar">
-                          <img
-                            src={getAvatarDisplay(friend.avatar)}
-                            alt="avatar"
-                            style={{
-                              width: "100%",
-                              height: "100%",
-                              borderRadius: "50%",
-                            }}
-                          />
-                        </div>
                         <div className="friend-info">
                           <span className="friend-name">{friend.name}</span>
                           <span
@@ -294,7 +282,10 @@ function FriendsList({
                       <div key={`inv-${reto}`} className="request-card">
                         <div className="invitation-info">
                           <span className="friend-name">{retador}</span>
-                          <span className="invitation-type"> (Sala {reto})</span>
+                          <span className="invitation-type">
+                            {" "}
+                            (Sala {reto})
+                          </span>
                         </div>
                         <div className="request-buttons">
                           <button

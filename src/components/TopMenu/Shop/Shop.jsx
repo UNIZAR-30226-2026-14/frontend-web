@@ -1,4 +1,4 @@
-import { sileo, Toaster } from "sileo";
+import { sileo } from "sileo";
 import "./Shop.css";
 import { BACKGROUNDS, TILE_SKINS } from "../../../data/itemData";
 import { profileService } from "../../../services/gameService";
@@ -50,6 +50,10 @@ function Shop({
         if (isNewPurchase) {
           setCoins(newCoins);
           sileo.success({ title: "¡Compra realizada!" });
+        } else {
+          sileo.info({
+            title: `${isBg ? "Fondo de tablero " : "Skin de fichas "} ${item.name} equipado`,
+          });
         }
 
         setOwnedList(updatedOwned);
@@ -63,17 +67,6 @@ function Shop({
   return (
     <div className="shop-container">
       <div className="shop-card">
-        <Toaster
-          position="top-center"
-          options={{
-            roundness: 12,
-            styles: {
-              title: "color: #4fe940 !important; font-weight: 800;",
-              description: "color: #1c1a1a !important;",
-            },
-          }}
-        />
-
         <button className="close-button" onClick={onClose}>
           X
         </button>

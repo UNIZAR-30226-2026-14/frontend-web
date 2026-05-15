@@ -1,6 +1,5 @@
 import "./pendingGames.css";
 import { useState, useEffect } from "react";
-//import { PENDING_GAMES } from "../../../data/itemData.jsx";
 import {
   PARTY_PREVIEW_SLOTS,
   getAvatarDisplay,
@@ -16,7 +15,6 @@ function PendingGames({
   setPendingDropdownOpen,
   onInvite,
 }) {
-  // if (!PENDING_GAMES || PENDING_GAMES.length === 0) return null;
   const [pendingGames, setPendingGames] = useState([]);
 
   useEffect(() => {
