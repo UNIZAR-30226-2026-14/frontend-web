@@ -60,6 +60,9 @@
 .cancel-button {
   flex-direction: column;
   user-select: none;
+  width: 100px;
+  height: 40px;
+  font-size: large;
 }
 
 @media (max-height: 500px) {

@@ -10,7 +10,6 @@ import { gameService, friendService } from "../../services/gameService.js";
 
 import {
   AVATAR_LIST,
-  PENDING_GAMES,
   getAvatarDisplay,
   getProfileImageRaw,
 } from "../../data/itemData.jsx";
@@ -90,12 +89,12 @@ function Home({
 
   const [challengeId, setChallengeId] = useState(null);
 
-  const handleChallenge = async (opponentId) => {
+  const handleChallenge = async (opponentId, resume) => {
     try {
       const idPartida = roomCode.replace("RUM-", "");
       const invitation = await gameService.createInvitation(
         opponentId,
-        idPartida,
+        resume ? selectedGame.idPartida : idPartida,
       );
 
       if (invitation) {
@@ -114,13 +113,6 @@ function Home({
 
   const handleAnswerChallenge = async (friendId, gameId, accept) => {
     try {
-      console.log("Datos enviados:", {
-        myId: user?.id,
-        friendId,
-        gameId,
-        accept,
-      });
-
       if (!user?.id) throw new Error("El ID de usuario no existe");
 
       const ok = await gameService.answerChallenge(
@@ -296,13 +288,11 @@ function Home({
 
   useEffect(() => {
     let interval;
-
-    if (isWaitingForStart) {
+    if (isWaitingForStart && roomCode) {
       interval = setInterval(async () => {
         const id = roomCode.replace("RUM-", "");
         try {
           const partida = await gameService.getGameStatus(id);
-
           if (partida.estado === "RUNNING") {
             clearInterval(interval);
             setIsWaitingForStart(false);
@@ -313,24 +303,8 @@ function Home({
         }
       }, 2000);
     }
-
     return () => clearInterval(interval);
   }, [isWaitingForStart, roomCode, onStart]);
-
-  useEffect(() => {
-    let interval;
-    if (isWaitingForStart && !isHost) {
-      interval = setInterval(async () => {
-        const id = roomCode.replace("RUM-", "");
-        const partida = await gameService.getGameStatus(id);
-        if (partida.estado === "RUNNING") {
-          clearInterval(interval);
-          onStart(id);
-        }
-      }, 2000);
-    }
-    return () => clearInterval(interval);
-  }, [isWaitingForStart, isHost, roomCode]);
 
   const loadFriendList = async () => {
     try {
@@ -347,6 +321,106 @@ function Home({
   useEffect(() => {
     if (user.id) loadFriendList();
   }, [user.id]);
+
+  // --- 1. Añade este estado al principio de tu componente Home (con los demás useState) ---
+  const [activeInviteId, setActiveInviteId] = useState(null);
+
+  // --- 2. Sustituye los useEffect de polling (líneas 250-320 aprox) por este ---
+  useEffect(() => {
+    const checkGlobalStatus = async () => {
+      if (!user?.id) return;
+
+      try {
+        const data = await gameService.getInvitesAndProgress(user.id);
+        const invitaciones = data?.invitaciones || [];
+        const partidasEnCurso = data?.partidasEnCurso || [];
+
+        if (invitaciones.length > 0) {
+          const inv = invitaciones[0]; // Trabajamos con la primera invitación
+
+          // Si ya tenemos este modal abierto para esta partida, no hacemos nada
+          if (activeInviteId === inv.idPartida) return;
+
+          // ¿Es una reanudación o un reto nuevo?
+          const esReanudacion = partidasEnCurso.some(
+            (p) => p.idPartida === inv.idPartida,
+          );
+
+          setActiveInviteId(inv.idPartida);
+
+          sileo.info({
+            title: esReanudacion ? "Reanudar Partida" : "¡Nuevo Reto!",
+            description: `${inv.nombreEmisor} te invita a la partida ${inv.idPartida}.`,
+            options: [
+              {
+                label: "Aceptar",
+                onClick: async () => {
+                  // Avisar conexión al backend
+                  const ok = await gameService.joinResumeGame(
+                    user.id,
+                    inv.idPartida,
+                  );
+                  if (ok) {
+                    onStart(inv.idPartida);
+                    setActiveInviteId(null);
+                  }
+                },
+              },
+              {
+                label: "Rechazar",
+                onClick: async () => {
+                  // DELETE: El backend sustituye por BOT
+                  await gameService.deleteInvitation(
+                    inv.idEmisor,
+                    user.id,
+                    inv.idPartida,
+                  );
+                  setActiveInviteId(null);
+                },
+              },
+            ],
+          });
+        } else {
+          // Si no hay invitaciones, reseteamos el bloqueo
+          setActiveInviteId(null);
+        }
+      } catch (error) {
+        console.error("Error en polling:", error);
+      }
+    };
+
+    const interval = setInterval(checkGlobalStatus, 4000);
+    return () => clearInterval(interval);
+  }, [user.id, onStart, activeInviteId]);
+
+  const handleAnswer = async (inv, accept) => {
+    if (accept) {
+      // 1. Avisar conexión (PATCH o el endpoint que hayamos definido)
+      const ok = await gameService.joinResumeGame(user.id, inv.idPartida);
+
+      if (ok) {
+        // 2. Entrar a la partida
+        onStart(inv.idPartida);
+        // 3. Opcional: El backend suele borrar la invitación al unirse,
+        // pero si no, la borras tú manualmente aquí.
+      }
+    } else {
+      try {
+        // Borrar la invitación
+        // El backend, al recibir este DELETE, debería ejecutar la lógica
+        // de marcarte como abandonada=true y meter un BOT.
+        await gameService.deleteInvitation(
+          inv.idEmisor,
+          user.id,
+          inv.idPartida,
+        );
+
+        sileo.success({ title: "Invitación rechazada" });
+      } catch (error) {
+        console.error("No se pudo rechazar:", error);
+      }
+    }
+  };
 
   return (
     <div className="home-screen">
@@ -496,7 +570,7 @@ function Home({
                       {friend.status === "online" && (
                         <button
                           className="challenge-button"
-                          onClick={() => handleChallenge(friend.id)}
+                          onClick={() => handleChallenge(friend.id, false)}
                           disabled={challengeId === friend.id}
                         >
                           {challengeId === friend.id ? "..." : "Retar"}
@@ -638,12 +712,7 @@ function Home({
                     userId={user.id}
                     userAvatar={getAvatarDisplay(userAvatar)}
                     setSelectedGame={async (game) => {
-                      const exito = await gameService.resumeGame(game.idPartida);
-                      if (exito) {
-                        setSelectedGame(game);
-                        onStart(game.idPartida);
-                        setShowResumeModal(false);
-                      }
+                      setSelectedGame(game);
                     }}
                   />
                 </div>
@@ -668,7 +737,7 @@ function Home({
                         {friend.status === "online" && (
                           <button
                             className="challenge-button"
-                            onClick={() => handleChallenge(friend.id)}
+                            onClick={() => handleChallenge(friend.id, true)}
                             disabled={challengeId === friend.id}
                           >
                             {challengeId === friend.id ? "..." : "Retar"}
@@ -682,6 +751,29 @@ function Home({
                 </div>
               </div>
             </div>
+            <button
+              className="start-game-btn"
+              onClick={async () => {
+                if (selectedGame) {
+                  try {
+                    const exito = await gameService.resumeGame(
+                      selectedGame.idPartida,
+                    );
+                    if (exito) {
+                      onStart(selectedGame.idPartida);
+                    }
+                  } catch (err) {
+                    sileo.error({
+                      title: "Error",
+                      description: "No se pudo reanudar la partida.",
+                    });
+                  }
+                }
+              }}
+              disabled={!selectedGame}
+            >
+              Empezar
+            </button>
           </div>
         </div>
       )}
@@ -689,7 +781,7 @@ function Home({
       {/* Selector de modos de juego */}
       <div className="gamemodes">
         <div
-          className={`gamemode-card classic ${selectedGame ? "" : ""} ${selectedGame && selectedGame.mode !== "classic" ? "disabled" : ""}`}
+          className="gamemode-card classic"
           onClick={() => {
             setModeChosen("classic");
             setShowPlayOptions(true);
@@ -729,7 +821,7 @@ function Home({
         </div>
 
         <div
-          className={`gamemode-card arcade ${selectedGame && selectedGame.mode !== "arcade" ? "disabled" : ""}`}
+          className="gamemode-card arcade"
           onClick={() => {
             setModeChosen("arcade");
             setShowPlayOptions(true);

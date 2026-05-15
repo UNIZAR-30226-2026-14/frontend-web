@@ -34,7 +34,7 @@ function PendingGames({
   return (
     <div className="pending-list-mini">
       {pendingGames.map((game, index) => {
-        const isSelected = selectedGame?.id === game.id;
+        const isSelected = selectedGame?.idPartida === game.idPartida;
         return (
           <div
             key={`game-${game.id || index}`}

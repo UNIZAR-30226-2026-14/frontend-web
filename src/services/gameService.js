@@ -288,9 +288,7 @@ export const friendService = {
       if (!res.ok)
         throw new Error("Error al obtener las invitaciones del usuario");
 
-      const data = await res.json();
-      console.log("Invitaciones:", data);
-      return data;
+      return await res.json();
     } catch (error) {
       console.error(error);
       return [];
@@ -400,7 +398,7 @@ export const gameService = {
     return await res.json();
   },
 
-   // Obtener partida
+  // Obtener partida
   getAllGames: async (esArcade) => {
     try {
       const res = await apiFetch("partidas/matchmaking", {
@@ -472,12 +470,9 @@ export const gameService = {
     const res = await apiFetch(`partidas/${gameId}/mercado`, {
       headers: getHeaders(),
     });
-    if (!res.ok)
-      throw new Error("Error al obtener el mercado.");
+    if (!res.ok) throw new Error("Error al obtener el mercado.");
     return await res.json();
   },
-
- 
 
   // Obtener participaciones de una partida
   getParticipationByGame: async (gameId) => {
@@ -538,7 +533,42 @@ export const gameService = {
       method: "POST",
       headers: getHeaders(),
     });
+    if (!response.ok) {
+      const errorDetail = await response.json();
+      console.log("Detalle del error 400:", errorDetail);
+      throw new Error(errorDetail.message || "Error 400");
+    }
     return response.ok;
+  },
+
+  // gameService.js
+
+  joinResumeGame: async (userId, gameId) => {
+    try {
+      const response = await fetch(
+        `${API_URL}/participaciones/${userId}/${gameId}/conexion`,
+        {
+          method: "PATCH",
+          headers: getHeaders(),
+          body: JSON.stringify({ conectado: true }),
+        },
+      );
+      return response.ok;
+    } catch (error) {
+      console.error("Error al unirse a reanudable:", error);
+      return false;
+    }
+  },
+
+  getInvitesAndProgress: async (userId) => {
+    const res = await apiFetch(
+      `invitaciones?idInvitado=${userId}&includeInProgress=true`,
+    );
+    if (res.ok) {
+      return await res.json();
+      // Este JSON ahora debería traer: { invitaciones: [], partidasEnCurso: [...] }
+    }
+    return null;
   },
 
   // Retar a un amigo
@@ -559,6 +589,22 @@ export const gameService = {
     } catch (error) {
       console.error("Error en createInvitation:", error);
       throw error;
+    }
+  },
+
+  // Eliminar una invitación
+  deleteInvitation: async (idHost, idJugador, idPartida) => {
+    try {
+      const res = await apiFetch(
+        `invitaciones/${idHost}/${idJugador}/${idPartida}`,
+        {
+          method: "DELETE",
+          headers: getHeaders(),
+        },
+      );
+      return res.ok;
+    } catch (e) {
+      return false;
     }
   },
 
