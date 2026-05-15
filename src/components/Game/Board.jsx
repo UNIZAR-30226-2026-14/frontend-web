@@ -51,11 +51,16 @@ function Board({
   const [ordenTurno, setOrdenTurno] = useState(null);
 
   const [matchPoints, setMatchPoints] = useState(0);
-  const [primeraJugada, setPrimeraJugada] = useState(false);
+  const [primeraJugada, setPrimeraJugada] = useState(true);
   const [activeEvent, setActiveEvent] = useState(null);
   const [deckSize, setDeckSize] = useState(0);
 
   const [isShopOpen, setIsShopOpen] = useState(false);
+
+  const [chooseTarget, setChooseTarget] = useState(true);
+  const [userTarget, setUserTarget] = useState(null);
+
+  const [itemPoll, setItemPoll] = useState([]);
 
   // Datos de los oponentes (participaciones del juego, cargadas al inicio)
   const [opponents, setOpponents] = useState([]);
@@ -111,17 +116,45 @@ function Board({
     setMatchPoints((prev) => prev + puntosGanados);
   };
 
-    const recibirPowerup = (powerup) => {
+  // --------------------------------------------------------------------------------MIRAR LUEGO
+  const activarHabilidadConTarget = async (powerUp) => {
+  // 1. Abrimos el selector y esperamos
+    setChooseTarget(true);
+    
+    const idObjetivo = await new Promise((resolve) => {
+      // Guardamos el "resolve" en la referencia para usarlo fuera de aquí
+      resolveEleccion.current = resolve;
+    });
+  
+    // 2. Una vez que resolveEleccion.current() sea llamado, el código sigue aquí:
+    console.log("Objetivo elegido:", idObjetivo);
+    ejecutarAtaque(powerUp, idObjetivo);
+  };
+  
+  // Esta es la función que llamarás desde los botones del mapa de oponentes
+  const manejarSeleccionObjetivo = (idJugador) => {
+    setChooseTarget(false);
+    if (resolveEleccion.current) {
+      resolveEleccion.current(idJugador); // Esto desbloquea el 'await' anterior
+      resolveEleccion.current = null;
+    }
+  };
+
+  
+
+  const recibirEfecto = (powerup) => {
     //esto mejor será ponerlo aparte
     switch (powerup.id) {
 
       case "GUARDIAN_ANGEL":
         setAngel(true);
+        break;
 
       case "PLUS_FOUR":
         if (angel) {
           setAngel(false); //Indicar que lo hemos usao
         } else drawFour();
+        break;
 
       case "SMOKE_BOMB":
         if (angel) {
@@ -131,57 +164,61 @@ function Board({
           ...prev,
           isBlind: true,
         }));
-        }
+        }break;
 
-      /*case "midasTouch":
-        setHandPositions((prev) => {
-          const next = { ...prev };
-          const slotsConFichas = Object.keys(next).filter(
-            (key) => next[key] !== "",
-          );
-          const seleccionadas = slotsConFichas
-            .sort(() => 0.5 - Math.random())
-            .slice(0, 3);
+      case "CHILI_PEPPER":
+        if (angel) {
+          setAngel(false); 
+          //Indicar que lo hemos usao
+        } else setMyTime(15);
+        break;
 
-          seleccionadas.forEach((slot) => {
-            next[slot] = { ...next[slot], habilidad: "dorada" };
-          });
-
-          return next;
-        });
-        break;*/
-
-      case 1:
-
+      case "GLASS_CEILING":
+        if (angel) {
+          setAngel(false); 
+          //Indicar que lo hemos usao
+        } else setPrimeraJugada(true);
+        break;
       default:
         break;
     }
 
     // Quitar del inventario una vez usado
-    setInventory((prev) => prev.filter((item) => item.id !== powerup.id));
+    //setInventory((prev) => prev.filter((item) => item.id !== powerup.id));
   };
 
-  const ejecutarPowerup = (powerup) => {
+  const ejecutarPowerup = (powerup, victim) => {
     //esto mejor será ponerlo aparte
     switch (powerup.id) {
 
+      case "GUARDIAN_ANGEL":
+        gameService.useItemSelf(idPartida,powerup.id);
+        setAngel(true); //o aquí o en efectos
+        console.log("Protegido");
+        break;
 
-      case "midasTouch":
-        setHandPositions((prev) => {
-          const next = { ...prev };
-          const slotsConFichas = Object.keys(next).filter(
-            (key) => next[key] !== "",
-          );
-          const seleccionadas = slotsConFichas
-            .sort(() => 0.5 - Math.random())
-            .slice(0, 3);
+      case "PLUS_FOUR":
+        break;
 
-          seleccionadas.forEach((slot) => {
-            next[slot] = { ...next[slot], habilidad: "dorada" };
-          });
+      case "SMOKE_BOMB":
+        break;
+        
+      case "CHILI_PEPPER":
+        break;  
 
-          return next;
-        });
+      case "GLASS_CEILING":
+        break;  
+
+      case "WHITE_GLOVE":
+        break;
+
+      case "SWAP_ON_FAIL":
+        break;  
+
+      case "MIDAS_TOUCH":
+        break;
+      
+      case "CRYSTAL_BALL":
         break;
 
       case 1:
@@ -243,10 +280,14 @@ function Board({
     
   }, [activeEvent]); // Se dispara cada vez que te toca
 
+ const guardarMercado = (cosos) => {
+    // Forzamos que cosos sea tratado como array por seguridad
+    const lista = Array.isArray(cosos) ? cosos : [];
+    const nombres = lista.map(item => item?.codigo).filter(Boolean); 
+    // .filter(Boolean) elimina posibles undefined si algún item no tiene código
+    setItemPoll(nombres);
+};
 
-
-
-  const delay = (ms) => new Promise((res) => setTimeout(res, ms)); // pa pruebas
 
   const [handPositions, setHandPositions] = useState(() => {
     // Inicializamos 20 huecos vacíos
@@ -419,13 +460,14 @@ function Board({
           miPosicion = Number(participacion.ordenTurno);
           setOrdenTurno(miPosicion);
           actualizarManoVisual(parsearFichas(participacion.manoActual));
-        }
-
-        if (isArcade) {
-          
-          //const mercado = await gameService.getMercado(idPartida);
-         // console.log("Monedas: ", mercado.monedasJugador);
-         // console.log("Objetos en venta: ", mercado.objetosMercado);
+          if (isArcade) {
+            const efectos = participacion.efectosActivos;
+            console.log("EFECTOS ACTIVOS: ");
+            for (let i = 0; i < participacion.length; i++) {
+              recibirEfecto(participacion[i]);
+              
+            }
+          }
         }
 
         const turnoDeLaPartida = Number(partida.turno);
@@ -441,6 +483,14 @@ function Board({
         // Si acaba de empezar mi turno, sincronizamos frontend y backend
         if (esMiTurnoAhora && !miTurno) {
           if (isArcade) {
+            
+            gameService.updateMoney(user.id,idPartida,matchPoints);
+            const mercado = await gameService.getMercado(idPartida);
+            console.log("DINERO: ", mercado.monedasJugador);
+
+
+            guardarMercado(mercado.objetosMercado);
+            console.log("items: ", itemPoll);
             setActiveEvent(partida.eventoActual);
           }
           const resU = await gameService.getParticipation(user.id, idPartida);
@@ -580,6 +630,8 @@ function Board({
     }
   };
 
+  
+
   const drawFour = async () => {
     try {
       setProcessing(true);
@@ -632,6 +684,7 @@ function Board({
         return;
       }
       sumarPuntosPorJugada();
+      
       if (primeraJugada) {
         setPrimeraJugada(false);
       }
@@ -666,6 +719,7 @@ function Board({
   const drawTileButton = () => {
     undoMove();
     drawTile();
+    console.log("Oponentes: ",opponents);
   };
 
   useEffect(() => {
@@ -784,14 +838,43 @@ function Board({
           </button>
         </div>
 
+        {chooseTarget && (
+          <div className="Eleccion">
+            <h1>ELIGE</h1>
+            {[2, 1, 0].map((idx) => {
+              const op = opponents[idx];
+
+              // Si el oponente no existe en este índice, no renderizamos nada para ese slot
+              if (!op) return null;
+            
+              return (
+                <div key={idx} className="target-selection">
+                  
+                  <button
+                    /* CORRECCIÓN: Usar arrow function para evitar ejecución inmediata */
+                    onClick={() => {manejarSeleccionObjetivo(op.idJugador);}}
+                    disabled={processing || !miTurno}
+                    title={`Atacar a ${op.jugadorNombre}`}
+                  >
+                    {/* Agregamos el nombre para que el botón no esté vacío */}
+                    {op.jugadorNombre}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
         { isArcade && (<PowerUpSlots inventory={inventory} onActivate={ejecutarPowerup} shop={shop} disabled={processing || !miTurno}/>)} 
         {isShopOpen && (
             <PowerUpsShop 
+              gallery={itemPoll}
               matchPoints={matchPoints}
               setMatchPoints={setMatchPoints}
               inventory={inventory}
               setInventory={setInventory}
               onClose={() => setIsShopOpen(false)} 
+              gameId={idPartida}
             />
           )}
 

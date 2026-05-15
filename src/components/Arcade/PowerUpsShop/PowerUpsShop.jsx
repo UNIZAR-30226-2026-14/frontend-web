@@ -1,24 +1,38 @@
-import { useState } from "react"; // Añadido
+import { useState, useMemo } from "react";
 import "./powerUpsShop.css";
 import { POWER_UPS } from "../../../data/itemData";
+import { gameService } from "../../../services/gameService.js";
 
-function PowerUpsShop({ matchPoints, setMatchPoints, inventory, setInventory, onClose }) {
-  // Retoque: Estado para manejar la selección visual
-  const [selectedItem, setSelectedItem] = useState(POWER_UPS[0] || null);
+function PowerUpsShop({ gallery, matchPoints, setMatchPoints, inventory, setInventory, onClose, gameId }) {
+  
+  // 1. Filtramos los POWER_UPS para que solo aparezcan los que están en gallery
+  // Usamos useMemo para que no se recalcule en cada render si no cambia gallery
+  const itemsInShop = useMemo(() => {
+    return POWER_UPS.filter(item => gallery.includes(item.id));
+  }, [gallery]);
+
+  // 2. Estado inicial: Seleccionamos el primer objeto de la galería filtrada
+  const [selectedItem, setSelectedItem] = useState(itemsInShop[0] || null);
 
   const handleBuyPowerUp = (item) => {
-    if (!item) return; // Seguridad
+    if (!item) return;
 
     if (inventory.length >= 3) {
+      alert("Inventario lleno"); // Opcional: feedback visual
       return;
     }
 
-    if (matchPoints >= item.price) {
-      setMatchPoints((prev) => prev - item.price);
-      const newItem = { ...item, id: Date.now() }; 
-      setInventory([...inventory, newItem]);
+    console.log(item.id);
 
+    if (gameService.buyItem(gameId, item.id) && (matchPoints >= item.price)) {
+      setMatchPoints((prev) => prev - item.price);
       
+      const newItem = { 
+        ...item, 
+        instanceId: Date.now() // Usamos instanceId para la key de React si es necesario
+      }; 
+
+      setInventory([...inventory, newItem]);
     } 
   };
 
@@ -26,23 +40,30 @@ function PowerUpsShop({ matchPoints, setMatchPoints, inventory, setInventory, on
     <div className="shop-popup">
       <button className="close-button" onClick={onClose}>×</button>
       
-      {/* Retoque: Grid simplificado para los iconos superiores */}
       <div className="power-ups-grid">
-        {POWER_UPS.map((item) => (
+        {/* Renderizamos solo los items filtrados */}
+        {itemsInShop.map((item) => (
           <div 
             key={item.id} 
             className={`item-card ${selectedItem?.id === item.id ? "active" : ""}`}
             onClick={() => setSelectedItem(item)}
           >
             <div className="item-icon">{item.icon}</div>
+            <div className="item-name-mini">{item.name}</div>
           </div>
         ))}
       </div>
 
-      {/* Retoque: Footer con descripción y botón lateral según image_9469d8.png */}
       <div className="shop-footer">
         <div className="item-description">
-          {selectedItem ? selectedItem.description : "Selecciona un objeto"}
+          {selectedItem ? (
+            <>
+              <strong>{selectedItem.name}</strong>
+              <p>{selectedItem.description}</p>
+            </>
+          ) : (
+            "Selecciona un objeto"
+          )}
         </div>
         
         {selectedItem && (
@@ -52,7 +73,6 @@ function PowerUpsShop({ matchPoints, setMatchPoints, inventory, setInventory, on
           </button>
         )}
       </div>
-      
     </div>
   );
 }

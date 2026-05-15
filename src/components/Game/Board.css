@@ -80,6 +80,56 @@
   
 }
 
+/* Importante: He cambiado .eleccion por .Eleccion para coincidir con tu JSX */
+.Eleccion {
+  position: fixed;
+  /* Lo situamos en el centro de la pantalla para que la elección sea clara */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  
+  display: flex;
+  flex-direction: row; /* En fila suele ser más intuitivo para elegir oponentes */
+  gap: 20px;
+  padding: 25px;
+  
+  background-color: rgba(99, 94, 94, 0.85);
+  backdrop-filter: blur(8px);
+  border-radius: 15px;
+  border: 2px solid rgb(0, 0, 0);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  z-index: 9999; /* Por encima de todo */
+}
+
+.target-selection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.target-selection button {
+  padding: 10px 20px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: white;
+  background-color: #444;
+  border: 1px solid #666;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.target-selection button:hover:not(:disabled) {
+  background-color: #d4af37; /* Color oro al pasar el mouse */
+  color: black;
+  transform: scale(1.1);
+}
+
+.target-selection button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 img {
   width: 70px;
   height: 70px;

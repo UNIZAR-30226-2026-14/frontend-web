@@ -54,3 +54,27 @@
     width: 100%;
     height: 100%;
 }
+
+.confirmation-popup {
+  position: absolute;
+  bottom: 50px;
+  left: 0;
+  background: white;
+  padding: 8px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  display: flex;
+  gap: 5px;
+  pointer-events: auto;
+}
+
+.confirm-button, .cancel-button {
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.confirm-button { background: #4CAF50; color: white; }
+.cancel-button { background: #f44336; color: white; }

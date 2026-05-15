@@ -2,7 +2,7 @@ const DICEBEAR = "https://api.dicebear.com/7.x/avataaars/svg";
 
 export const defaultAvatarUrl = `${DICEBEAR}?seed=Alex&backgroundColor=b6e3f4`;
 
-const precio = 0; //6
+const precio = 6; //6
 export const icons = {
   PLUS_FOUR: (
     <g transform="scale(0.5) translate(50, 20)">
@@ -285,6 +285,7 @@ export const POWER_UPS = [
     description: "Obliga al oponente a robar 4 fichas extra.",
     // Envolvemos el path del objeto 'icons' en un componente SVG
     icon: <svg width="100%" height="100%" viewBox="0 0 100 100">{icons.PLUS_FOUR}</svg>,
+    propio: false, //indica si lo usas pa ti o no
   },
   {
     id: "GUARDIAN_ANGEL",
@@ -292,6 +293,7 @@ export const POWER_UPS = [
     price: precio,
     description: "Te protege del próximo ataque que recibas.",
     icon: <svg width="100%" height="100%" viewBox="0 0 90 110">{icons.guardianAngel}</svg>,
+    propio: true,
   },
   {
     id: "SWAP_ON_FAIL",
@@ -299,13 +301,15 @@ export const POWER_UPS = [
     price: precio,
     description: "Ves 3 fichas del oponente que selecciones, escoges una y la intercambias con una tuya.",
     icon: <svg width="100%" height="100%" viewBox="0 0 100 100">{icons.swap}</svg>,
+    propio: false,
   },
   {
     id: "MIDAS_TOUCH",
     name: "Toque de Midas",
-    price: 0,
+    price: 3,
     description: "Tus jugadas de este turno valen el doble de puntos.",
     icon: <svg width="100%" height="100%" viewBox="0 0 100 100">{icons.midasTouch}</svg>,
+    propio: true,
   },
   {
     id: "SMOKE_BOMB",
@@ -313,6 +317,7 @@ export const POWER_UPS = [
     price: precio,
     description: "Oculta las fichas del tablero al jugador que selecciones durante su siguiente turno.",
     icon: <svg width="100%" height="100%" viewBox="0 0 100 100">{icons.smokeBomb}</svg>,
+    propio: false,
   },
   {
     id: "CRYSTAL_BALL",
@@ -320,6 +325,7 @@ export const POWER_UPS = [
     price: precio,
     description: "Ver las fichas de un color específico del resto de oponentes.",
     icon: <svg width="100%" height="100%" viewBox="0 0 100 100">{icons.crystalBall}</svg>,
+    propio: true,
   },
   {
     id: "WHITE_GLOVE",
@@ -327,6 +333,7 @@ export const POWER_UPS = [
     price: precio,
     description: "Ver las fichas de un color específico del resto de oponentes.",
     icon: <svg width="100%" height="100%" viewBox="0 0 100 100">{icons.glove}</svg>, // Usando lupa para el guante
+    propio: false,
   },
   {
     id: "CHILI_PEPPER",
@@ -334,13 +341,15 @@ export const POWER_UPS = [
     price: precio,
     description: "Reducir a la mitad el tiempo del próximo turno de un jugador.",
     icon: <svg width="100%" height="100%" viewBox="0 0 100 100">{icons.halfTime}</svg>,
+    propio: false,
   },
   {
     id: "GLASS_CEILING",
     name: "Techo de cristal",
     price: precio,
     description: "Hacer que la siguiente jugada de un jugador deba ser de 30 puntos o más.",
-    icon: <svg width="100%" height="100%" viewBox="0 0 1361 1284">{icons.hearing}</svg>, // Usando el de drinks como placeholder
+    icon: <svg width="100%" height="100%" viewBox="0 0 1361 1284">{icons.hearing}</svg>, 
+    propio: false,
   },
 ];
 

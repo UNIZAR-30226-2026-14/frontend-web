@@ -363,6 +363,43 @@ export const gameService = {
     return await res.json();
   },
 
+  buyItem: async (gameId, itemId) => {
+    const res = await apiFetch(`partidas/${gameId}/mercado/comprar`, {
+      method: "POST",
+      headers: getHeaders(),
+      body: JSON.stringify({
+        codigoObjeto: itemId,
+      }),
+    });
+    if (!res.ok) throw new Error("Error al comprar item.");
+    return await res.json();
+  },
+
+  useItem: async (gameId, itemId, targetid) => {
+    const res = await apiFetch(`partidas/${gameId}/mercado/usar`, {
+      method: "POST",
+      headers: getHeaders(),
+      body: JSON.stringify({
+        codigoObjeto: itemId,
+        idJugadorObjetivo: targetid,
+      }),
+    });
+    if (!res.ok) throw new Error("Error al usar objeto.");
+    return await res.json();
+  },
+
+  useItemSelf: async (gameId, itemId) => {
+    const res = await apiFetch(`partidas/${gameId}/mercado/usar`, {
+      method: "POST",
+      headers: getHeaders(),
+      body: JSON.stringify({
+        codigoObjeto: itemId,
+      }),
+    });
+    if (!res.ok) throw new Error("Error al usar objeto.");
+    return await res.json();
+  },
+
    // Obtener partida
   getAllGames: async (esArcade) => {
     try {
@@ -409,6 +446,18 @@ export const gameService = {
     return await res.json();
   },
 
+  updateMoney: async (userId, gameId, money) => {
+    const res = await apiFetch(`participaciones/${userId}/${gameId}/monedas`, {
+      method: "PATCH",
+      headers: getHeaders(),
+      body: JSON.stringify({
+        monedasPartida: money,
+      }),
+    });
+    if (!res.ok) throw new Error("Error al pasar turno.");
+    return await res.json();
+  },
+
   // Obtener participación
   getParticipation: async (userId, gameId) => {
     const res = await apiFetch(`participaciones/${userId}/${gameId}`, {
@@ -420,7 +469,7 @@ export const gameService = {
   },
 
   getMercado: async (gameId) => {
-    const res = await apiFetch(`partida/${gameId}/mercado`, {
+    const res = await apiFetch(`partidas/${gameId}/mercado`, {
       headers: getHeaders(),
     });
     if (!res.ok)
