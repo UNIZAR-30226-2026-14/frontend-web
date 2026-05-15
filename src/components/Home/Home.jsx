@@ -241,6 +241,29 @@ function Home({
     }
   };
 
+  /*const handleQuickMatch = async (mode) => {
+    try {
+      const partidas = await gameService.getAllGames(mode === "arcade");
+      const idPartida = partidas.partida.idPartida;
+      console.log("Id ", idPartida);
+      setRoomCode(`RUM-${idPartida}`);
+      setIsHost(partidas.creadaNuevaPartida);
+      console.log(`Roomcode: ${roomCode} `);
+      setIsWaitingForStart(true);
+      setShowPlayOptions(false);
+      sileo.info({
+        title: "Buscando partida",
+        description: "Esperando a otros jugadores o completando con bots...",
+      });
+    } catch (error) {
+      console.error("Error en matchmaking:", error);
+      sileo.error({
+        title: "Error",
+        description: "No se pudo encontrar partida.",
+      });
+    }
+  };*/
+
   const handleStartLobbyGame = async () => {
     const idPartida = roomCode.replace("RUM-", "");
     try {
@@ -289,14 +312,17 @@ function Home({
 
   useEffect(() => {
     let interval;
-    if (isWaitingForStart && roomCode) {
+    if (isWaitingForStart && roomCode && roomCode.includes("RUM-")) {
       interval = setInterval(async () => {
         const id = roomCode.replace("RUM-", "");
+        if (!id || id === "undefined") return;
         try {
           const partida = await gameService.getGameStatus(id);
           if (partida.estado === "RUNNING") {
             clearInterval(interval);
             setIsWaitingForStart(false);
+            setShowPlayOptions(false); // Cerramos el menú de elegir modo
+            setActivePopup(null);
             onStart(id);
           }
         } catch (e) {
