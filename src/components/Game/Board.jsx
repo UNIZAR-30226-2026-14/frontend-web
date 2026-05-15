@@ -51,7 +51,7 @@ function Board({
   const [ordenTurno, setOrdenTurno] = useState(null);
 
   const [matchPoints, setMatchPoints] = useState(0);
-  const [primeraJugada, setPrimeraJugada] = useState(false);
+  const [primeraJugada, setPrimeraJugada] = useState(true);
   const [activeEvent, setActiveEvent] = useState(null);
   const [deckSize, setDeckSize] = useState(0);
   const resolveEleccion = useRef(null);
@@ -559,7 +559,7 @@ const manejarBola = async (powerup) => {
              }
             
             gameService.updateMoney(user.id,idPartida,matchPoints);
-            gameService.updateMoney(user.id,idPartida,100);
+            //gameService.updateMoney(user.id,idPartida,100);
             const mercado = await gameService.getMercado(idPartida);
             console.log("DINERO: ", mercado.monedasJugador);
             
@@ -571,7 +571,7 @@ const manejarBola = async (powerup) => {
             setInventory(mercado.habilidadesCompradas);
 
             console.log("Evento: ",partida.eventoActual);
-            //setActiveEvent(partida.eventoActual);
+            setActiveEvent(partida.eventoActual);
           }
           const resU = await gameService.getParticipation(user.id, idPartida);
           
