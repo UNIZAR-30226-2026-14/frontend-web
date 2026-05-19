@@ -37,13 +37,8 @@
 
 /* Solo las fichas unidas aplican el cálculo */
 .hand-container.tile-joined {
-  /* CALCULO:
-     Multiplicamos el índice por el valor que queremos reducir.
-     Si el gap es 10px y queremos que se solapen 2px (total 12px de movimiento):
-  */
-  transform: translateX(calc(var(--tile-index) * -10px));
-
-  /* Aseguramos que la ficha de la derecha esté siempre encima de la anterior */
+  transform: translateX(calc(var(--tile-index) * -8px));; 
+  margin-right: -25px; 
   z-index: calc(10 + var(--tile-index));
 }
 
@@ -330,7 +325,9 @@ img {
   }
 
   .hand-container.tile-joined {
-    transform: translateX(calc(var(--tile-index) * -6px)); 
+    transform: translateX(calc(var(--tile-index) * -6px));; 
+    margin-right: -16px; 
+    z-index: calc(10 + var(--tile-index));
   }
 
   .UNDO {
