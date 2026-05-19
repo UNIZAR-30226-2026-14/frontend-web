@@ -1,6 +1,7 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import Tile from "./Tile.jsx";
 import Hand from "./Hand.jsx";
+import { POWER_UPS } from "../../data/itemData";
 import DraggableTile from "./draggableTile.jsx";
 import { useGame } from "../../hooks/useGame.js";
 import "./Board.css";
@@ -55,6 +56,16 @@ function Board({
   const resolveEleccion = useRef(null);
 
   const [isShopOpen, setIsShopOpen] = useState(false);
+  //pa bola de cristal
+  const [isBallUsed, setIsBallUsed] = useState(false);
+  const [inventCristal, setInventCristal] = useState([]);
+  const [handCristal, setHandCristal] = useState(() => {
+    // Inicializamos 20 huecos vacíos
+    const initial = {};
+    for (let i = 0; i < 20; i++) initial[`hand-slot-${i}`] = "";
+    return initial;
+  });
+
 
   const [chooseTarget, setChooseTarget] = useState(false);
   const [userTarget, setUserTarget] = useState(null);
@@ -62,6 +73,7 @@ function Board({
   const [itemPoll, setItemPoll] = useState([]);
 
   // Datos de los oponentes (participaciones del juego, cargadas al inicio)
+  const [opponents, setOpponents] = useState([]);
   const [jugadoresOrdenados, setJugadoresOrdenados] = useState([]);
 
   const [finPartida, setFinPartida] = useState(false);
@@ -192,23 +204,18 @@ function Board({
   };
 
   const activarHabilidadConTarget = async (powerUp) => {
-    // 1. Abrimos el selector y esperamos
     setChooseTarget(true);
-
     const idObjetivo = await new Promise((resolve) => {
-      // Guardamos el "resolve" en la referencia para usarlo fuera de aquí
       resolveEleccion.current = resolve;
     });
-
-    // console.log("Objetivo elegido:", idObjetivo);
     gameService.useItem(idPartida, powerUp, idObjetivo);
   };
 
-  // Esta es la función que llamarás desde los botones del mapa de oponentes
+ 
   const manejarSeleccionObjetivo = (idJugador) => {
     setChooseTarget(false);
     if (resolveEleccion.current) {
-      resolveEleccion.current(idJugador); // Esto desbloquea el 'await' anterior
+      resolveEleccion.current(idJugador);
       resolveEleccion.current = null;
     }
   };
@@ -245,33 +252,81 @@ function Board({
     try {
       
       const data = await gameService.useItemSelf(idPartida, powerup.id);
-
-      
       const nuevaManoCifrada = data.manoActual;
-
       actualizarManoVisual(parsearFichas(nuevaManoCifrada));
     } catch (error) {
       console.error("Falló el uso del objeto:", error.message);
     }
   };
 
+ 
+
   const manejarBola = async (powerup) => {
-    try {
-      const data = await gameService.useItemSelf(idPartida, powerup.id);
+  try {
+      setChooseTarget(true);
+      const idObjetivo = await new Promise((resolve) => {
+        resolveEleccion.current = resolve;
+      });
+    
+      const data = await gameService.useItem(idPartida, powerup.id, idObjetivo);
+      const gallery = data.habilidadesObjetivoVisibles; 
+      setIsBallUsed(true);
+      setHandCristal(parsearFichas(data.fichasObjetivoVisibles));
 
-      const nuevaManoCifrada = data.manoActual;
 
-      console.log("Mano actualizada:", nuevaManoCifrada);
+      const itemsReales = POWER_UPS.filter(item => gallery.includes(item.id));
 
-     
-      actualizarManoVisual(parsearFichas(nuevaManoCifrada));
+
+      const MAX_SLOTS = 3; 
+      const inventarioRelleno = Array.from({ length: MAX_SLOTS }, (_, index) => {
+        return itemsReales[index] || null;
+      });
+
+      setInventCristal(inventarioRelleno);
+
+    } catch (error) {
+      console.error("Falló el uso del objeto:", error.message);
+    }
+  };
+
+  const manejarTrueque = async (powerup) => {
+  try {
+    setChooseTarget(true);
+    const idObjetivo = await new Promise((resolve) => {
+      resolveEleccion.current = resolve;
+    });
+  
+    const data = await gameService.useItem(idPartida, powerup.id, idObjetivo);
+    console.log("Trueque: ", data);
+
+  } catch (error) {
+    console.error("Falló el uso del objeto:", error.message);
+  }
+};
+
+const manejarGuante = async (powerup) => {
+  try {
+      setChooseTarget(true);
+      const idObjetivo = await new Promise((resolve) => {
+        resolveEleccion.current = resolve;
+      });
+    
+      const data = await gameService.useItem(idPartida, powerup.id, idObjetivo);
+      const gallery = data.habilidadesCompradas;
+      const itemsReales = POWER_UPS.filter(item => gallery.includes(item.id));
+
+      const MAX_SLOTS = 3; 
+      const inventarioRelleno = Array.from({ length: MAX_SLOTS }, (_, index) => {
+        return itemsReales[index] || null;
+      });
+      setInventory(inventarioRelleno);
+
     } catch (error) {
       console.error("Falló el uso del objeto:", error.message);
     }
   };
 
   const ejecutarPowerup = (powerup, victim) => {
-    //esto mejor será ponerlo aparte
     switch (powerup.id) {
       case "GUARDIAN_ANGEL":
         gameService.useItemSelf(idPartida, powerup.id);
@@ -294,13 +349,11 @@ function Board({
         break;
 
       case "WHITE_GLOVE":
-        activarHabilidadConTarget(powerup.id);
-        //ALGO MÁS
+        manejarGuante(powerup);
         break;
 
       case "SWAP_ON_FAIL":
-        //activarHabilidadConTarget(powerup.id);
-        //ALGO MÁS
+        manejarTrueque(powerup);
         break;
 
       case "MIDAS_TOUCH":
@@ -308,6 +361,7 @@ function Board({
         break;
 
       case "CRYSTAL_BALL":
+        manejarBola(powerup);
         break;
 
       case 1:
@@ -396,7 +450,6 @@ function Board({
     // Inicializamos 20 huecos vacíos
     const initial = {};
     for (let i = 0; i < 20; i++) initial[`hand-slot-${i}`] = "";
-    console.log("Es arcade: ", isArcade);
     return initial;
   });
 
@@ -567,7 +620,7 @@ function Board({
             }
 
             gameService.updateMoney(user.id, idPartida, matchPoints);
-            //gameService.updateMoney(user.id,idPartida,100);
+            gameService.updateMoney(user.id,idPartida,100);
             const mercado = await gameService.getMercado(idPartida);
             console.log("DINERO: ", mercado.monedasJugador);
 
@@ -610,6 +663,8 @@ function Board({
             (a, b) => Number(a.ordenTurno) - Number(b.ordenTurno) 
           );
           setJugadoresOrdenados(listaOrdenada); 
+          const otros = listaOrdenada.filter((p) => p.idJugador !== user.id);
+          setOpponents(otros);
         })
         .catch((err) => {
           console.error("Error al cargar participantes:", err);
@@ -662,6 +717,7 @@ function Board({
     setProcessing(true);
     setChooseTarget(false);
     setIsShopOpen(false);
+    setIsBallUsed(false);
 
     undoMove();
 
@@ -848,6 +904,7 @@ function Board({
       setMiTurno(false);
       setContadorOut(0);
       setHeJugado(false);
+      setIsBallUsed(false);
     } catch (error) {
       console.error("Error al terminar turno:", error);
       // Si falla, podríamos llamar a undoMove() para restaurar el tablero
@@ -862,8 +919,8 @@ function Board({
   };
 
   const drawTileButton = () => {
-    console.log("OPONENTES: ",opponents);
     setContadorOut(0);
+    setIsBallUsed(false);
     undoMove();
     drawTile();
   };
@@ -1096,6 +1153,48 @@ function Board({
         </div>
 
         <GameControls onSortColor={sortByColor} onSortNum={sortByNumber} />
+
+        {isBallUsed && (
+          <div className="hand-crystal-container">
+            <div className="crystal-content-wrapper">
+              <div className="crystal-tiles-rack">
+                {Object.keys(handCristal).map((slotId) => {
+                  const tile = handCristal[slotId];
+                  return (
+                    <div key={slotId} className="crystal-tile-slot">
+                      {tile && (
+                        <Tile
+                          number={tile.number}
+                          color={tile.color}
+                          placed={tile.placed}
+                          habilidad={tile.habilidad}
+                          skinColor={currentSkin}
+                          blured={activeEffects.isBlind}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* aquí los items */}
+              <div className="crystal-items-inventory">
+                <div className="slots-grid">
+                  {(inventCristal || []).map((item, index) => (
+                    <div key={index} className="crystal-item-slot">
+                      {item ? (
+                        <div className="item-icon-wrapper">{item.icon}</div>
+                      ) : (
+                        <span className="empty-slot"> </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+          </div>
+        )}
 
 
 

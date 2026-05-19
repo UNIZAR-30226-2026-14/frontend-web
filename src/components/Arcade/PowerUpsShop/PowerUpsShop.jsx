@@ -5,13 +5,10 @@ import { gameService } from "../../../services/gameService.js";
 
 function PowerUpsShop({ gallery, matchPoints, setMatchPoints, inventory, setInventory, onClose, gameId, discount }) {
   
-  // 1. Filtramos los POWER_UPS para que solo aparezcan los que están en gallery
-  // Usamos useMemo para que no se recalcule en cada render si no cambia gallery
   const itemsInShop = useMemo(() => {
     return POWER_UPS.filter(item => gallery.includes(item.id));
   }, [gallery]);
 
-  // 2. Estado inicial: Seleccionamos el primer objeto de la galería filtrada
   const [selectedItem, setSelectedItem] = useState(itemsInShop[0] || null);
 
   const handleBuyPowerUp = (item) => {
@@ -24,7 +21,7 @@ function PowerUpsShop({ gallery, matchPoints, setMatchPoints, inventory, setInve
 
     console.log(item.id);
     //(gameService.buyItem(gameId, item.id) && (matchPoints >= item.price))
-    if (gameService.buyItem(gameId, item.id) && (matchPoints >= item.price)) {
+    if (gameService.buyItem(gameId, item.id)) {
       setMatchPoints((prev) => prev - item.price);
       
       const newItem = { 

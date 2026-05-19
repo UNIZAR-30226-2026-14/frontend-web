@@ -78,7 +78,6 @@
 /* Importante: He cambiado .eleccion por .Eleccion para coincidir con tu JSX */
 .Eleccion {
   position: fixed;
-  /* Lo situamos en el centro de la pantalla para que la elección sea clara */
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -281,6 +280,60 @@ img {
 .continue-button:hover {
   color: #fff;
 }
+
+.hand-crystal-container {
+  position: fixed;
+  top: 50%;
+  left: 10%;
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px dashed #4facfe;
+  border-radius: 12px;
+  padding: 10px;
+  margin: 15px auto;
+  max-width: 90%;
+}
+
+.crystal-content-wrapper {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.crystal-tiles-rack {
+  display: flex;
+  left: 5%;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 6px;
+  border-radius: 8px;
+  flex-grow: 1;
+}
+
+.crystal-tile-slot {
+  width: 45px; /* Ajusta según el tamaño real de tus Tiles */
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.crystal-items-inventory .slots-grid {
+  display: flex;
+  gap: 6px;
+}
+
+.crystal-item-slot {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 @media (max-width: 1070px) {
   
  
@@ -376,6 +429,19 @@ img {
     flex-direction: column;
     border-radius: 15px;
     width: 100%;
+  }
+
+  .hand-crystal-container {
+    position: fixed;
+    top: 50%;
+    left: 5%;
+  }
+  
+  .crystal-content-wrapper {
+    display: flex;
+    gap: 0.6vw;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .reward-badge, .continue-button {

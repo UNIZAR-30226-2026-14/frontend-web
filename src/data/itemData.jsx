@@ -331,8 +331,8 @@ export const POWER_UPS = [
     id: "WHITE_GLOVE",
     name: "Guante Blanco",
     price: precio,
-    description: "Ver las fichas de un color específico del resto de oponentes.",
-    icon: <svg width="100%" height="100%" viewBox="0 0 100 100">{icons.glove}</svg>, // Usando lupa para el guante
+    description: "Le robas un objeto al azar a un oponente.",
+    icon: <svg width="100%" height="100%" viewBox="0 0 100 100">{icons.glove}</svg>,
     propio: false,
   },
   {
