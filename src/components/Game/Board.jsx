@@ -62,7 +62,7 @@ function Board({
   const [itemPoll, setItemPoll] = useState([]);
 
   // Datos de los oponentes (participaciones del juego, cargadas al inicio)
-  const [opponents, setOpponents] = useState([]);
+  const [jugadoresOrdenados, setJugadoresOrdenados] = useState([]);
 
   const [finPartida, setFinPartida] = useState(false);
 
@@ -539,7 +539,6 @@ function Board({
           miPosicion = Number(participacion.ordenTurno);
           setOrdenTurno(miPosicion);
           actualizarManoVisual(parsearFichas(participacion.manoActual));
-          console.log("HOLAS: ");
         }
 
         const turnoDeLaPartida = Number(partida.turno);
@@ -602,13 +601,20 @@ function Board({
         actualizarManoVisual(parsearFichas(data.manoActual));
       });
 
+      // guardamos orden de los jugadores
       gameService
         .getParticipationByGame(idPartida)
         .then((lista) => {
-          const otros = lista.filter((p) => p.idJugador !== user.id);
-          setOpponents(otros);
+         
+          const listaOrdenada = (Array.isArray(lista) ? lista : []).sort(
+            (a, b) => Number(a.ordenTurno) - Number(b.ordenTurno) 
+          );
+          setJugadoresOrdenados(listaOrdenada); 
         })
-        .catch(() => {});
+        .catch((err) => {
+          console.error("Error al cargar participantes:", err);
+        });
+
     }
 
     const interval = setInterval(sincronizar, 3000);
@@ -856,6 +862,7 @@ function Board({
   };
 
   const drawTileButton = () => {
+    console.log("OPONENTES: ",opponents);
     setContadorOut(0);
     undoMove();
     drawTile();
@@ -1090,24 +1097,35 @@ function Board({
 
         <GameControls onSortColor={sortByColor} onSortNum={sortByNumber} />
 
+
+
         <div className="Users">
-          {[2, 1, 0].map((idx) => {
-            const op = opponents[idx];
-            return (
-              <div key={idx}>
-                <img alt="" src={getAvatarDisplay(getProfileImageRaw(op))} />
-                <div>{op?.jugadorNombre || "bot"}</div>
-              </div>
-            );
-          })}
-          <div className="ME">
-            <img
-              alt=""
-              src={getAvatarDisplay(userPic ?? getProfileImageRaw(user))}
-            />
-            <div>{user.nombre}</div>
-          </div>
+  {jugadoresOrdenados.map((jugador, idx) => {
+    // Comprobamos si el jugador del ciclo actual eres tú
+    const soyYo = jugador.idJugador === user.id;
+
+    return (
+      <div 
+        key={jugador.idJugador || idx} 
+        className={soyYo ? "ME" : "oponente-item"}
+      >
+        <img
+          alt={jugador.jugadorNombre || "bot"}
+          src={getAvatarDisplay(
+            soyYo 
+              ? (userPic ?? getProfileImageRaw(user)) 
+              : getProfileImageRaw(jugador)
+          )}
+        />
+        <div>
+          {jugador.jugadorNombre || "bot"} 
         </div>
+      </div>
+    );
+  })}
+</div>
+
+        
 
         {/* SOPORTE DEL JUGADOR */}
         <PlayerRack
