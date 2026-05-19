@@ -21,14 +21,28 @@
   padding: 12px;
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1070px) {
+  
   .board-area {
-    height: 35vw;
-    width: 65vw;
+    width: 95vw;        
+    left: 55%;          
+    transform: translateX(-50%);
+    padding: 10px;      
+    top: 45px;          
+    gap: 15px;
   }
 
   .board-grid {
-    gap: 0vw;
-    padding: 0vw;
+    position: relative; 
+    top: 0;             
+    
+    grid-template-columns: repeat(25, 3.2vw); 
+    grid-template-rows: repeat(8, 4.6vw);
+    
+    gap: 0.5vw;         
+    padding: 6px;
+    
+    justify-content: center;
+    align-content: center;
   }
 }

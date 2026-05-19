@@ -1,3 +1,7 @@
+/* ==========================================================================
+   SOPORTE PARA EL ATREZZO / SOPORTE DE FICHAS (RACK)
+   ========================================================================== */
+
 .player-rack {
   position: fixed;
   bottom: 0;
@@ -15,37 +19,42 @@
 }
 
 .player-Hand {
-  position: relative; /* Para posicionarlo sobre el SVG */
+  position: relative; /* Esencial para pintar por encima del SVG */
   top: 0px;
   display: grid;
   grid-template-columns: repeat(
     calc(var(--slots) / 2),
     50px
-  ); /* 10 fichas por fila */
+  ); /* Configuración de columnas fijas */
   grid-template-rows: repeat(2, 70px); /* 2 filas */
   gap: 2px;
   font-family: "Arial", sans-serif;
   margin: 0 auto;
   width: fit-content;
+  z-index: 2; /* Forzamos que se mantenga por encima del SVG */
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1070px) {
+  
   .rack-svg {
-    height: 20vw;
-    width: 30vw;
-    margin-top: 10vw;
-    transform: translateX(-0%);
+    height: 18vw;  
+    width: 45vw;   
+    margin-top: 5vw;
+    position: absolute;
+    transform: none;
   }
 
   .player-Hand {
-    position: absolute; /* Para posicionarlo sobre el SVG */
-    left: 5%;
+    position: relative; 
+    left: 0;
+    top: -1vw; 
     grid-template-columns: repeat(
       calc(var(--slots) / 2),
-      2.6vw
-    ); /* 10 fichas por fila */
-    grid-template-rows: repeat(2, 4vw); /* 2 filas */
-    gap: 1vw;
-    transform: translateX(50%);
+      3vw 
+    ); 
+    grid-template-rows: repeat(2, 5vw); 
+    gap: 0.6vw;
+    transform: none; 
+    z-index: 5;
   }
 }

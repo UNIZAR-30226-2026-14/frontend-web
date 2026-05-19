@@ -463,6 +463,7 @@
 }
 
 @media (max-width: 1070px) {
+
   .gamemode-card {
     flex: 0 1 260px;
     padding: 28px 20px 26px;
@@ -484,5 +485,22 @@
   .join-section {
     width: 30%;
     font-size: 50%;
+  }
+
+  .selection-card{
+    font-size: 50%;
+    padding: 0px;
+  }
+
+  .selection-card h3{
+    font-size: 150%;
+    display: flex;
+  flex-direction: column;
+    text-align: center !important;
+  }  
+
+  .join-card{
+    font-size: 50%;
+    padding: 0px;
   }
 }

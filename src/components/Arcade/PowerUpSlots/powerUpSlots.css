@@ -78,3 +78,36 @@
 
 .confirm-button { background: #4CAF50; color: white; }
 .cancel-button { background: #f44336; color: white; }
+
+@media (max-width: 1070px) {
+
+  
+  .powerup-inventory {
+    font-size: 1.5rem;
+    right: auto;        
+    left: 120px;         
+    bottom: 10px;      
+  }
+
+  .slots-grid {
+    gap: 6px; 
+  }
+
+
+  .slot, .slot-selected {
+    width: 45px;
+    height: 45px;
+    font-size: 1.1rem;
+  }
+  .confirmation-popup {
+    bottom: 55px;      
+    padding: 6px;
+    border-radius: 6px;
+    white-space: nowrap; 
+  }
+
+  .confirm-button, .cancel-button {
+    padding: 6px 10px;  
+    font-size: 11px;
+  }
+}

@@ -286,3 +286,104 @@ img {
 .continue-button:hover {
   color: #fff;
 }
+@media (max-width: 1070px) {
+  
+ 
+  .Users {
+    font-size: 0.6rem;
+    margin-top: 50px; 
+    margin-left: 10px;
+    line-height: 10px;
+  }
+
+  .ME {
+    font-size: 0.8rem !important;
+    line-height: 12px;
+  }
+
+  img {
+    width: 25px;
+    height: 25px;
+  }
+
+  .ME img {
+    width: 35px;
+    height: 35px;
+  }
+
+  
+  .puntos {
+    font-size: 1rem;
+    left: 15px; 
+    bottom: 30px;
+  }
+
+  .tiempo {
+    font-size: 1rem;
+    left: 15px; 
+    bottom: 10px;
+  }
+
+  .hand-container {
+    max-width: 85vw; 
+    margin-bottom: 10px;
+  }
+
+  .hand-container.tile-joined {
+    transform: translateX(calc(var(--tile-index) * -6px)); 
+  }
+
+  .UNDO {
+    left: auto;
+    right: 120px; 
+    bottom: 15px;
+  }
+
+  .UNDO button {
+    font-size: 2.5rem; 
+    padding: 25px 5px;
+  }
+
+  .FINISH {
+    left: auto;
+    right: 15px; 
+    bottom: 22px;
+    font-size: 1.1rem;
+  }
+
+  .Eleccion {
+    flex-direction: column; 
+    gap: 15px;
+    padding: 20px;
+    width: 80vw;
+    max-width: 320px;
+  }
+
+  
+  .victoria-titulo {
+    font-size: 1.9rem;
+  }
+
+  .victory-modal {
+    padding: 25px;
+    min-width: 280px;
+    max-width: 90vw;
+  }
+
+  .winner-avatar {
+    width: 100px;
+    height: 100px;
+  }
+
+  .victory-footer {
+    flex-direction: column;
+    border-radius: 15px;
+    width: 100%;
+  }
+
+  .reward-badge, .continue-button {
+    justify-content: center;
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+}
