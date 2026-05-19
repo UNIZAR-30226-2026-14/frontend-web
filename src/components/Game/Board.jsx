@@ -11,6 +11,7 @@ import { sortColor, sortNum } from "./botones_f.js";
 import { handleDragLogic } from "./dragHandlers.js";
 import { getAvatarDisplay, getProfileImageRaw } from "../../data/itemData.jsx";
 import { LogOut, Pause } from "lucide-react";
+import { sileo, Toaster } from "sileo";
 
 import PlayerRack from "./PlayerRack/PlayerRack.jsx";
 import BoardGrid from "./BoardGrid/BoardGrid.jsx";
@@ -116,7 +117,6 @@ function Board({
   };
 
   const recibirEfecto = (powerup) => {
-    console.log("ESTOY AQUI: ", powerup);
     //esto mejor será ponerlo aparte
     switch (powerup) {
       case "GUARDIAN_ANGEL":
@@ -125,17 +125,30 @@ function Board({
 
       case "PLUS_FOUR":
         if (angel) {
-          setAngel(false); //Indicar que lo hemos usao
-        } else drawTile_NOPASS();
+          setAngel(false); 
+          sileo.info({
+            title: `¡Tu ángel te ha protegido!`,
+          });
+        } else { 
+          sileo.info({
+            title: `¡Alguien te hace robar 4 fichas!`,
+          });
+          drawTile_NOPASS();
         drawTile_NOPASS();
         drawTile_NOPASS();
-        drawTile_NOPASS();
+        drawTile_NOPASS();}
         break;
 
       case "SMOKE_BOMB":
         if (angel) {
-          setAngel(false); //Indicar que lo hemos usao
+          setAngel(false);
+          sileo.info({
+            title: `¡Tu ángel te ha protegido!`,
+          });
         } else {
+          sileo.info({
+            title: `¡Alguien te ha lanzado una bomba de humo!`,
+          });
           setActiveEffects((prev) => ({
             ...prev,
             isBlind: true,
@@ -146,15 +159,29 @@ function Board({
       case "CHILI_PEPPER":
         if (angel) {
           setAngel(false);
-          //Indicar que lo hemos usao
-        } else setMyTime(15);
+          sileo.info({
+            title: `¡Tu ángel te ha protegido!`,
+          });
+        } else {
+          sileo.info({
+            title: `¡Alguien te obliga ha jugar en 15 segundos!`,
+          });
+          setMyTime(15);
+        }
         break;
 
       case "GLASS_CEILING":
         if (angel) {
           setAngel(false);
-          //Indicar que lo hemos usao
-        } else setPrimeraJugada(true);
+          sileo.info({
+            title: `¡Tu ángel te ha protegido!`,
+          });
+        } else{ 
+          sileo.info({
+            title: `¡Alguien te obliga a volver a romper!`,
+          });
+          setPrimeraJugada(true);
+        }
         break;
       default:
         break;
@@ -173,8 +200,7 @@ function Board({
       resolveEleccion.current = resolve;
     });
 
-    // 2. Una vez que resolveEleccion.current() sea llamado, el código sigue aquí:
-    console.log("Objetivo elegido:", idObjetivo);
+    // console.log("Objetivo elegido:", idObjetivo);
     gameService.useItem(idPartida, powerUp, idObjetivo);
   };
 
@@ -217,16 +243,12 @@ function Board({
 
   const manejarMidas = async (powerup) => {
     try {
-      // 1. ESPERAR a la respuesta del servidor con 'await'
+      
       const data = await gameService.useItemSelf(idPartida, powerup.id);
 
-      // 2. Extraer la propiedad específica del JSON resultante
+      
       const nuevaManoCifrada = data.manoActual;
 
-      console.log("Mano actualizada:", nuevaManoCifrada);
-
-      // 3. ACTUALIZAR el estado de React para que el jugador vea sus nuevas fichas
-      // Suponiendo que tienes un setMano o similar:
       actualizarManoVisual(parsearFichas(nuevaManoCifrada));
     } catch (error) {
       console.error("Falló el uso del objeto:", error.message);
@@ -235,16 +257,13 @@ function Board({
 
   const manejarBola = async (powerup) => {
     try {
-      // 1. ESPERAR a la respuesta del servidor con 'await'
       const data = await gameService.useItemSelf(idPartida, powerup.id);
 
-      // 2. Extraer la propiedad específica del JSON resultante
       const nuevaManoCifrada = data.manoActual;
 
       console.log("Mano actualizada:", nuevaManoCifrada);
 
-      // 3. ACTUALIZAR el estado de React para que el jugador vea sus nuevas fichas
-      // Suponiendo que tienes un setMano o similar:
+     
       actualizarManoVisual(parsearFichas(nuevaManoCifrada));
     } catch (error) {
       console.error("Falló el uso del objeto:", error.message);
@@ -312,32 +331,49 @@ function Board({
     console.log("EVENTO AHORA ES: ", activeEvent);
     switch (activeEvent) {
       case "+pieza":
+        sileo.info({
+            title: `¡Te comes una pieza de gratis!`,
+          });
         setDiscount(false);
         setIlegalColor(null);
         drawTile_NOPASS();
         break;
 
       case "prohibido_rojo":
+        sileo.info({
+            title: `¡No puedes jugar fichas rojas este turno!`,
+          });
         setDiscount(false);
         setIlegalColor("red");
         break;
 
       case "prohibido_azul":
+        sileo.info({
+            title: `¡No puedes jugar fichas azules este turno!`,
+          });
         setDiscount(false);
         setIlegalColor("blue");
         break;
 
       case "prohibido_naranja":
+        sileo.info({
+            title: `¡No puedes jugar fichas naranjas este turno!`,
+          });
         setDiscount(false);
         setIlegalColor("orange");
         break;
 
       case "prohibido_negro":
+        sileo.info({
+            title: `¡No puedes jugar fichas negras este turno!`,
+          });
         setDiscount(false);
         setIlegalColor("black");
         break;
-
       case "50porcien":
+        sileo.info({
+            title: `¡Los objetos de la tienda están a mitad de precio este turno!`,
+          });
         setDiscount(true); // Cosas
         setIlegalColor(null);
         break;
@@ -605,9 +641,15 @@ function Board({
 
   const finalizarTurnoPorTimeout = () => {
     setMiTurno(false);
+    sileo.info({
+            title: `¡Se te acabó el tiempo!`,
+          });
 
     setContadorOut((prev) => prev + 1);
     if (contadorOut >= 1) {
+      sileo.error({
+            title: `Expulsado de partida por innactividad.`,
+          });
       salirPartida();
     }
 
@@ -744,10 +786,38 @@ function Board({
       setProcessing(true);
       const conjuntos = obtenerConjuntosDelTablero(boardPositions, ilegalColor);
 
-      if (
-        conjuntos.length === 0 ||
-        (primeraJugada && !validarInicial(boardPositions))
-      ) {
+      if (primeraJugada && !validarInicial(boardPositions)) {
+        sileo.error({
+            title: `¡Tú jugada tiene que sumar 30 o más! Tampoco puedes usar fichas de otros jugadores.`,
+          });
+        undoMove();
+        setProcessing(false);
+        return;
+      }
+
+      if ( conjuntos.length === 0 ) {
+        if (ilegalColor ==="red") {
+          sileo.error({
+            title: `¡Tú jugada no es válida! Recuerda que no puedes uar fichas rojas.`,
+          });
+        } 
+        else if (ilegalColor ==="blue"){
+          sileo.error({
+            title: `¡Tú jugada no es válida! Recuerda que no puedes uar fichas azules.`,
+          });
+        } else if (ilegalColor ==="orange"){
+          sileo.error({
+            title: `¡Tú jugada no es válida! Recuerda que no puedes uar fichas naranjas.`,
+          });
+        } else if (ilegalColor ==="black"){
+          sileo.error({
+            title: `¡Tú jugada no es válida! Recuerda que no puedes uar fichas negras.`,
+          });
+        }
+        else 
+        {sileo.error({
+            title: `¡Tú jugada no es válida!`,
+          });}
         undoMove();
         setProcessing(false);
         return;
@@ -854,6 +924,7 @@ function Board({
 
   return (
     <DndContext onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
+      
       <div
         className={`game-container ${activeEffects.isBlind ? "smoke-screen" : ""}`}
         style={{ backgroundColor: currentBackground }}
