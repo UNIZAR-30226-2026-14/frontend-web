@@ -42,7 +42,6 @@ function Board({
   onLeave,
   isHost,
 }) {
-  // Obtenemos el estado del juego y las funciones para manipularlo
   const { bag, playerHand, gameBoard, setGameBoard, setPlayerHand } = useGame();
   const [activeId, setActiveId] = useState(null); // Para rastrear qué ficha se arrastra
   const [joinedSlots, setJoinedSlots] = useState([]);
@@ -207,9 +206,6 @@ function Board({
       default:
         break;
     }
-
-    // Quitar del inventario una vez usado
-    //setInventory((prev) => prev.filter((item) => item.id !== powerup.id));
   };
 
   const activarHabilidadConTarget = async (powerUp) => {
@@ -275,8 +271,6 @@ function Board({
       console.error("Falló el uso del objeto:", error.message);
     }
   };
-
- 
 
   const manejarBola = async (powerup) => {
   try {
@@ -346,7 +340,7 @@ const manejarTrueque = async (powerup) => {
   } catch (error) {
     console.error("Falló el uso del objeto:", error.message);
   }
-};
+  };
 
 const manejarGuante = async (powerup) => {
   try {
@@ -517,7 +511,6 @@ const manejarGuante = async (powerup) => {
   useEffect(() => {
     const newJoined = [];
 
-    // Recorremos el tablero por filas (8 filas de 25)
     for (let row = 0; row < 8; row++) {
       let currentRowIndices = [];
       let currentRowTiles = [];
@@ -531,7 +524,6 @@ const manejarGuante = async (powerup) => {
           currentRowIndices.push(slotId);
           currentRowTiles.push(tile);
         } else {
-          // Al encontrar un hueco vacío, validamos el grupo acumulado hasta ahora
           if (areCompatible(currentRowTiles)) {
             newJoined.push(...currentRowIndices);
           }
@@ -539,14 +531,13 @@ const manejarGuante = async (powerup) => {
           currentRowTiles = [];
         }
       }
-      // Validar si quedó un grupo al final de la fila
       if (areCompatible(currentRowTiles)) {
         newJoined.push(...currentRowIndices);
       }
     }
 
     setJoinedSlots(newJoined);
-  }, [boardPositions]); // Se ejecuta cada vez que el tablero cambie
+  }, [boardPositions]);
 
   const undoMove = () => {
     setHeJugado(false);
@@ -559,17 +550,15 @@ const manejarGuante = async (powerup) => {
 
     setHandPositions((prev) => {
       const next = { ...prev };
-
-      // Buscamos el primer slot vacío
+ç
       const slots = Object.keys(next);
       const primerHuecoLibre = slots.find((key) => next[key] === "");
 
       if (primerHuecoLibre) {
         next[primerHuecoLibre] = nuevaFicha;
       } else {
-        // Si no hay hueco, creamos un nuevo slot
         const nuevoIndice = slots.length;
-        setSlotsNecesarios(nuevoIndice + 1); // Expandimos el rack
+        setSlotsNecesarios(nuevoIndice + 1);
         next[`hand-slot-${nuevoIndice}`] = nuevaFicha;
       }
       setStartTurnHand(next);
@@ -692,7 +681,7 @@ const manejarGuante = async (powerup) => {
       }
     };
 
-    // Carga inicial del orden de turno y oponentes
+    // carga inicial del orden de turno y oponentes
     if (ordenTurno === null) {
       gameService.getParticipation(user.id, idPartida).then((data) => {
         setOrdenTurno(Number(data.ordenTurno));
@@ -722,13 +711,12 @@ const manejarGuante = async (powerup) => {
   }, [idPartida, user.id, ordenTurno, miTurno, processing]);
 
   function handleDragStart(event) {
-    setActiveId(event.active.id); // Guardamos el ID al empezar
+    setActiveId(event.active.id); 
   }
 
   function handleDragEnd(event) {
     setActiveId(null);
 
-    // Empaquetamos estados y setters para pasarlos a la lógica externa
     const states = {
       handPositions,
       setHandPositions,
@@ -1116,20 +1104,17 @@ const manejarGuante = async (powerup) => {
             {[2, 1, 0].map((idx) => {
               const op = opponents[idx];
 
-              // Si el oponente no existe en este índice, no renderizamos nada para ese slot
               if (!op) return null;
 
               return (
                 <div key={idx} className="target-selection">
                   <button
-                    /* CORRECCIÓN: Usar arrow function para evitar ejecución inmediata */
                     onClick={() => {
                       manejarSeleccionObjetivo(op.idJugador);
                     }}
                     disabled={processing || !miTurno}
                     title={`Atacar a ${op.jugadorNombre}`}
                   >
-                    {/* Agregamos el nombre para que el botón no esté vacío */}
                     {op.jugadorNombre}
                   </button>
                 </div>
@@ -1140,7 +1125,6 @@ const manejarGuante = async (powerup) => {
         {finPartida && (
           <div className="victory-overlay">
             <div className="victory-modal">
-              {/* Texto simple en lugar de multicolor */}
               <h1 className="victoria-titulo">¡VICTORIA!</h1>
 
               <h2 className="winner-name">{ganador ? ganador : "usr"}</h2>
@@ -1240,7 +1224,7 @@ const manejarGuante = async (powerup) => {
               </div>
 
             </div>
-          </div>
+          </div>   
         )}
 
         {isTradeUsed && (
@@ -1250,29 +1234,29 @@ const manejarGuante = async (powerup) => {
                   const tile = handTrade[slotId];
                   return (
                     <button 
-            key={slotId} 
-            className="crystal-tile-slot"
-            onClick={() => {
-              manejarSeleccionFicha(tile); 
-            }}
-            style={{
-              background: 'none',
-              border: 'none',
-              padding: 0,
-              cursor: 'pointer',
-              transition: 'transform 0.2s'
-            }}
-            title={`Seleccionar ficha ${tile.number} ${tile.color}`}
-          >
-            <Tile
-              number={tile.number}
-              color={tile.color}
-              placed={tile.placed}
-              habilidad={tile.habilidad}
-              skinColor={currentSkin}
-              blured={activeEffects.isBlind}
-            />
-          </button>
+                      key={slotId} 
+                      className="crystal-tile-slot"
+                      onClick={() => {
+                        manejarSeleccionFicha(tile); 
+                      }}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        padding: 0,
+                        cursor: 'pointer',
+                        transition: 'transform 0.2s'
+                      }}
+                      title={`Seleccionar ficha ${tile.number} ${tile.color}`}
+                    >
+                      <Tile
+                        number={tile.number}
+                        color={tile.color}
+                        placed={tile.placed}
+                        habilidad={tile.habilidad}
+                        skinColor={currentSkin}
+                        blured={activeEffects.isBlind}
+                      />
+                    </button>
                   );
               })}
           </div>
@@ -1281,33 +1265,31 @@ const manejarGuante = async (powerup) => {
 
 
         <div className="Users">
-  {jugadoresOrdenados.map((jugador, idx) => {
-    // Comprobamos si el jugador del ciclo actual eres tú
-    const soyYo = jugador.idJugador === user.id;
-
-    return (
-      <div 
-        key={jugador.idJugador || idx} 
-        className={soyYo ? "ME" : "oponente-item"}
-      >
-        <img
-          alt={jugador.jugadorNombre || "bot"}
-          src={getAvatarDisplay(
-            soyYo 
-              ? (userPic ?? getProfileImageRaw(user)) 
-              : getProfileImageRaw(jugador)
-          )}
-        />
-        <div>
-          {jugador.jugadorNombre || "bot"} 
+          {jugadoresOrdenados.map((jugador, idx) => {
+            const soyYo = jugador.idJugador === user.id;
+          
+            return (
+              <div 
+                key={jugador.idJugador || idx} 
+                className={soyYo ? "ME" : "oponente-item"}
+              >
+                <img
+                  alt={jugador.jugadorNombre || "bot"}
+                  src={getAvatarDisplay(
+                    soyYo 
+                      ? (userPic ?? getProfileImageRaw(user)) 
+                      : getProfileImageRaw(jugador)
+                  )}
+                />
+                <div>
+                  {jugador.jugadorNombre || "bot"} 
+                </div>
+              </div>
+            );
+          })}
         </div>
-      </div>
-    );
-  })}
-</div>
 
         
-
         {/* SOPORTE DEL JUGADOR */}
         <PlayerRack
           handPositions={handPositions}
