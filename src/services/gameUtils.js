@@ -167,6 +167,10 @@ export const validarInicial = (boardPositions) => {
   return totalPoints >= 30;
 };
 
+export const tratarFicha = (tile) => {
+  return aux(tile);
+}
+
 export const obtenerFicha = (handPositions) => {
   const salida = "";
   let count =0;

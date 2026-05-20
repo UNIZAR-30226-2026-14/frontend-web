@@ -26,6 +26,7 @@ import {
   obtenerConjuntosDelTablero,
   validarInicial,
   obtenerFicha,
+  tratarFicha,
 } from "../../services/gameUtils.js";
 import { gameService } from "../../services/gameService.js";
 
@@ -67,6 +68,13 @@ function Board({
     return initial;
   });
 
+  const [isTradeUsed, setIsTradeUsed] = useState(false);
+  const [handTrade, setHandTrade] = useState(() => {
+    // Inicializamos 20 huecos vacíos
+    const initial = {};
+    for (let i = 0; i < 3; i++) initial[`hand-slot-${i}`] = "";
+    return initial;
+  });
 
   const [chooseTarget, setChooseTarget] = useState(false);
   const [userTarget, setUserTarget] = useState(null);
@@ -221,6 +229,14 @@ function Board({
     }
   };
 
+  const manejarSeleccionFicha = (tile) => {
+    setIsTradeUsed(false);
+    if (resolveEleccion.current) {
+      resolveEleccion.current(tile);
+      resolveEleccion.current = null;
+    }
+  };
+
   const actualizarManoVisual = (fichas) => {
     if (!fichas) return;
 
@@ -298,21 +314,18 @@ const manejarTrueque = async (powerup) => {
     
     const dataObjetivo = await gameService.useItem(idPartida, powerup.id, idObjetivo);
     const fichasObj = dataObjetivo.fichasObjetivoVisibles;
-    
-    // CORRECCIÓN DE SEGURIDAD: Convertimos a array por si 'fichasObj' es un objeto indexado
-    const arrayFichasRival = Object.values(fichasObj).filter(tile => tile !== null && tile !== undefined);
-    
-    if (arrayFichasRival.length === 0) {
-      throw new Error("El rival elegido no tiene fichas disponibles para el trueque.");
-    }
 
-    // Elegimos una ficha aleatoria basándonos en las que realmente tiene el rival
-    const suFicha = arrayFichasRival[Math.floor(Math.random() * arrayFichasRival.length)];
+    const arrayFichasRival = parsearFichas(Object.values(fichasObj).filter(tile => tile !== null && tile !== undefined));
+    setHandTrade(arrayFichasRival);
+    console.log("FICHAS: ", arrayFichasRival)
+    setIsTradeUsed(true);
+    const fichaObjetivo = await new Promise((resolve) => {
+      resolveEleccion.current = resolve;
+    });
+
+    const suFicha = tratarFicha(fichaObjetivo);
+    //const suFicha = arrayFichasRival[Math.floor(Math.random() * arrayFichasRival.length)];
     const miFicha = obtenerFicha(handPositions);
-
-    console.log("FichasObj original: ", fichasObj);
-    console.log("su Ficha seleccionada: ", suFicha);
-    console.log("mi Ficha seleccionada: ", miFicha);
 
     if (!miFicha) {
       throw new Error("No tienes fichas en tu soporte para intercambiar.");
@@ -567,6 +580,7 @@ const manejarGuante = async (powerup) => {
 
   const actualizarTableroVisual = (tableroApi) => {
     console.log("Inicio actualizar tablero");
+    console.log("Ficha activa: ", activeTile);
     if (!tableroApi) return;
     console.log("Tablero api no es null");
 
@@ -749,7 +763,7 @@ const manejarGuante = async (powerup) => {
     setChooseTarget(false);
     setIsShopOpen(false);
     setIsBallUsed(false);
-
+    setIsTradeUsed(false);
     undoMove();
 
     setActiveEffects((prev) => ({
@@ -936,6 +950,7 @@ const manejarGuante = async (powerup) => {
       setContadorOut(0);
       setHeJugado(false);
       setIsBallUsed(false);
+      setIsTradeUsed(false);
     } catch (error) {
       console.error("Error al terminar turno:", error);
       // Si falla, podríamos llamar a undoMove() para restaurar el tablero
@@ -952,6 +967,7 @@ const manejarGuante = async (powerup) => {
   const drawTileButton = () => {
     setContadorOut(0);
     setIsBallUsed(false);
+    setIsTradeUsed(false);
     undoMove();
     drawTile();
   };
@@ -1224,6 +1240,41 @@ const manejarGuante = async (powerup) => {
               </div>
 
             </div>
+          </div>
+        )}
+
+        {isTradeUsed && (
+          <div className="Eleccion">
+            <h1>ELIGE</h1>
+            {Object.keys(handTrade).map((slotId) => {
+                  const tile = handTrade[slotId];
+                  return (
+                    <button 
+            key={slotId} 
+            className="crystal-tile-slot"
+            onClick={() => {
+              manejarSeleccionFicha(tile); 
+            }}
+            style={{
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              cursor: 'pointer',
+              transition: 'transform 0.2s'
+            }}
+            title={`Seleccionar ficha ${tile.number} ${tile.color}`}
+          >
+            <Tile
+              number={tile.number}
+              color={tile.color}
+              placed={tile.placed}
+              habilidad={tile.habilidad}
+              skinColor={currentSkin}
+              blured={activeEffects.isBlind}
+            />
+          </button>
+                  );
+              })}
           </div>
         )}
 
