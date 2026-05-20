@@ -167,6 +167,19 @@ export const validarInicial = (boardPositions) => {
   return totalPoints >= 30;
 };
 
+export const obtenerFicha = (handPositions) => {
+  const salida = "";
+  let count =0;
+  while (count < 20) {
+    const tile = handPositions[`hand-slot-${count}`];
+    if (tile !== "") {
+      return aux(tile);
+    }
+    count ++;
+  }  
+  return "";
+};
+
 
 
 export const obtenerConjuntosDelTablero = (boardPositions, notColor) => {

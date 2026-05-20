@@ -399,6 +399,21 @@ export const gameService = {
     return await res.json();
   },
 
+  useItemTrueque: async (gameId, itemId, targetid, miFicha, suFicha) => {
+    const res = await apiFetch(`partidas/${gameId}/mercado/usar`, {
+      method: "POST",
+      headers: getHeaders(),
+      body: JSON.stringify({
+        codigoObjeto: itemId,
+        idJugadorObjetivo: targetid,
+        fichaPropia: miFicha,
+        fichaObjetivo: suFicha,
+      }),
+    });
+    if (!res.ok) throw new Error("Error al usar objeto.");
+    return await res.json();
+  },
+
   // Obtener partida
   getAllGames: async (esArcade) => {
     try {

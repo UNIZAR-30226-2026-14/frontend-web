@@ -25,6 +25,7 @@ import {
   parsearFichas,
   obtenerConjuntosDelTablero,
   validarInicial,
+  obtenerFicha,
 } from "../../services/gameUtils.js";
 import { gameService } from "../../services/gameService.js";
 
@@ -276,9 +277,7 @@ function Board({
 
       const itemsReales = POWER_UPS.filter(item => gallery.includes(item.id));
 
-
-      const MAX_SLOTS = 3; 
-      const inventarioRelleno = Array.from({ length: MAX_SLOTS }, (_, index) => {
+      const inventarioRelleno = Array.from({ length: 3 }, (_, index) => {
         return itemsReales[index] || null;
       });
 
@@ -289,15 +288,47 @@ function Board({
     }
   };
 
-  const manejarTrueque = async (powerup) => {
+const manejarTrueque = async (powerup) => {
   try {
     setChooseTarget(true);
     const idObjetivo = await new Promise((resolve) => {
       resolveEleccion.current = resolve;
     });
   
-    const data = await gameService.useItem(idPartida, powerup.id, idObjetivo);
-    console.log("Trueque: ", data);
+    // 1. Primer servicio (Cambiamos el nombre a 'dataObjetivo')
+    const dataObjetivo = await gameService.useItem(idPartida, powerup.id, idObjetivo);
+    const fichasObj = dataObjetivo.fichasObjetivoVisibles;
+    
+    // CORRECCIÓN DE SEGURIDAD: Convertimos a array por si 'fichasObj' es un objeto indexado
+    const arrayFichasRival = Object.values(fichasObj).filter(tile => tile !== null && tile !== undefined);
+    
+    if (arrayFichasRival.length === 0) {
+      throw new Error("El rival elegido no tiene fichas disponibles para el trueque.");
+    }
+
+    // Elegimos una ficha aleatoria basándonos en las que realmente tiene el rival
+    const suFicha = arrayFichasRival[Math.floor(Math.random() * arrayFichasRival.length)];
+    const miFicha = obtenerFicha(handPositions);
+
+    console.log("FichasObj original: ", fichasObj);
+    console.log("su Ficha seleccionada: ", suFicha);
+    console.log("mi Ficha seleccionada: ", miFicha);
+
+    if (!miFicha) {
+      throw new Error("No tienes fichas en tu soporte para intercambiar.");
+    }
+
+    // 2. Segundo servicio (Cambiamos el nombre a 'dataTrueque')
+    const dataTrueque = await gameService.useItemTrueque(
+      idPartida, 
+      powerup.id, 
+      idObjetivo, 
+      miFicha, // Asegúrate de que tu función 'obtenerFicha' devuelva el objeto o ID que espera el backend
+      suFicha
+    );
+    
+    const nuevaManoCifrada = dataTrueque.manoActual;
+    actualizarManoVisual(parsearFichas(nuevaManoCifrada));
 
   } catch (error) {
     console.error("Falló el uso del objeto:", error.message);
