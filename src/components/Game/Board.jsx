@@ -295,7 +295,7 @@ const manejarTrueque = async (powerup) => {
       resolveEleccion.current = resolve;
     });
   
-    // 1. Primer servicio (Cambiamos el nombre a 'dataObjetivo')
+    
     const dataObjetivo = await gameService.useItem(idPartida, powerup.id, idObjetivo);
     const fichasObj = dataObjetivo.fichasObjetivoVisibles;
     
@@ -318,12 +318,12 @@ const manejarTrueque = async (powerup) => {
       throw new Error("No tienes fichas en tu soporte para intercambiar.");
     }
 
-    // 2. Segundo servicio (Cambiamos el nombre a 'dataTrueque')
+    
     const dataTrueque = await gameService.useItemTrueque(
       idPartida, 
       powerup.id, 
       idObjetivo, 
-      miFicha, // Asegúrate de que tu función 'obtenerFicha' devuelva el objeto o ID que espera el backend
+      miFicha, 
       suFicha
     );
     
@@ -651,7 +651,7 @@ const manejarGuante = async (powerup) => {
             }
 
             gameService.updateMoney(user.id, idPartida, matchPoints);
-            gameService.updateMoney(user.id,idPartida,100);
+            //gameService.updateMoney(user.id,idPartida,100);
             const mercado = await gameService.getMercado(idPartida);
             console.log("DINERO: ", mercado.monedasJugador);
 

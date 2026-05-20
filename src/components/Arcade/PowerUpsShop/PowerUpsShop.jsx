@@ -20,8 +20,8 @@ function PowerUpsShop({ gallery, matchPoints, setMatchPoints, inventory, setInve
     }
 
     console.log(item.id);
-    //(gameService.buyItem(gameId, item.id) && (matchPoints >= item.price))
-    if (gameService.buyItem(gameId, item.id)) {
+    if (gameService.buyItem(gameId, item.id) && (matchPoints >= item.price)) {
+    //if (gameService.buyItem(gameId, item.id)) {
       setMatchPoints((prev) => prev - item.price);
       
       const newItem = { 
